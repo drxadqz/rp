@@ -34,8 +34,6 @@ Instead of asking a classifier to memorize 27 flat categories, the model uses th
 configs/
   c3_farnet/
     current_best_s7_public.yaml
-    c3_farnet_errorgate_paircal_full_eval.yaml
-    c3_farnet_formal_fullmanifest_source_reliable_router_s7_20260709.yaml
   data/
     local_paths.example.yaml
 docs/
