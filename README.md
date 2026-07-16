@@ -119,6 +119,11 @@ The result files in [results/current_best_s7](results/current_best_s7) record th
 - `hard_pair_metrics.csv`: hard-pair boundary statistics
 - `history.json`: training history for the verified run
 
+## Algorithm Explanation
+
+- English explanation: [docs/algorithm.md](docs/algorithm.md)
+- Chinese explanation: [docs/algorithm_zh.md](docs/algorithm_zh.md)
+
 ## Scientific Boundary
 
 This project estimates visual road-surface states and visual friction affordance. RSCD labels are visual proxy labels, not synchronized tire-force or friction-meter measurements. Therefore, the method should be described as:
