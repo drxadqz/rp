@@ -1,0 +1,11 @@
+datasets:
+  rscd_prepared:
+    type: rscd_prepared
+    labels_csv: /path/to/RSCD_prepared/official_friction/labels.csv
+
+# Optional image-folder datasets can be added in the same format:
+# datasets:
+#   roadsaw:
+#     type: imagefolder
+#     dataset_name: roadsaw
+#     root: /path/to/RoadSaW

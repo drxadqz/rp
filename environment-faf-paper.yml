@@ -1,0 +1,23 @@
+name: faf_paper
+channels:
+  - defaults
+dependencies:
+  - python=3.11
+  - pip
+  - pip:
+      - --index-url
+      - https://download.pytorch.org/whl/cu128
+      - torch==2.11.0+cu128
+      - torchvision==0.26.0+cu128
+      - --extra-index-url
+      - https://pypi.org/simple
+      - numpy
+      - pandas
+      - Pillow
+      - PyYAML
+      - scikit-learn
+      - tqdm
+      - opencv-python
+      - tensorboard
+      - timm
+      - open3d
