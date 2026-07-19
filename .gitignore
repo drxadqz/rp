@@ -13,6 +13,9 @@ runs/
 wandb/
 *.pt
 *.pth
+!checkpoints/
+!checkpoints/**/
+!checkpoints/c3_farnet_formal_fullmanifest_source_reliable_router_s7_20260709/best_checkpoint.pth
 *.ckpt
 *.onnx
 *.log
