@@ -1,0 +1,23 @@
+extends: c3_farnet_formal_fullmanifest_shape_topology_concrete_film_s17_20260709.yaml
+
+output_dir: E:/perception_outputs/rscd_surface_classification/c3_farnet_formal_fullmanifest_opponent_retinex_concrete_film_s18_20260709
+
+model:
+  # S18: S17 shape/topology router plus opponent-Retinex optical evidence.
+  # The target is RSCD's wet/water optical ambiguity: water film is often
+  # low-chroma specular or dark neutral, while material color and illumination
+  # shift together. Opponent channels and Retinex residuals are injected into
+  # the early tensor mechanism, not appended as a late head.
+  backbone: convnext_tiny_family_router_opponent_retinex_concrete_film_stem
+
+loss:
+  # Keep S17's free-energy route objective. Slightly emphasize asphalt/concrete
+  # film routes because opponent/Retinex evidence is meant to separate optical
+  # wetness from material and lighting.
+  family_mechanism_router_weight: 0.235
+  family_router_target_margin_weight: 0.072
+  family_router_target_margin: 0.245
+  family_router_asphalt_weight: 1.38
+  family_router_concrete_weight: 1.62
+  family_router_concrete_slight_weight: 1.25
+  family_router_concrete_severe_weight: 1.13

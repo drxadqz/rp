@@ -1,0 +1,26 @@
+extends: c3_farnet_screen_s61_sequential_factor_refinement_warmup_20260710.yaml
+
+output_dir: E:/perception_outputs/rscd_surface_classification/c3_farnet_screen_s61_sequential_factor_refinement_fastwarmup_20260710
+
+train:
+  resume_from:
+  teacher_checkpoint:
+  teacher_logits_cache:
+  expert_teacher_checkpoint:
+  expert_teacher_logits_cache:
+  trainable_prefixes:
+  evaluate_initial: false
+  lr: 0.0008
+  weight_decay: 0.002
+  epochs: 1
+  batch_size: 8
+  grad_accum_steps: 2
+  num_workers: 2
+  prefetch_factor: 2
+  amp: true
+  augmentation: true
+  balanced_sampling: true
+  max_train_samples_per_class: 1000
+  samples_per_epoch: 27000
+  grad_clip_norm: 5.0
+  log_every_steps: 250

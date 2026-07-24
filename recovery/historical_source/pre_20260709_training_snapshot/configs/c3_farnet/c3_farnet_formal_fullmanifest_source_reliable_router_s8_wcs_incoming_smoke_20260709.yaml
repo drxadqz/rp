@@ -1,0 +1,14 @@
+extends: c3_farnet_formal_fullmanifest_source_reliable_router_s8_wcs_incoming_20260709.yaml
+
+output_dir: E:/perception_outputs/rscd_surface_classification/c3_farnet_formal_fullmanifest_source_reliable_router_s8_wcs_incoming_smoke_20260709
+
+train:
+  max_train_samples_per_class: 2
+  samples_per_epoch: 54
+  epochs: 1
+  log_every_steps: 1
+
+eval:
+  batch_size: 32
+  max_val_samples_per_class: 1
+  max_test_samples_per_class: 1

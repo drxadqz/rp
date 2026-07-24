@@ -1,0 +1,27 @@
+extends: c3_farnet_formal_fullmanifest_road_cortex_s22_20260709.yaml
+
+output_dir: E:/perception_outputs/rscd_surface_classification/c3_farnet_formal_fullmanifest_road_cortex_graph_s24_20260709
+
+model:
+  # S24: self-designed graph-diffusion RSCD backbone.
+  # Each local road patch feature is treated as a graph node. Edge weights are
+  # guided by material similarity, wet-film continuity, roughness boundaries,
+  # and nuisance/marking suppression.
+  backbone: road_cortex_graph_tiny
+  pretrained: false
+
+loss:
+  # Graph diffusion is meant to protect local boundaries while propagating film
+  # evidence, so keep a moderate teacher prior and slightly emphasize weak
+  # wet/water concrete classes through the existing focus CE.
+  anchor_consistency_weight: 0.24
+  anchor_no_flip_weight: 0.09
+  focus_ce_extra_weight: 0.30
+
+train:
+  lr: 0.00011
+  weight_decay: 0.0032
+  epochs: 1
+  batch_size: 8
+  grad_accum_steps: 2
+  samples_per_epoch: 0

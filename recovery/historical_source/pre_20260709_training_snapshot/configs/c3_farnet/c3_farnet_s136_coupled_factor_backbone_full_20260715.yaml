@@ -1,0 +1,31 @@
+extends: c3_farnet_s136_coupled_factor_backbone_screen_20260715.yaml
+
+output_dir: E:/perception_outputs/rscd_surface_classification/s136_coupled_factor_backbone_full_20260715
+
+# Full RSCD protocol for S136. Launch only if the cap250 screen passes
+# scripts/audit_rscd_candidate_promotion.py against the S96 cap250 baseline.
+
+train:
+  resume_from: E:/perception_outputs/rscd_surface_classification/s136_coupled_factor_backbone_screen_20260715/best_checkpoint.pth
+  evaluate_initial: true
+  batch_size: 16
+  grad_accum_steps: 1
+  num_workers: 2
+  prefetch_factor: 2
+  lr: 0.0001
+  weight_decay: 0.01
+  epochs: 10
+  amp: true
+  augmentation: true
+  balanced_sampling: true
+  max_train_samples_per_class:
+  samples_per_epoch: 0
+  grad_clip_norm: 5.0
+  log_every_steps: 2000
+  resume_step_checkpoint: true
+  save_step_checkpoint_every: 2000
+
+eval:
+  batch_size: 32
+  max_val_samples_per_class:
+  max_test_samples_per_class:

@@ -1,0 +1,90 @@
+extends: c3_farnet_screen_s96_wc_pair_relative_boundary_20260712.yaml
+
+output_dir: E:/perception_outputs/rscd_surface_classification/c3_farnet_screen_s141_pseudo_roughness_state_reliability_s96_20260716
+
+# S141 tests one narrow follow-up after S140 and the earlier FiLM failure.
+# Target: wet/water + concrete + slight/severe confusion.
+# Mechanism: do not modulate the whole global feature. Instead, refine only the
+# roughness token and roughness reliability scalar through a pseudo-roughness
+# tri-state model: true visible roughness, film-hidden roughness, pseudo roughness.
+# The new auxiliary loss weakly supervises this tri-state only on wet/water
+# concrete slight/severe samples, so other families are protected by construction
+# and by the S96 teacher/no-flip losses.
+
+model:
+  use_pseudo_roughness_aware_reliability: true
+  pseudo_roughness_aware_reliability_hidden_dim: 128
+  pseudo_roughness_aware_reliability_scale: 0.055
+  pseudo_roughness_aware_reliability_rho_scale: 0.080
+  pseudo_roughness_aware_reliability_gate_floor: 0.010
+  pseudo_roughness_aware_reliability_dropout: 0.015
+  pseudo_roughness_aware_reliability_detach_context: false
+
+loss:
+  reliability_weight: 0.010
+  pseudo_roughness_state_weight: 0.080
+  focus_ce_extra_weight: 0.22
+  focus_ce_classes:
+    - wet_concrete_smooth
+    - wet_concrete_slight
+    - wet_concrete_severe
+    - water_concrete_smooth
+    - water_concrete_slight
+    - water_concrete_severe
+  anchor_consistency_weight: 0.42
+  anchor_consistency_focus_weight: 0.010
+  anchor_consistency_focus_low_margin_threshold: 0.18
+  anchor_consistency_temperature: 2.0
+  anchor_consistency_protect_weight: 0.60
+  anchor_consistency_protect_confidence: 0.74
+  anchor_consistency_protect_margin: 0.24
+  anchor_no_flip_weight: 0.42
+  anchor_no_flip_nonfocus_only: true
+  anchor_error_gate_weight: 0.0
+  anchor_consistency_exempt_classes:
+    - wet_concrete_smooth
+    - wet_concrete_slight
+    - wet_concrete_severe
+    - water_concrete_smooth
+    - water_concrete_slight
+    - water_concrete_severe
+  anchor_nonregression_weight: 0.24
+  anchor_nonregression_focus_weight: 0.030
+  anchor_nonregression_margin: 0.014
+  anchor_nonregression_confidence: 0.70
+  anchor_nonregression_teacher_margin: 0.12
+
+train:
+  resume_from: E:/perception_outputs/rscd_surface_classification/c3_farnet_screen_s96_wc_pair_relative_boundary_20260712/best_checkpoint.pth
+  teacher_checkpoint: E:/perception_outputs/rscd_surface_classification/c3_farnet_screen_s96_wc_pair_relative_boundary_20260712/best_checkpoint.pth
+  teacher_backbone: convnext_tiny_gate_calibrated_tensor_coupling_concrete_film_rough_stem
+  teacher_head_type: hardpair_error_gated_calibrated
+  teacher_preserve_hardpair_focus: true
+  trainable_prefixes:
+    - pseudo_roughness_aware_reliability
+  evaluate_initial: true
+  lr: 0.00012
+  weight_decay: 0.0010
+  epochs: 1
+  batch_size: 4
+  grad_accum_steps: 4
+  num_workers: 2
+  prefetch_factor: 2
+  amp: true
+  augmentation: true
+  factor_graph_pair_sampling: true
+  factor_graph_pair_sampling_seed: 14116
+  factor_graph_pair_sampling_pair_slots: 2
+  factor_graph_pair_sampling_positive_slots: 0
+  factor_graph_pair_sampling_wet_concrete_focus_scale: 9.0
+  factor_graph_pair_sampling_roughness_focus_scale: 4.5
+  factor_graph_pair_sampling_wet_water_focus_scale: 2.6
+  max_train_samples_per_class: 1000
+  samples_per_epoch: 27000
+  grad_clip_norm: 2.0
+  log_every_steps: 500
+
+eval:
+  batch_size: 16
+  max_val_samples_per_class: 250
+  max_test_samples_per_class: 250

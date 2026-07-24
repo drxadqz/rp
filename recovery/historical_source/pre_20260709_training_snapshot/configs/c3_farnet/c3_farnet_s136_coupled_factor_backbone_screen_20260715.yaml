@@ -1,0 +1,50 @@
+seed: 136
+output_dir: E:/perception_outputs/rscd_surface_classification/s136_coupled_factor_backbone_screen_20260715
+
+# S136 is a custom RSCD backbone route, not a ConvNeXt/RSPNet/RoadFormer reuse.
+# It targets factor coupling at the earliest image-to-feature stage:
+# dry/wet/water film state, asphalt/concrete material, and smooth/slight/severe
+# roughness each supervise both final class prediction and early coupling gates.
+
+data:
+  train_manifest: E:/perception/friction_affordance_field/data/manifests_full/rscd_prepared_train.csv
+  val_manifest: E:/perception/friction_affordance_field/data/manifests_full/rscd_prepared_val.csv
+  test_manifest: E:/perception/friction_affordance_field/data/manifests_full/rscd_prepared_test.csv
+  image_size: 192
+  train_resize_mode: letterbox
+  eval_resize_mode: letterbox
+
+model:
+  stem_dim: 48
+  stage_dims: [96, 192, 384]
+  dropout: 0.15
+
+loss:
+  class_weight: 1.0
+  factor_weight: 0.25
+  factor_axis_weights:
+    friction: 1.0
+    material: 1.0
+    roughness: 1.4
+  coupling_gate_weight: 0.06
+
+train:
+  batch_size: 16
+  grad_accum_steps: 1
+  num_workers: 2
+  prefetch_factor: 2
+  lr: 0.0003
+  weight_decay: 0.01
+  epochs: 6
+  amp: true
+  augmentation: true
+  balanced_sampling: true
+  max_train_samples_per_class: 1000
+  samples_per_epoch: 27000
+  grad_clip_norm: 5.0
+  log_every_steps: 120
+
+eval:
+  batch_size: 32
+  max_val_samples_per_class: 250
+  max_test_samples_per_class: 250

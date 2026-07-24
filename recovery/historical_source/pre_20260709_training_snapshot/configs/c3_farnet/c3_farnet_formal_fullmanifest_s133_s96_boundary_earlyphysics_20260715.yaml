@@ -1,0 +1,44 @@
+extends: c3_farnet_screen_s96_wc_pair_relative_boundary_20260712.yaml
+
+output_dir: E:/perception_outputs/rscd_surface_classification/c3_farnet_formal_fullmanifest_s133_s96_boundary_earlyphysics_20260715
+
+# S133: promote the best cap250 S96 route to the full RSCD protocol.
+# Mechanism: early PhysicsTexture/scale-space/pair-value stem conditioning plus
+# a water-concrete feature-value boundary corrector. The gate evidence targets
+# wet/water concrete roughness and film erasure before the final RSCD-27 logits.
+
+train:
+  resume_from: E:/perception_outputs/rscd_surface_classification/c3_farnet_screen_s96_wc_pair_relative_boundary_20260712/best_checkpoint.pth
+  teacher_checkpoint: E:/perception_outputs/rscd_surface_classification/c3_farnet_screen_s96_wc_pair_relative_boundary_20260712/best_checkpoint.pth
+  teacher_backbone: convnext_tiny_gate_calibrated_tensor_coupling_concrete_film_rough_stem
+  teacher_head_type: hardpair_error_gated_calibrated
+  teacher_preserve_hardpair_focus: true
+  trainable_prefixes:
+    - feature_value_boundary_corrector
+  evaluate_initial: true
+  lr: 0.00010
+  weight_decay: 0.0008
+  epochs: 1
+  batch_size: 8
+  grad_accum_steps: 2
+  num_workers: 2
+  prefetch_factor: 2
+  amp: true
+  augmentation: true
+  balanced_sampling: true
+  factor_graph_pair_sampling: true
+  factor_graph_pair_sampling_seed: 13315
+  factor_graph_pair_sampling_pair_slots: 2
+  factor_graph_pair_sampling_positive_slots: 0
+  factor_graph_pair_sampling_wet_concrete_focus_scale: 10.0
+  factor_graph_pair_sampling_roughness_focus_scale: 3.5
+  factor_graph_pair_sampling_wet_water_focus_scale: 2.0
+  max_train_samples_per_class:
+  samples_per_epoch: 0
+  grad_clip_norm: 2.0
+  log_every_steps: 2000
+
+eval:
+  batch_size: 32
+  max_val_samples_per_class:
+  max_test_samples_per_class:

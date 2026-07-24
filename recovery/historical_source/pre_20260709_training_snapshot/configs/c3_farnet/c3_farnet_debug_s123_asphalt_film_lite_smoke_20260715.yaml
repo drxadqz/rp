@@ -1,0 +1,18 @@
+extends: c3_farnet_screen_s123_asphalt_film_lite_s96_anchor_20260715.yaml
+
+output_dir: E:/perception_outputs/rscd_surface_classification/c3_farnet_debug_s123_asphalt_film_lite_smoke_20260715
+
+train:
+  epochs: 1
+  samples_per_epoch: 108
+  max_train_samples_per_class: 4
+  batch_size: 4
+  grad_accum_steps: 2
+  num_workers: 0
+  prefetch_factor: null
+  log_every_steps: 1
+
+eval:
+  batch_size: 4
+  max_val_samples_per_class: 4
+  max_test_samples_per_class: 4

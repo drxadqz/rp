@@ -1,0 +1,37 @@
+extends: c3_farnet_formal_fullmanifest_source_reliable_router_s7_20260709.yaml
+
+output_dir: E:/perception_outputs/rscd_surface_classification/c3_farnet_screen_s66_early_mechanism_conditioned_s7_anchor_20260710
+
+model:
+  backbone: convnext_tiny_early_mechanism_conditioned_gate_calibrated_concrete_film_rough_stem
+  pretrained: false
+  use_source_reliable_boundary_router: true
+
+train:
+  resume_from: E:/perception_outputs/rscd_surface_classification/c3_farnet_formal_fullmanifest_source_reliable_router_s7_20260709/best_checkpoint.pth
+  trainable_prefixes:
+    - backbone.stem_conditioners
+    - backbone.gate_calibrated_tensor_coupling_banks
+    - source_reliable_boundary_router
+    - pairwise_hardpair_experts
+    - pairwise_hardpair_error_gates
+  evaluate_initial: true
+  lr: 0.00004
+  weight_decay: 0.002
+  epochs: 1
+  batch_size: 8
+  grad_accum_steps: 2
+  num_workers: 2
+  prefetch_factor: 2
+  amp: true
+  augmentation: true
+  balanced_sampling: true
+  max_train_samples_per_class: 1000
+  samples_per_epoch: 27000
+  grad_clip_norm: 5.0
+  log_every_steps: 500
+
+eval:
+  batch_size: 32
+  max_val_samples_per_class:
+  max_test_samples_per_class:

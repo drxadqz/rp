@@ -1,0 +1,39 @@
+seed: 17
+output_dir: outputs/full_protocol
+device: auto
+
+data:
+  train_manifests:
+    - data/manifests/rscd_prepared_train.csv
+    - data/manifests/roadsaw_train.csv
+    - data/manifests/roadsc_train.csv
+  val_manifests:
+    - data/manifests/rscd_prepared_val.csv
+    - data/manifests/roadsaw_val.csv
+    - data/manifests/roadsc_val.csv
+  test_manifests:
+    - data/manifests/rscd_prepared_test.csv
+    - data/manifests/roadsaw_test.csv
+    - data/manifests/roadsc_test.csv
+  image_size: 224
+  batch_size: 48
+  num_workers: 6
+  max_train_samples: null
+  max_val_samples: null
+
+model:
+  backbone: resnet18
+  embedding_dim: 512
+  dropout: 0.2
+
+optim:
+  epochs: 80
+  lr: 0.0001
+  weight_decay: 0.0001
+  grad_clip_norm: 5.0
+  amp: true
+
+loss:
+  task_weight: 1.0
+  interval_weight: 0.35
+  monotonic_weight: 0.05

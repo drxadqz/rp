@@ -1,0 +1,184 @@
+seed: 79
+output_dir: D:\NMI_SPWFM_datasets\friction_affordance_outputs\paper_protocol\v25_lean_masked_query_consistency_safety
+device: auto
+data:
+  train_manifests:
+  - data/manifests_full/rscd_prepared_train.csv
+  - data/manifests_full/roadsaw_train.csv
+  - data/manifests_full/roadsc_train.csv
+  val_manifests:
+  - data/manifests_full/rscd_prepared_val.csv
+  - data/manifests_full/roadsaw_val.csv
+  - data/manifests_full/roadsc_val.csv
+  test_manifests:
+  - data/manifests_full/rscd_prepared_test.csv
+  - data/manifests_full/roadsaw_test.csv
+  - data/manifests_full/roadsc_test.csv
+  image_size: 192
+  batch_size: 8
+  num_workers: 2
+  prefetch_factor: 2
+  max_train_samples: null
+  max_val_samples: null
+  max_test_samples: null
+  max_train_samples_per_class: null
+  max_val_samples_per_class: null
+  max_test_samples_per_class: null
+  balanced_sampling: true
+  balanced_dataset_first: true
+  balanced_group_columns:
+  - dataset
+  - class_label
+  balanced_num_samples_per_epoch: 36000
+  sample_seed: 79
+  augmentation:
+    random_resized_crop: false
+    crop_scale:
+    - 0.78
+    - 1.0
+    crop_ratio:
+    - 0.88
+    - 1.12
+    color_jitter:
+      brightness: 0.35
+      contrast: 0.35
+      saturation: 0.18
+      hue: 0.035
+    random_grayscale_p: 0.1
+    gaussian_blur_p: 0.14
+    blur_sigma:
+    - 0.1
+    - 1.2
+    random_erasing_p: 0.04
+    erase_scale:
+    - 0.015
+    - 0.07
+    resize_mode: bottom_square
+    gray_world_alpha: 0.75
+    fourier_low_freq_jitter_p: 0.35
+    fourier_beta: 0.08
+    fourier_strength:
+    - 0.7
+    - 1.3
+  balanced_weight_overrides:
+  - where:
+      wetness_label: very_wet
+    multiplier: 1.8
+  - where:
+      wetness_label: wet
+    multiplier: 1.4
+  - where:
+      wetness_label: damp
+    multiplier: 1.2
+model:
+  backbone: convnext_tiny
+  embedding_dim: 768
+  dropout: 0.3
+  pretrained: true
+  freeze_backbone: false
+  use_physics_branch: true
+  physics_dim: 96
+  use_friction_set: false
+  friction_set_entropy_expansion: 0.12
+  friction_set_interval_mix: 0.8
+  use_evidence_field: true
+  evidence_dim: 96
+  evidence_hidden_dim: 64
+  evidence_patch_stride: 8
+  evidence_contact_prior_strength: 1.0
+  evidence_entropy_expansion: 0.12
+  evidence_interval_mix: 0.26
+  evidence_risk_logit_mix: 0.12
+  num_domains: 3
+  physics_quality_cues: true
+  evidence_road_likelihood_prior_strength: 0.75
+  evidence_region_mixture_cues: true
+  evidence_region_mixture_expansion: 0.04
+  evidence_region_mixture_kernel_size: 11
+  evidence_num_queries: 4
+  evidence_query_disagreement_expansion: 0.08
+optim:
+  epochs: 20
+  lr: 8.0e-05
+  weight_decay: 0.05
+  grad_clip_norm: 5.0
+  grad_accum_steps: 4
+  amp: true
+  early_stop_patience: 5
+  early_stop_min_delta: 0.0005
+  log_every_steps: 100
+loss:
+  task_weight: 0.58
+  compatibility_weight: 0.0
+  group_dro_weight: 0.0
+  group_vrex_weight: 0.0
+  group_dro_temperature: 0.05
+  risk_ordinal_weight: 0.2
+  interval_weight: 0.09
+  coverage_weight: 1.8
+  endpoint_weight: 1.8
+  target_width_weight: 0.35
+  width_weight: 0.0
+  coverage_margin: 0.04
+  monotonic_weight: 0.05
+  risk_mu_monotonic_weight: 0.08
+  domain_weight: 0.0
+  domain_grl_lambda: 0.0
+  feature_coral_weight: 0.0
+  risk_conditional_coral_weight: 0.008
+  coral_min_samples_per_domain: 2
+  evidence_risk_weight: 0.2
+  evidence_interval_weight: 0.06
+  evidence_endpoint_weight: 0.55
+  evidence_width_weight: 0.04
+  evidence_target_width_weight: 0.45
+  evidence_attention_prior_weight: 0.01
+  evidence_attention_smooth_weight: 0.01
+  evidence_risk_consistency_weight: 0.05
+  evidence_interval_consistency_weight: 0.05
+  evidence_attention_region_weight: 0.05
+  evidence_attention_pseudo_road_weight: 0.04
+  coverage_risk_weight: 0.35
+  coverage_wetness_weight: 0.25
+  coverage_snow_weight: 0.2
+  coverage_near_white_weight: 0.35
+  coverage_low_texture_weight: 0.22
+  coverage_specular_weight: 0.18
+  coverage_weight_max: 2.05
+  interval_order_weight: 0.04
+  interval_order_margin_scale: 0.25
+  interval_order_min_gap: 0.02
+  wetness_conditional_coral_weight: 0.012
+  state_contrastive_temperature: 0.18
+  state_contrastive_cross_domain_only: true
+  risk_state_contrastive_weight: 0.012
+  friction_state_contrastive_weight: 0.008
+  wetness_state_contrastive_weight: 0.006
+  wetness_ordinal_weight: 0.1
+  evidence_query_diversity_weight: 0.012
+  evidence_pseudo_road_min_mass: 0.74
+  evidence_pseudo_road_threshold: 0.35
+  evidence_bottom_mass_target: 0.62
+  evidence_center_bottom_mass_target: 0.25
+  evidence_top_mass_max: 0.35
+  aug_consistency_weight: 0.1
+  aug_consistency_max_samples: 6
+  aug_consistency_strength: 0.1
+  aug_consistency_noise_std: 0.012
+  aug_consistency_mask_ratio: 0.18
+  aug_consistency_mask_block_frac: 0.18
+  aug_consistency_mask_max_blocks: 4
+  aug_consistency_mask_value: mean
+  aug_consistency_interval_weight: 1.0
+  aug_consistency_attention_weight: 0.4
+  aug_consistency_attention_mask: road_likelihood
+  aug_consistency_attention_mask_threshold: 0.35
+  aug_consistency_attention_mask_sharpness: 12.0
+experiment_note: 'Candidate semantic-segmentation consistency route: v24 multi-query
+  local evidence plus MIC-style masked weak-view consistency. The weak view receives
+  camera-style perturbation and a few random region masks, then risk logits, friction
+  intervals, and road-limited attention must remain consistent with the clean view.
+  This tests whether the model is learning stable road material evidence rather than
+  memorizing dataset style or a single brittle texture patch. Uses batch_size=8 with
+  grad_accum_steps=4 to match the effective batch of the batch_size=16/grad_accum_steps=2
+  rows on 4GB VRAM.'

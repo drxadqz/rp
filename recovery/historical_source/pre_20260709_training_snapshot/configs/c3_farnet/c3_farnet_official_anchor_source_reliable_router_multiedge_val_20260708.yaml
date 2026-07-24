@@ -1,0 +1,52 @@
+extends: c3_farnet_errorgate_paircal_full_eval.yaml
+
+output_dir: E:/perception_outputs/rscd_surface_classification/c3_farnet_official_anchor_source_reliable_router_multiedge_val_20260708
+
+model:
+  use_source_reliable_boundary_router: true
+  source_reliable_boundary_hidden_dim: 32
+  source_reliable_boundary_scale: 7.0
+  source_reliable_boundary_base_strength: 1.0
+  source_reliable_boundary_physics_gate_floor: 0.5
+  source_reliable_boundary_gate_temperature: 6.0
+  source_reliable_boundary_source_temperature: 28.0
+  source_reliable_boundary_learned_gate_bias: -1.6
+  source_reliable_boundary_dropout: 0.0
+  source_reliable_boundary_routes:
+    - source: dry_concrete_smooth
+      target: dry_concrete_slight
+      topk: 3
+      margin: 1.00
+      source_f1: 0.907292954264524
+      min_source_f1: 0.90
+      route_scale: 1.00
+      kind: dry_concrete_roughness
+    - source: wet_concrete_smooth
+      target: water_concrete_smooth
+      topk: 2
+      margin: 0.35
+      source_f1: 0.8590281943611278
+      min_source_f1: 0.84
+      route_scale: 0.35
+      kind: wet_water_smooth_film
+    - source: wet_asphalt_slight
+      target: water_asphalt_slight
+      topk: 2
+      margin: 0.50
+      source_f1: 0.8796630565583634
+      min_source_f1: 0.86
+      route_scale: 0.20
+      kind: water_asphalt_film
+    - source: water_concrete_slight
+      target: water_concrete_severe
+      topk: 2
+      margin: 0.75
+      source_f1: 0.672566371681416
+      min_source_f1: 0.60
+      route_scale: 0.18
+      kind: concrete_film_roughness
+
+eval:
+  batch_size: 32
+  max_val_samples_per_class:
+  max_test_samples_per_class:

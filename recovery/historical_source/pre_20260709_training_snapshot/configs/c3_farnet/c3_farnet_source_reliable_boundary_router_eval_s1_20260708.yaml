@@ -1,0 +1,13 @@
+extends: c3_farnet_source_reliable_boundary_router_micro_20260708.yaml
+
+output_dir: E:/perception_outputs/rscd_surface_classification/c3_farnet_source_reliable_boundary_router_eval_s1_20260708
+
+model:
+  source_reliable_boundary_scale: 1.0
+  source_reliable_boundary_base_strength: 1.0
+  source_reliable_boundary_physics_gate_floor: 0.5
+
+eval:
+  batch_size: 16
+  max_val_samples_per_class: 120
+  max_test_samples_per_class: 120

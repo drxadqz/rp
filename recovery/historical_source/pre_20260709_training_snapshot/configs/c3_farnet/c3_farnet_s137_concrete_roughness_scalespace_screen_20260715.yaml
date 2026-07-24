@@ -1,0 +1,25 @@
+extends: c3_farnet_s136_coupled_factor_backbone_screen_20260715.yaml
+
+output_dir: E:/perception_outputs/rscd_surface_classification/s137_concrete_roughness_scalespace_screen_20260715
+
+# S137 is a task-adapted custom backbone route. It keeps the S136 factorized
+# class/factor supervision, then adds an early concrete-conditioned scale-space
+# roughness conditioner before the generic coupling experts. The target is the
+# measured S7 bottleneck: concrete smooth/slight/severe boundaries, especially
+# under wet/water film where roughness evidence is partly hidden.
+
+model:
+  use_concrete_roughness_scale_space: true
+  concrete_roughness_scale_space_mode: learned
+  concrete_roughness_scale_space_scale: 0.18
+
+loss:
+  class_weight: 1.0
+  factor_weight: 0.25
+  factor_axis_weights:
+    friction: 1.0
+    material: 1.0
+    roughness: 1.5
+  coupling_gate_weight: 0.06
+  concrete_roughness_route_weight: 0.04
+

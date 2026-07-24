@@ -1,0 +1,29 @@
+extends: c3_farnet_s137_concrete_roughness_scalespace_screen_20260715.yaml
+
+output_dir: E:/perception_outputs/rscd_surface_classification/s137_concrete_roughness_scalespace_full_20260715
+
+# Full RSCD protocol for S137. Launch only if the S137 screen beats its
+# same-budget control and passes the cap250 promotion gate.
+
+train:
+  resume_from: E:/perception_outputs/rscd_surface_classification/s137_concrete_roughness_scalespace_screen_20260715/best_checkpoint.pth
+  evaluate_initial: true
+  batch_size: 16
+  grad_accum_steps: 1
+  num_workers: 2
+  prefetch_factor: 2
+  lr: 0.0001
+  weight_decay: 0.01
+  epochs: 10
+  amp: true
+  augmentation: true
+  balanced_sampling: true
+  max_train_samples_per_class:
+  samples_per_epoch: 0
+  grad_clip_norm: 5.0
+  log_every_steps: 2000
+
+eval:
+  batch_size: 32
+  max_val_samples_per_class:
+  max_test_samples_per_class:

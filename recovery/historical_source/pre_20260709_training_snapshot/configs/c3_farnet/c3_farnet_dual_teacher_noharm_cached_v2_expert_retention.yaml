@@ -1,0 +1,55 @@
+extends: c3_farnet_dual_teacher_noharm_cached_micro.yaml
+
+seed: 113
+output_dir: D:/NMI_SPWFM_datasets/friction_affordance_outputs/rscd_surface_classification/c3_farnet_dual_teacher_noharm_cached_v2_expert_retention_20260707
+
+loss:
+  focus_ce_extra_weight: 0.030
+  focus_ce_classes:
+    - water_concrete_slight
+    - wet_concrete_slight
+    - water_concrete_severe
+    - dry_concrete_smooth
+    - dry_concrete_slight
+    - dry_concrete_severe
+
+  anchor_consistency_weight: 0.0
+  anchor_consistency_focus_weight: 0.0
+  anchor_consistency_protect_weight: 0.12
+  anchor_consistency_protect_confidence: 0.76
+  anchor_consistency_protect_margin: 0.24
+  anchor_no_flip_weight: 0.06
+  anchor_no_flip_nonfocus_only: false
+
+  dual_teacher_noharm_weight: 0.095
+  dual_teacher_expert_weight: 1.10
+  dual_teacher_anchor_weight: 0.25
+  dual_teacher_margin_weight: 0.20
+  dual_teacher_margin_tolerance: 0.012
+  dual_teacher_expert_confidence: 0.46
+  dual_teacher_expert_margin: 0.0
+  dual_teacher_expert_requires_anchor_advantage: true
+  dual_teacher_expert_advantage_margin: -0.015
+  dual_teacher_anchor_confidence: 0.76
+  dual_teacher_anchor_margin: 0.24
+  dual_teacher_anchor_protect_nonexpert: false
+  dual_teacher_anchor_protect_expert_classes: false
+  dual_teacher_expert_classes:
+    - water_concrete_slight
+    - wet_concrete_slight
+    - water_concrete_severe
+    - dry_concrete_smooth
+    - dry_concrete_slight
+    - dry_concrete_severe
+  dual_teacher_protected_classes:
+    - dry_asphalt_slight
+    - dry_asphalt_severe
+    - wet_asphalt_severe
+    - water_asphalt_severe
+    - wet_concrete_severe
+
+train:
+  lr: 0.000012
+  samples_per_epoch: 1500
+  teacher_logits_cache: D:/NMI_SPWFM_datasets/friction_affordance_outputs/rscd_surface_classification/c3_farnet_dual_teacher_noharm_cached_micro_20260707/cache_anchor_train.pt
+  expert_teacher_logits_cache: D:/NMI_SPWFM_datasets/friction_affordance_outputs/rscd_surface_classification/c3_farnet_dual_teacher_noharm_cached_micro_20260707/cache_expert_train.pt

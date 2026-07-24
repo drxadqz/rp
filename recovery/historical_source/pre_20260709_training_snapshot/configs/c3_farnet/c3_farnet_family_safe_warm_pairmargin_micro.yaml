@@ -1,0 +1,111 @@
+extends: c3_farnet_family_safe_early_router_micro.yaml
+
+seed: 97
+output_dir: D:/NMI_SPWFM_datasets/friction_affordance_outputs/rscd_surface_classification/c3_farnet_family_safe_warm_pairmargin_micro_20260707
+
+model:
+  backbone: convnext_tiny_family_safe_tensor_coupling_warm_stem
+
+loss:
+  # Keep the repair local: these are exactly the families where the latest
+  # head-calibrated screen moved decisions, but here the update is routed
+  # through early physical tensor banks instead of the global classifier head.
+  focus_ce_extra_weight: 0.018
+  focus_ce_classes:
+    - water_asphalt_severe
+    - water_asphalt_slight
+    - wet_asphalt_severe
+    - wet_asphalt_slight
+    - dry_concrete_slight
+    - dry_concrete_severe
+    - water_concrete_slight
+    - water_concrete_severe
+
+  pair_value_selective_margin_weight: 0.062
+  pair_value_selective_margin_target: 0.44
+  pair_value_selective_margin_low_margin_threshold: 1.05
+  pair_value_selective_margin_min_weight: 0.10
+  pair_value_selective_margin_gate_threshold: 0.34
+  pair_value_selective_margin_gate_temperature: 9.0
+  pair_value_selective_margin_uncertainty_temperature: 2.2
+  pair_value_selective_margin_value_aug_std: 0.003
+  pair_value_selective_margin_pairs:
+    - water_asphalt_slight|water_asphalt_severe
+    - wet_asphalt_slight|wet_asphalt_severe
+    - dry_concrete_slight|dry_concrete_severe
+    - water_concrete_slight|water_concrete_severe
+  pair_value_selective_margin_pair_weights:
+    water_asphalt_slight|water_asphalt_severe: 1.00
+    wet_asphalt_slight|wet_asphalt_severe: 0.48
+    dry_concrete_slight|dry_concrete_severe: 0.72
+    water_concrete_slight|water_concrete_severe: 0.34
+
+  value_guided_hardpair_margin_weight: 0.020
+  value_guided_hardpair_margin_target: 0.38
+  value_guided_hardpair_margin_low_margin_threshold: 1.00
+  value_guided_hardpair_margin_min_weight: 0.12
+  value_guided_hardpair_margin_pairs:
+    - water_asphalt_slight|water_asphalt_severe
+    - dry_concrete_slight|dry_concrete_severe
+  value_guided_hardpair_margin_pair_weights:
+    water_asphalt_slight|water_asphalt_severe: 1.00
+    dry_concrete_slight|dry_concrete_severe: 0.70
+
+  anchor_consistency_weight: 0.72
+  anchor_consistency_protect_weight: 0.74
+  anchor_consistency_protect_confidence: 0.66
+  anchor_consistency_protect_margin: 0.14
+  anchor_no_flip_weight: 0.56
+  anchor_no_flip_nonfocus_only: false
+
+  anchor_nonregression_weight: 0.34
+  anchor_nonregression_focus_weight: 0.22
+  anchor_nonregression_margin: 0.012
+  anchor_nonregression_confidence: 0.64
+  anchor_nonregression_teacher_margin: 0.10
+  anchor_nonregression_focus_classes:
+    - water_asphalt_severe
+    - water_asphalt_slight
+    - wet_asphalt_severe
+    - wet_asphalt_slight
+    - dry_concrete_slight
+    - dry_concrete_severe
+    - water_concrete_slight
+    - water_concrete_severe
+
+  pareto_safe_distill_weight: 0.16
+  pareto_safe_margin_weight: 0.22
+  pareto_safe_hardpair_margin_weight: 0.18
+  pareto_safe_confidence: 0.64
+  pareto_safe_teacher_margin: 0.10
+  pareto_safe_margin_tolerance: 0.018
+  pareto_safe_focus_protect_scale: 0.58
+  pareto_safe_focus_classes:
+    - water_asphalt_severe
+    - water_asphalt_slight
+    - wet_asphalt_severe
+    - wet_asphalt_slight
+    - dry_concrete_slight
+    - dry_concrete_severe
+    - water_concrete_slight
+    - water_concrete_severe
+  pareto_safe_hardpair_pairs:
+    - left: water_concrete_slight
+      right: water_concrete_severe
+      margin: 0.05
+    - left: water_asphalt_slight
+      right: water_asphalt_severe
+      margin: 0.04
+    - left: wet_asphalt_slight
+      right: wet_asphalt_severe
+      margin: 0.04
+    - left: dry_concrete_slight
+      right: dry_concrete_severe
+      margin: 0.04
+
+train:
+  trainable_prefixes:
+    - backbone.family_safe_tensor_coupling_banks
+  lr: 0.00018
+  samples_per_epoch: 2600
+  log_every_steps: 100

@@ -1,0 +1,112 @@
+extends: c3_farnet_screen_s146_s96_frequency_physics_gate_current_20260717.yaml
+
+output_dir: E:/perception_outputs/rscd_surface_classification/c3_farnet_screen_s148_s96_spectral_pairlocal_wc_tailguard_20260717
+
+# S148: pair-local spectral selector, not an RSPNet-style frequency backbone.
+#
+# S146 was safe but too weak; S147 proved that family-wide ordinal smoothing
+# moves the decision boundary but damages too many classes. S148 therefore uses
+# frequency evidence only as a calibrated local judge for the hardest RSCD pair:
+#
+#   water_concrete_slight <-> water_concrete_severe
+#
+# It reads non-wavelet frequency maps, S96/S146 stage-1 and stage-3 features,
+# and PhysicsTexture boundary evidence. The output is a signed no-spill logit
+# margin only inside this one pair. It cannot move probability to another
+# friction/material family.
+
+model:
+  backbone: convnext_tiny_gate_calibrated_frequency_physics_concrete_film_rough_stem
+  pretrained: false
+  head_type: hardpair_error_gated_calibrated
+  use_source_reliable_boundary_router: true
+  expose_hardpair_pair_value_evidence: true
+  use_physics_texture_stem_adapter: true
+  use_scale_space_roughness_stem_adapter: true
+  use_pair_value_stem_conditioner: true
+  use_feature_value_boundary_corrector: true
+  use_backbone_family_ordinal_no_spill_adapter: false
+  use_backbone_spectral_pair_selector: true
+  backbone_spectral_pair_selector_pairs:
+    - water_concrete_slight|water_concrete_severe
+  backbone_spectral_pair_selector_hidden_dim: 64
+  backbone_spectral_pair_selector_scale: 0.16
+  backbone_spectral_pair_selector_gate_margin: 0.98
+  backbone_spectral_pair_selector_gate_temperature: 5.8
+  backbone_spectral_pair_selector_gate_floor: 0.0
+  backbone_spectral_pair_selector_spectral_margin_threshold: 0.026
+  backbone_spectral_pair_selector_spectral_margin_temperature: 22.0
+  backbone_spectral_pair_selector_alignment_temperature: 22.0
+  backbone_spectral_pair_selector_dropout: 0.02
+
+loss:
+  focus_ce_extra_weight: 0.26
+  focus_ce_classes:
+    - water_concrete_slight
+    - water_concrete_severe
+  feature_value_boundary_pairwise_loss_weight: 0.36
+  feature_value_boundary_pairwise_loss_pairs:
+    - water_concrete_slight|water_concrete_severe
+  feature_value_boundary_pairwise_pair_weights:
+    water_concrete_slight|water_concrete_severe: 3.0
+  value_guided_hardpair_margin_weight: 0.060
+  value_guided_hardpair_margin_pairs:
+    - water_concrete_slight|water_concrete_severe
+  value_guided_hardpair_margin_pair_weights:
+    water_concrete_slight|water_concrete_severe: 2.8
+  value_guided_hardpair_margin_target: 0.42
+  value_guided_hardpair_margin_low_margin_threshold: 1.05
+  value_guided_hardpair_margin_min_weight: 0.22
+  anchor_consistency_weight: 0.42
+  anchor_consistency_focus_weight: 0.010
+  anchor_consistency_focus_low_margin_threshold: 0.18
+  anchor_consistency_temperature: 2.0
+  anchor_consistency_protect_weight: 0.62
+  anchor_consistency_protect_confidence: 0.74
+  anchor_consistency_protect_margin: 0.24
+  anchor_no_flip_weight: 0.44
+  anchor_no_flip_nonfocus_only: true
+  anchor_error_gate_weight: 0.0
+  anchor_consistency_exempt_classes:
+    - water_concrete_slight
+    - water_concrete_severe
+  anchor_nonregression_weight: 0.26
+  anchor_nonregression_focus_weight: 0.032
+  anchor_nonregression_margin: 0.014
+  anchor_nonregression_confidence: 0.70
+  anchor_nonregression_teacher_margin: 0.12
+
+train:
+  resume_from: E:/perception_outputs/rscd_surface_classification/c3_farnet_screen_s96_wc_pair_relative_boundary_20260712/best_checkpoint.pth
+  teacher_checkpoint: E:/perception_outputs/rscd_surface_classification/c3_farnet_screen_s96_wc_pair_relative_boundary_20260712/best_checkpoint.pth
+  teacher_backbone: convnext_tiny_gate_calibrated_tensor_coupling_concrete_film_rough_stem
+  teacher_head_type: hardpair_error_gated_calibrated
+  teacher_preserve_hardpair_focus: true
+  trainable_prefixes:
+    - backbone_spectral_pair_selector
+  evaluate_initial: true
+  lr: 0.00014
+  weight_decay: 0.0010
+  epochs: 1
+  batch_size: 4
+  grad_accum_steps: 4
+  num_workers: 2
+  prefetch_factor: 2
+  amp: true
+  augmentation: true
+  factor_graph_pair_sampling: true
+  factor_graph_pair_sampling_seed: 14817
+  factor_graph_pair_sampling_pair_slots: 2
+  factor_graph_pair_sampling_positive_slots: 0
+  factor_graph_pair_sampling_wet_concrete_focus_scale: 12.0
+  factor_graph_pair_sampling_roughness_focus_scale: 4.2
+  factor_graph_pair_sampling_wet_water_focus_scale: 2.4
+  max_train_samples_per_class: 1000
+  samples_per_epoch: 27000
+  grad_clip_norm: 2.0
+  log_every_steps: 500
+
+eval:
+  batch_size: 16
+  max_val_samples_per_class: 250
+  max_test_samples_per_class: 250

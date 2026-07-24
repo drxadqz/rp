@@ -1,0 +1,52 @@
+extends: c3_farnet_formal_fullmanifest_family_router_pcgrad_noharm_s14_20260709.yaml
+
+output_dir: E:/perception_outputs/rscd_surface_classification/c3_farnet_formal_fullmanifest_concrete_film_split_router_s15_20260709
+
+model:
+  # S15: early concrete-film split router.
+  # The old concrete route treated wet/water + concrete + smooth/slight/severe
+  # as one mechanism. This backbone separates smooth film bridge, hidden slight
+  # roughness, and hidden severe roughness before global pooling.
+  backbone: convnext_tiny_family_router_concrete_film_split_stem
+
+loss:
+  # Keep S14's no-harm objective, but supervise the early router with 6 routes:
+  # protect / dry-concrete / asphalt-film / concrete-smooth / concrete-slight /
+  # concrete-severe. This targets the measured water_concrete_slight bottleneck
+  # without globally moving easy classes.
+  family_mechanism_router_weight: 0.20
+  family_router_split_concrete_film_routes: true
+  family_router_protect_sample_weight: 0.42
+  family_router_dry_weight: 1.08
+  family_router_asphalt_weight: 1.32
+  family_router_concrete_weight: 1.58
+  family_router_concrete_slight_weight: 1.16
+  family_router_concrete_severe_weight: 1.08
+  family_router_protect_leak_weight: 0.035
+
+  rscd_pcgrad_focus_classes:
+    - water_concrete_smooth
+    - water_concrete_slight
+    - water_concrete_severe
+    - wet_concrete_smooth
+    - wet_concrete_slight
+    - wet_concrete_severe
+    - water_asphalt_slight
+    - water_asphalt_severe
+    - dry_concrete_slight
+    - dry_concrete_severe
+
+  pair_value_selective_margin_pairs:
+    - water_concrete_smooth|water_concrete_slight
+    - water_concrete_slight|water_concrete_severe
+    - wet_concrete_smooth|wet_concrete_slight
+    - wet_concrete_slight|wet_concrete_severe
+    - water_asphalt_slight|water_asphalt_severe
+    - dry_concrete_slight|dry_concrete_severe
+  pair_value_selective_margin_pair_weights:
+    water_concrete_smooth|water_concrete_slight: 0.42
+    water_concrete_slight|water_concrete_severe: 0.36
+    wet_concrete_smooth|wet_concrete_slight: 0.34
+    wet_concrete_slight|wet_concrete_severe: 0.30
+    water_asphalt_slight|water_asphalt_severe: 0.70
+    dry_concrete_slight|dry_concrete_severe: 0.58

@@ -1,0 +1,69 @@
+seed: 79
+output_dir: E:/perception/friction_affordance_runs/c3_farnet_smoke_20260704
+
+data:
+  train_manifest: E:/perception/friction_affordance_field/data/manifests_full/rscd_prepared_train.csv
+  val_manifest: E:/perception/friction_affordance_field/data/manifests_full/rscd_prepared_val.csv
+  test_manifest: E:/perception/friction_affordance_field/data/manifests_full/rscd_prepared_test.csv
+  image_size: 192
+  train_resize_mode: letterbox
+  eval_resize_mode: letterbox
+
+model:
+  backbone: convnext_tiny
+  embedding_dim: 768
+  pretrained: false
+  dropout: 0.2
+  token_dim: 128
+  pair_rank: 4
+  triple_rank: 4
+  head_type: coupled_tensor
+  use_physics_branch: true
+  physics_dim: 96
+  physics_quality_cues: true
+  physics_quality_region_cues: false
+  use_semantic_physics_attention_branch: true
+  semantic_physics_attention_dim: 64
+  use_local_physics_field_branch: true
+  local_physics_field_dim: 64
+  local_physics_field_scale: 0.08
+
+loss:
+  factor_weight: 0.3
+  factor_axis_weights:
+    friction: 1.0
+    material: 1.0
+    roughness: 1.0
+  tournament_weight: 0.1
+  counterfactual_weight: 0.05
+  reliability_weight: 0.05
+  counterfactual_margin: 1.0
+  supervise_none: false
+
+train:
+  resume_from: D:/NMI_SPWFM_datasets/friction_affordance_outputs/rscd_surface_classification/screen_dry_concrete_vor_residual_scale012_lr1e3_s8k_from_anchor/best.pt
+  trainable_prefixes:
+    - norm
+    - decoder
+    - roughness_reliability
+    - coupled_head
+    - boundary_experts
+    - linear_head
+  batch_size: 4
+  grad_accum_steps: 1
+  num_workers: 0
+  lr: 0.000035
+  weight_decay: 0.003
+  epochs: 1
+  amp: true
+  augmentation: true
+  balanced_sampling: true
+  samples_per_epoch: 108
+  max_train_samples_per_class: 4
+  grad_clip_norm: 5.0
+  log_every_steps: 8
+
+eval:
+  batch_size: 8
+  max_val_samples_per_class: 4
+  max_test_samples_per_class: 4

@@ -1,0 +1,27 @@
+extends: c3_farnet_formal_fullmanifest_road_cortex_s22_20260709.yaml
+
+output_dir: E:/perception_outputs/rscd_surface_classification/c3_farnet_formal_fullmanifest_road_cortex_former_s23_20260709
+
+model:
+  # S23: self-designed Transformer-style RSCD backbone.
+  # RoadCortexFormer is not a generic ViT/Swin/RoadFormer clone. Friction,
+  # material, roughness, and coupling factor tokens query local road texture and
+  # physics evidence, then send bounded updates back to the spatial feature map.
+  backbone: road_cortex_former_tiny
+  pretrained: false
+
+loss:
+  # The factor-token attention route is more expressive than S22, so use a
+  # slightly stronger non-regression prior while still allowing from-scratch
+  # learning on all full-manifest labels.
+  anchor_consistency_weight: 0.26
+  anchor_no_flip_weight: 0.10
+  focus_ce_extra_weight: 0.28
+
+train:
+  lr: 0.00010
+  weight_decay: 0.0035
+  epochs: 1
+  batch_size: 8
+  grad_accum_steps: 2
+  samples_per_epoch: 0

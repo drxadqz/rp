@@ -1,0 +1,105 @@
+seed: 79
+output_dir: outputs/rtx3050_evidencefield_smoke
+device: auto
+
+data:
+  train_manifests:
+    - data/manifests/rscd_prepared_train.csv
+    - data/manifests/roadsaw_train.csv
+    - data/manifests/roadsc_train.csv
+  val_manifests:
+    - data/manifests/rscd_prepared_val.csv
+    - data/manifests/roadsaw_val.csv
+    - data/manifests/roadsc_val.csv
+  test_manifests:
+    - data/manifests/rscd_prepared_test.csv
+    - data/manifests/roadsaw_test.csv
+    - data/manifests/roadsc_test.csv
+  image_size: 160
+  batch_size: 10
+  num_workers: 2
+  prefetch_factor: 2
+  max_train_samples: 1000
+  max_val_samples: 300
+  max_test_samples: 300
+  balanced_sampling: true
+  balanced_dataset_first: true
+  balanced_group_columns:
+    - dataset
+    - class_label
+  balanced_num_samples_per_epoch: 1000
+  sample_seed: 79
+  augmentation:
+    random_resized_crop: true
+    crop_scale: [0.80, 1.0]
+    crop_ratio: [0.9, 1.1]
+    color_jitter:
+      brightness: 0.25
+      contrast: 0.25
+      saturation: 0.15
+      hue: 0.03
+    random_grayscale_p: 0.05
+    gaussian_blur_p: 0.10
+    blur_sigma: [0.1, 1.2]
+    random_erasing_p: 0.04
+
+model:
+  backbone: mobilenet_v3_large
+  embedding_dim: 512
+  dropout: 0.25
+  pretrained: true
+  freeze_backbone: false
+  use_physics_branch: true
+  physics_dim: 64
+  use_friction_set: true
+  friction_set_entropy_expansion: 0.12
+  friction_set_interval_mix: 0.80
+  use_evidence_field: true
+  evidence_dim: 64
+  evidence_hidden_dim: 48
+  evidence_patch_stride: 8
+  evidence_contact_prior_strength: 1.0
+  evidence_entropy_expansion: 0.08
+  evidence_interval_mix: 0.20
+  evidence_risk_logit_mix: 0.15
+  num_domains: 3
+
+optim:
+  epochs: 2
+  lr: 0.00012
+  weight_decay: 0.03
+  grad_clip_norm: 5.0
+  grad_accum_steps: 2
+  amp: true
+  early_stop_patience: 2
+  early_stop_min_delta: 0.001
+
+loss:
+  task_weight: 0.40
+  compatibility_weight: 1.0
+  group_dro_weight: 0.15
+  group_vrex_weight: 0.05
+  group_dro_temperature: 0.05
+  risk_ordinal_weight: 0.20
+  interval_weight: 0.05
+  coverage_weight: 1.0
+  endpoint_weight: 1.5
+  target_width_weight: 0.5
+  width_weight: 0.0
+  coverage_margin: 0.0
+  monotonic_weight: 0.05
+  risk_mu_monotonic_weight: 0.08
+  domain_weight: 0.0
+  domain_grl_lambda: 0.0
+  feature_coral_weight: 0.01
+  risk_conditional_coral_weight: 0.02
+  coral_min_samples_per_domain: 2
+  evidence_risk_weight: 0.20
+  evidence_interval_weight: 0.05
+  evidence_endpoint_weight: 0.50
+  evidence_width_weight: 0.05
+  evidence_target_width_weight: 0.50
+  evidence_attention_prior_weight: 0.01
+  evidence_attention_smooth_weight: 0.01
+  evidence_risk_consistency_weight: 0.05
+  evidence_interval_consistency_weight: 0.05

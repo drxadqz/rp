@@ -1,0 +1,6 @@
+extends: c3_farnet_protected_tristate_dryconcrete_micro.yaml
+
+output_dir: D:/NMI_SPWFM_datasets/friction_affordance_outputs/rscd_surface_classification/c3_farnet_currentbest_dry_concrete_safe_patch_inference_20260708
+
+eval:
+  logit_patch_rules_path: E:/perception/friction_affordance_field/configs/c3_farnet/pareto_safe_logit_rules_dry_concrete_slight_20260708.json

@@ -1,0 +1,77 @@
+seed: 97
+output_dir: D:/NMI_SPWFM_datasets/friction_affordance_outputs/rscd_surface_classification/c3_farnet_errorgate_paircal_full_eval_20260703
+
+data:
+  train_manifest: E:/perception/friction_affordance_field/data/manifests_full/rscd_prepared_train.csv
+  val_manifest: E:/perception/friction_affordance_field/data/manifests_full/rscd_prepared_val.csv
+  test_manifest: E:/perception/friction_affordance_field/data/manifests_full/rscd_prepared_test.csv
+  image_size: 192
+  train_resize_mode: letterbox
+  eval_resize_mode: letterbox
+
+model:
+  backbone: convnext_tiny_gate_calibrated_tensor_coupling_concrete_film_rough_stem
+  embedding_dim: 768
+  pretrained: false
+  dropout: 0.2
+  token_dim: 256
+  pair_rank: 8
+  triple_rank: 8
+  head_type: hardpair_error_gated_calibrated
+  hardpair_correction_scale: 0.10
+  hardpair_gate_margin: 1.05
+  hardpair_gate_temperature: 4.5
+  hardpair_error_gate_bias_init: -4.0
+  hardpair_error_gate_floor: 0.0
+  hardpair_focus_classes:
+    - water_concrete_slight
+    - wet_concrete_slight
+    - water_concrete_severe
+    - wet_concrete_severe
+  use_physics_branch: true
+  physics_dim: 96
+  physics_quality_cues: true
+  physics_quality_region_cues: false
+  use_semantic_physics_attention_branch: true
+  semantic_physics_attention_dim: 64
+  use_local_physics_field_branch: true
+  local_physics_field_dim: 64
+  local_physics_field_scale: 0.08
+  use_dry_concrete_roughness_vor_residual: true
+  dry_concrete_roughness_hidden_dim: 48
+  dry_concrete_roughness_scale: 0.12
+  dry_concrete_roughness_gate_threshold: 0.12
+  dry_concrete_roughness_gate_temperature: 14.0
+
+loss:
+  factor_weight: 0.0
+  factor_axis_weights:
+    friction: 1.0
+    material: 1.0
+    roughness: 1.0
+  tournament_weight: 0.0
+  counterfactual_weight: 0.0
+  reliability_weight: 0.0
+  counterfactual_margin: 1.0
+  supervise_none: false
+
+train:
+  resume_from: D:/NMI_SPWFM_datasets/friction_affordance_outputs/rscd_surface_classification/screen_dry_concrete_vor_residual_scale012_lr1e3_s8k_from_anchor/best.pt
+  batch_size: 8
+  grad_accum_steps: 2
+  num_workers: 2
+  prefetch_factor: 2
+  lr: 0.00009
+  weight_decay: 0.002
+  epochs: 2
+  amp: true
+  augmentation: true
+  balanced_sampling: true
+  samples_per_epoch: 12000
+  grad_clip_norm: 5.0
+  log_every_steps: 150
+
+eval:
+  batch_size: 32
+  max_val_samples_per_class:
+  max_test_samples_per_class:

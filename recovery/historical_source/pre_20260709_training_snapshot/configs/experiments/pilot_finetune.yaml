@@ -1,0 +1,47 @@
+seed: 31
+output_dir: outputs/pilot_finetune
+device: auto
+
+data:
+  train_manifests:
+    - data/manifests/rscd_prepared_train.csv
+    - data/manifests/roadsaw_train.csv
+    - data/manifests/roadsc_train.csv
+  val_manifests:
+    - data/manifests/rscd_prepared_val.csv
+    - data/manifests/roadsaw_val.csv
+    - data/manifests/roadsc_val.csv
+  test_manifests:
+    - data/manifests/rscd_prepared_test.csv
+    - data/manifests/roadsaw_test.csv
+    - data/manifests/roadsc_test.csv
+  image_size: 192
+  batch_size: 48
+  num_workers: 0
+  max_train_samples: null
+  max_val_samples: null
+  sample_seed: 31
+
+model:
+  backbone: resnet18
+  embedding_dim: 512
+  dropout: 0.2
+  pretrained: true
+  freeze_backbone: false
+
+optim:
+  epochs: 8
+  lr: 0.0001
+  weight_decay: 0.0001
+  grad_clip_norm: 5.0
+  amp: true
+  early_stop_patience: 3
+  early_stop_min_delta: 0.001
+
+loss:
+  task_weight: 1.0
+  interval_weight: 0.35
+  coverage_weight: 1.0
+  width_weight: 0.02
+  coverage_margin: 0.0
+  monotonic_weight: 0.05

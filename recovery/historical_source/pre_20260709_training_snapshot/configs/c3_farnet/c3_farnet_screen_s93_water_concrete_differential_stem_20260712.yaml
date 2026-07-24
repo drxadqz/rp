@@ -1,0 +1,88 @@
+extends: c3_farnet_screen_s76_released_physics_stem_early_cotune_20260711.yaml
+
+output_dir: E:/perception_outputs/rscd_surface_classification/c3_farnet_screen_s93_water_concrete_differential_stem_20260712
+
+model:
+  backbone: convnext_tiny_water_concrete_differential_stem
+  pretrained: false
+  head_type: hardpair_error_gated_calibrated
+  use_source_reliable_boundary_router: true
+  expose_hardpair_pair_value_evidence: true
+  use_physics_texture_stem_adapter: true
+  physics_texture_stem_hidden_dim: 32
+  physics_texture_stem_scale: 0.060
+  physics_texture_stem_gate_floor: 0.18
+  use_scale_space_roughness_stem_adapter: true
+  scale_space_roughness_stem_hidden_dim: 32
+  scale_space_roughness_stem_scale: 0.045
+  scale_space_roughness_stem_gate_floor: 0.16
+  scale_space_roughness_stem_gate_mode: coupled_selective
+  scale_space_roughness_stem_dry_tail_weight: 1.05
+  scale_space_roughness_stem_wet_hidden_tail_weight: 1.20
+  use_pair_value_stem_conditioner: true
+  pair_value_stem_hidden_dim: 32
+  pair_value_stem_scale: 0.035
+  pair_value_stem_gate_floor: 0.10
+  pair_value_stem_value_aug_std: 0.010
+  pair_value_stem_learned_gate_bias: -0.7
+
+loss:
+  focus_ce_extra_weight: 0.30
+  focus_ce_classes:
+    - wet_concrete_smooth
+    - wet_concrete_slight
+    - wet_concrete_severe
+    - water_concrete_smooth
+    - water_concrete_slight
+    - water_concrete_severe
+  anchor_consistency_weight: 0.38
+  anchor_consistency_focus_weight: 0.010
+  anchor_consistency_focus_low_margin_threshold: 0.18
+  anchor_consistency_temperature: 2.0
+  anchor_consistency_protect_weight: 0.50
+  anchor_consistency_protect_confidence: 0.74
+  anchor_consistency_protect_margin: 0.24
+  anchor_no_flip_weight: 0.34
+  anchor_no_flip_nonfocus_only: true
+  anchor_error_gate_weight: 0.0
+  anchor_consistency_exempt_classes:
+    - wet_concrete_smooth
+    - wet_concrete_slight
+    - wet_concrete_severe
+    - water_concrete_smooth
+    - water_concrete_slight
+    - water_concrete_severe
+  anchor_nonregression_weight: 0.18
+  anchor_nonregression_focus_weight: 0.030
+  anchor_nonregression_margin: 0.014
+  anchor_nonregression_confidence: 0.70
+  anchor_nonregression_teacher_margin: 0.12
+
+train:
+  resume_from: E:/perception_outputs/rscd_surface_classification/c3_farnet_screen_s76_released_physics_stem_early_cotune_20260711/best_checkpoint.pth
+  teacher_checkpoint: E:/perception_outputs/rscd_surface_classification/c3_farnet_screen_s76_released_physics_stem_early_cotune_20260711/best_checkpoint.pth
+  teacher_backbone: convnext_tiny_gate_calibrated_tensor_coupling_concrete_film_rough_stem
+  teacher_head_type: hardpair_error_gated_calibrated
+  teacher_preserve_hardpair_focus: true
+  trainable_prefixes:
+    - backbone.water_concrete_differential_adapters
+  evaluate_initial: true
+  lr: 0.00007
+  weight_decay: 0.0012
+  epochs: 1
+  batch_size: 4
+  grad_accum_steps: 4
+  num_workers: 2
+  prefetch_factor: 2
+  amp: true
+  augmentation: true
+  balanced_sampling: true
+  max_train_samples_per_class: 1000
+  samples_per_epoch: 27000
+  grad_clip_norm: 3.0
+  log_every_steps: 500
+
+eval:
+  batch_size: 16
+  max_val_samples_per_class: 250
+  max_test_samples_per_class: 250

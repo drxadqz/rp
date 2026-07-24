@@ -1,0 +1,6 @@
+extends: c3_farnet_pareto_edge_expert_micro_20260708.yaml
+
+output_dir: D:/NMI_SPWFM_datasets/friction_affordance_outputs/rscd_surface_classification/c3_farnet_pareto_edge_expert_scale1000_eval_20260708
+
+model:
+  pareto_edge_expert_scale: 1000.0

@@ -1,0 +1,11 @@
+extends: c3_farnet_dual_teacher_noharm_smoke.yaml
+
+output_dir: D:/NMI_SPWFM_datasets/friction_affordance_outputs/rscd_surface_classification/c3_farnet_dual_teacher_noharm_cached_smoke_20260707
+
+train:
+  max_train_samples_per_class: 2
+  samples_per_epoch: 64
+  teacher_logits_cache: D:/NMI_SPWFM_datasets/friction_affordance_outputs/rscd_surface_classification/c3_farnet_dual_teacher_noharm_cached_smoke_20260707/cache_anchor_train.pt
+  expert_teacher_logits_cache: D:/NMI_SPWFM_datasets/friction_affordance_outputs/rscd_surface_classification/c3_farnet_dual_teacher_noharm_cached_smoke_20260707/cache_expert_train.pt
+  teacher_logits_cache_strict: true
+  teacher_cache_online_fallback: false

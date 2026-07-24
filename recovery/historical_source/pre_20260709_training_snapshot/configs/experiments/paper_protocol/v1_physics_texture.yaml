@@ -1,0 +1,117 @@
+seed: 79
+output_dir: D:\NMI_SPWFM_datasets\friction_affordance_outputs\paper_protocol\v1_physics_texture
+device: auto
+data:
+  train_manifests:
+  - data/manifests_full/rscd_prepared_train.csv
+  - data/manifests_full/roadsaw_train.csv
+  - data/manifests_full/roadsc_train.csv
+  val_manifests:
+  - data/manifests_full/rscd_prepared_val.csv
+  - data/manifests_full/roadsaw_val.csv
+  - data/manifests_full/roadsc_val.csv
+  test_manifests:
+  - data/manifests_full/rscd_prepared_test.csv
+  - data/manifests_full/roadsaw_test.csv
+  - data/manifests_full/roadsc_test.csv
+  image_size: 192
+  batch_size: 16
+  num_workers: 2
+  prefetch_factor: 2
+  max_train_samples: null
+  max_val_samples: null
+  max_test_samples: null
+  max_train_samples_per_class: null
+  max_val_samples_per_class: null
+  max_test_samples_per_class: null
+  balanced_sampling: true
+  balanced_dataset_first: true
+  balanced_group_columns:
+  - dataset
+  - class_label
+  balanced_num_samples_per_epoch: 36000
+  sample_seed: 79
+  augmentation:
+    random_resized_crop: true
+    crop_scale:
+    - 0.78
+    - 1.0
+    crop_ratio:
+    - 0.88
+    - 1.12
+    color_jitter:
+      brightness: 0.3
+      contrast: 0.3
+      saturation: 0.18
+      hue: 0.035
+    random_grayscale_p: 0.08
+    gaussian_blur_p: 0.12
+    blur_sigma:
+    - 0.1
+    - 1.2
+    random_erasing_p: 0.06
+    erase_scale:
+    - 0.015
+    - 0.07
+model:
+  backbone: convnext_tiny
+  embedding_dim: 768
+  dropout: 0.3
+  pretrained: true
+  freeze_backbone: false
+  use_physics_branch: true
+  physics_dim: 96
+  use_friction_set: false
+  friction_set_entropy_expansion: 0.12
+  friction_set_interval_mix: 0.8
+  use_evidence_field: false
+  evidence_dim: 96
+  evidence_hidden_dim: 64
+  evidence_patch_stride: 8
+  evidence_contact_prior_strength: 1.0
+  evidence_entropy_expansion: 0.08
+  evidence_interval_mix: 0.2
+  evidence_risk_logit_mix: 0.15
+  num_domains: 3
+optim:
+  epochs: 20
+  lr: 8.0e-05
+  weight_decay: 0.05
+  grad_clip_norm: 5.0
+  grad_accum_steps: 2
+  amp: true
+  early_stop_patience: 5
+  early_stop_min_delta: 0.0005
+  log_every_steps: 100
+loss:
+  task_weight: 1.0
+  compatibility_weight: 0.0
+  group_dro_weight: 0.0
+  group_vrex_weight: 0.0
+  group_dro_temperature: 0.05
+  risk_ordinal_weight: 0.2
+  interval_weight: 0.05
+  coverage_weight: 1.0
+  endpoint_weight: 1.5
+  target_width_weight: 0.5
+  width_weight: 0.0
+  coverage_margin: 0.0
+  monotonic_weight: 0.05
+  risk_mu_monotonic_weight: 0.08
+  domain_weight: 0.0
+  domain_grl_lambda: 0.0
+  feature_coral_weight: 0.0
+  risk_conditional_coral_weight: 0.0
+  coral_min_samples_per_domain: 2
+  evidence_risk_weight: 0.0
+  evidence_interval_weight: 0.0
+  evidence_endpoint_weight: 0.0
+  evidence_width_weight: 0.0
+  evidence_target_width_weight: 0.0
+  evidence_attention_prior_weight: 0.0
+  evidence_attention_smooth_weight: 0.0
+  evidence_risk_consistency_weight: 0.0
+  evidence_interval_consistency_weight: 0.0
+  evidence_attention_region_weight: 0.0
+  evidence_attention_pseudo_road_weight: 0.0
+experiment_note: 'Paper ablation V1: add physics-inspired texture statistics.'

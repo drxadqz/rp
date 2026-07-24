@@ -1,0 +1,55 @@
+extends: c3_farnet_screen_s68_ordinal_open_concrete_film_20260710.yaml
+
+output_dir: E:/perception_outputs/rscd_surface_classification/c3_farnet_screen_s73_spectral_scattering_family_router_20260710
+
+model:
+  backbone: convnext_tiny_family_router_spectral_scattering_concrete_film_stem
+  pretrained: false
+  use_source_reliable_boundary_router: true
+  expose_hardpair_pair_value_evidence: true
+
+loss:
+  focus_ce_extra_weight: 0.14
+  focus_ce_classes:
+    - wet_concrete_smooth
+    - wet_concrete_slight
+    - wet_concrete_severe
+    - water_concrete_smooth
+    - water_concrete_slight
+    - water_concrete_severe
+  protected_tristate_roughness_weight: 0.045
+  protected_tristate_roughness_margin: 0.42
+  protected_tristate_roughness_min_weight: 0.14
+  protected_tristate_roughness_severe_boost: 0.56
+  protected_tristate_roughness_slight_protect: 0.62
+  family_mechanism_router_weight: 0.245
+  family_router_split_concrete_film_routes: true
+  family_router_entropy_weight: 0.050
+  family_router_entropy_active_only: true
+  family_router_target_margin_weight: 0.078
+  family_router_target_margin: 0.255
+  family_router_margin_active_only: true
+  family_router_protect_sample_weight: 0.45
+  family_router_dry_weight: 1.08
+  family_router_asphalt_weight: 1.38
+  family_router_concrete_weight: 1.62
+  family_router_concrete_slight_weight: 1.32
+  family_router_concrete_severe_weight: 1.18
+  family_router_protect_leak_weight: 0.050
+
+train:
+  trainable_prefixes:
+    - backbone.gate_calibrated_tensor_coupling_banks
+    - backbone.family_route_routers
+    - backbone.family_safe_tensor_coupling_banks
+  lr: 0.00004
+  weight_decay: 0.0018
+  batch_size: 2
+  grad_accum_steps: 8
+  samples_per_epoch: 27000
+  max_train_samples_per_class: 1000
+
+eval:
+  batch_size: 16
+  max_val_samples_per_class: 250
+  max_test_samples_per_class: 250

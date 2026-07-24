@@ -1,0 +1,25 @@
+extends: c3_farnet_s139_factor_relational_kd_custom_backbone_screen_20260716.yaml
+
+output_dir: E:/perception_outputs/rscd_surface_classification/s140_relational_kd_concrete_scalespace_screen_20260716
+
+# S140 tests one task-adapted hypothesis after S139:
+# factor-relational KD improves the label-structure transfer, but the remaining
+# weak classes are still dominated by concrete + slight/severe roughness.
+# Therefore, add an early concrete-conditioned scale-space roughness expert
+# before the generic coupling experts, and keep the same teacher cache/budget.
+
+model:
+  use_concrete_roughness_scale_space: true
+  concrete_roughness_scale_space_mode: learned
+  concrete_roughness_scale_space_scale: 0.14
+
+loss:
+  concrete_roughness_route_weight: 0.035
+  teacher_factor_marginal_axis_weights:
+    friction: 1.0
+    material: 0.8
+    roughness: 1.6
+  teacher_hardpair_axis_weights:
+    friction: 1.15
+    material: 0.7
+    roughness: 1.6

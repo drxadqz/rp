@@ -1,0 +1,14 @@
+data_root: D:\NMI_SPWFM_datasets\friction_affordance_data
+datasets:
+  rscd_prepared:
+    type: imagefolder
+    root: D:\NMI_SPWFM_datasets\friction_affordance_data\RSCD_raw\RSCD dataset-1million
+    dataset_name: rscd
+  roadsaw:
+    type: imagefolder
+    root: D:\NMI_SPWFM_datasets\friction_affordance_data\RoadSaW-150_s
+    dataset_name: roadsaw
+  roadsc:
+    type: imagefolder
+    root: D:\NMI_SPWFM_datasets\friction_affordance_data\RoadSC-balanced_to_RoadSaW12-150_l
+    dataset_name: roadsc

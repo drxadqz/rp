@@ -1,0 +1,68 @@
+extends: c3_farnet_screen_s96_wc_pair_relative_boundary_20260712.yaml
+
+output_dir: E:/perception_outputs/rscd_surface_classification/c3_farnet_gate_s126_sequential_factor_cotune_s96_anchor_20260715
+
+# S126: sequential factor co-tuning.
+# Targeted label structure: friction -> material -> roughness coupling.
+# Instead of adding another late head, this opens the already task-designed
+# learnable early stem conditioners together with the validated boundary corrector.
+# PhysicsTexture remains a fixed physical evidence source in this configuration.
+model:
+  backbone: convnext_tiny_gate_calibrated_tensor_coupling_concrete_film_rough_stem
+  physics_texture_stem_scale: 0.055
+  scale_space_roughness_stem_scale: 0.040
+  pair_value_stem_scale: 0.030
+  pair_value_stem_learned_gate_bias: -0.9
+
+loss:
+  focus_ce_extra_weight: 0.20
+  feature_value_boundary_pairwise_loss_weight: 0.26
+  value_guided_hardpair_margin_weight: 0.045
+  anchor_consistency_weight: 0.48
+  anchor_consistency_focus_weight: 0.010
+  anchor_consistency_protect_weight: 0.64
+  anchor_consistency_protect_confidence: 0.72
+  anchor_consistency_protect_margin: 0.23
+  anchor_no_flip_weight: 0.48
+  anchor_no_flip_nonfocus_only: true
+  anchor_nonregression_weight: 0.26
+  anchor_nonregression_focus_weight: 0.040
+  anchor_nonregression_margin: 0.012
+  anchor_nonregression_confidence: 0.68
+  anchor_nonregression_teacher_margin: 0.10
+
+train:
+  resume_from: E:/perception_outputs/rscd_surface_classification/c3_farnet_screen_s96_wc_pair_relative_boundary_20260712/best_checkpoint.pth
+  teacher_checkpoint: E:/perception_outputs/rscd_surface_classification/c3_farnet_screen_s96_wc_pair_relative_boundary_20260712/best_checkpoint.pth
+  teacher_backbone: convnext_tiny_gate_calibrated_tensor_coupling_concrete_film_rough_stem
+  teacher_head_type: hardpair_error_gated_calibrated
+  teacher_preserve_hardpair_focus: true
+  trainable_prefixes:
+    - scale_space_roughness_stem_adapter
+    - pair_value_stem_conditioner
+    - feature_value_boundary_corrector
+  evaluate_initial: true
+  lr: 0.000055
+  weight_decay: 0.0008
+  batch_size: 4
+  grad_accum_steps: 4
+  num_workers: 2
+  prefetch_factor: 2
+  amp: true
+  augmentation: true
+  factor_graph_pair_sampling: true
+  factor_graph_pair_sampling_seed: 12615
+  factor_graph_pair_sampling_pair_slots: 2
+  factor_graph_pair_sampling_positive_slots: 0
+  factor_graph_pair_sampling_wet_concrete_focus_scale: 8.0
+  factor_graph_pair_sampling_roughness_focus_scale: 3.0
+  factor_graph_pair_sampling_wet_water_focus_scale: 2.0
+  max_train_samples_per_class: 250
+  samples_per_epoch: 6750
+  grad_clip_norm: 1.8
+  log_every_steps: 125
+
+eval:
+  batch_size: 8
+  max_val_samples_per_class: 250
+  max_test_samples_per_class: 250

@@ -1,0 +1,51 @@
+extends: c3_farnet_screen_s63_physics_gated_conv_20260710.yaml
+
+output_dir: E:/perception_outputs/rscd_surface_classification/c3_farnet_screen_s64_factorized_rep_pyramid_20260710
+
+model:
+  backbone: road_cortex_factorized_rep_pyramid_tiny
+  pretrained: false
+  use_source_reliable_boundary_router: false
+
+loss:
+  factor_weight: 0.10
+  factor_axis_weights:
+    friction: 0.85
+    material: 1.35
+    roughness: 1.45
+  tournament_weight: 0.025
+  counterfactual_weight: 0.0
+  reliability_weight: 0.0
+  focus_ce_extra_weight: 0.22
+  anchor_consistency_weight: 0.0
+  anchor_consistency_focus_weight: 0.0
+  anchor_no_flip_weight: 0.0
+  anchor_error_gate_weight: 0.0
+
+train:
+  resume_from:
+  teacher_checkpoint:
+  teacher_logits_cache:
+  expert_teacher_checkpoint:
+  expert_teacher_logits_cache:
+  trainable_prefixes:
+  evaluate_initial: false
+  lr: 0.00032
+  weight_decay: 0.003
+  epochs: 1
+  batch_size: 8
+  grad_accum_steps: 2
+  num_workers: 2
+  prefetch_factor: 2
+  amp: true
+  augmentation: true
+  balanced_sampling: true
+  max_train_samples_per_class: 1000
+  samples_per_epoch: 27000
+  grad_clip_norm: 5.0
+  log_every_steps: 250
+
+eval:
+  batch_size: 32
+  max_val_samples_per_class:
+  max_test_samples_per_class:

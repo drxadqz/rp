@@ -1,0 +1,32 @@
+extends: c3_farnet_formal_fullmanifest_source_reliable_router_s7_20260709.yaml
+
+output_dir: E:/perception_outputs/rscd_surface_classification/c3_farnet_formal_fullmanifest_road_cortex_retina_s27_20260709
+
+model:
+  # S27: self-designed bio-optical RSCD backbone.
+  # It uses retinal center-surround ON/OFF routes, opponent-color/Retinex
+  # routes, film/gloss routes, grain roughness routes, material routes, and a
+  # coupling route with lateral-inhibition-style nuisance suppression.
+  backbone: road_cortex_retina_tiny
+  pretrained: false
+
+loss:
+  anchor_consistency_weight: 0.23
+  anchor_consistency_focus_weight: 0.008
+  anchor_no_flip_weight: 0.08
+  anchor_error_gate_weight: 0.05
+  focus_ce_extra_weight: 0.29
+
+train:
+  resume_from:
+  trainable_prefixes:
+  evaluate_initial: false
+  lr: 0.00011
+  weight_decay: 0.0032
+  epochs: 1
+  batch_size: 8
+  grad_accum_steps: 2
+  samples_per_epoch: 0
+  amp: true
+  balanced_sampling: true
+  log_every_steps: 2000

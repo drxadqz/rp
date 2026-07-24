@@ -1,0 +1,28 @@
+extends: c3_farnet_formal_fullmanifest_source_reliable_router_s7_20260709.yaml
+
+output_dir: E:/perception_outputs/rscd_surface_classification/c3_farnet_formal_exactpass_source_reliable_router_s7_20260709
+
+train:
+  # Strict audit variant: each train image is visited once per epoch through
+  # the DataLoader shuffle path, rather than class-balanced sampling with
+  # replacement. Keep this for reviewer-facing exact-pass comparison; do not
+  # run concurrently with the full-length balanced experiment.
+  balanced_sampling: false
+  samples_per_epoch: 0
+  epochs: 1
+  evaluate_initial: true
+  batch_size: 8
+  grad_accum_steps: 2
+  num_workers: 2
+  prefetch_factor: 2
+  lr: 0.00003
+  weight_decay: 0.002
+  amp: true
+  augmentation: true
+  grad_clip_norm: 5.0
+  log_every_steps: 2000
+
+eval:
+  batch_size: 32
+  max_val_samples_per_class:
+  max_test_samples_per_class:

@@ -1,0 +1,8 @@
+extends: c3_farnet_screen_s76_released_physics_stem_early_cotune_20260711.yaml
+
+output_dir: E:/perception_outputs/rscd_surface_classification/c3_farnet_fulltest_s76_released_physics_stem_early_cotune_20260711
+
+eval:
+  batch_size: 16
+  max_val_samples_per_class:
+  max_test_samples_per_class:

@@ -1,0 +1,31 @@
+extends: c3_farnet_formal_fullmanifest_source_reliable_router_s7_20260709.yaml
+
+output_dir: E:/perception_outputs/rscd_surface_classification/c3_farnet_formal_fullmanifest_road_cortex_factor_interaction_transformer_s60_20260709
+
+model:
+  # S60: self-designed RSCD factor-region interaction Transformer backbone.
+  # It builds dry/film/water, asphalt/concrete, roughness and coupling tokens
+  # inside each stage and lets them exchange information with local region tokens.
+  backbone: road_cortex_factor_interaction_transformer_tiny
+  pretrained: false
+
+loss:
+  anchor_consistency_weight: 0.23
+  anchor_consistency_focus_weight: 0.008
+  anchor_no_flip_weight: 0.08
+  anchor_error_gate_weight: 0.05
+  focus_ce_extra_weight: 0.30
+
+train:
+  resume_from:
+  trainable_prefixes:
+  evaluate_initial: false
+  lr: 0.000095
+  weight_decay: 0.0035
+  epochs: 1
+  batch_size: 8
+  grad_accum_steps: 2
+  samples_per_epoch: 0
+  amp: true
+  balanced_sampling: true
+  log_every_steps: 2000

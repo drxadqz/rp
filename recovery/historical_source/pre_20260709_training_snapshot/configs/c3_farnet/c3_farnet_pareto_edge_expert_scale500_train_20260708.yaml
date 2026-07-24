@@ -1,0 +1,21 @@
+extends: c3_farnet_pareto_edge_expert_micro_20260708.yaml
+
+output_dir: D:/NMI_SPWFM_datasets/friction_affordance_outputs/rscd_surface_classification/c3_farnet_pareto_edge_expert_scale500_train_20260708
+
+model:
+  pareto_edge_expert_scale: 500.0
+  pareto_edge_expert_gate_floor: 0.12
+  pareto_edge_expert_learned_gate_bias: -1.2
+
+train:
+  lr: 0.00002
+  weight_decay: 0.0005
+  samples_per_epoch: 2400
+  epochs: 1
+  log_every_steps: 80
+
+loss:
+  pareto_selected_edge_loss_weight: 0.50
+  anchor_consistency_weight: 0.70
+  anchor_no_flip_weight: 0.48
+  anchor_nonregression_weight: 0.42

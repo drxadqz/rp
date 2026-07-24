@@ -1,0 +1,14 @@
+extends: c3_farnet_screen_s135_s96_wc_topology_texture_stem_20260715.yaml
+
+output_dir: E:/perception_outputs/rscd_surface_classification/c3_farnet_screen_s135b_s96_wc_occluded_film_topology_stem_20260715
+
+# S135b: revised early topology-texture stem.
+# Val-only CPU audit showed water_concrete_severe is not simply "rougher" than
+# water_concrete_slight. It is better described as a water-film occlusion state:
+# stronger connected film and film boundaries, weaker visible concrete texture.
+# The implementation keeps the same trainable module but the signed mechanism
+# channel now represents:
+#   occluded water film severe evidence - visible slight concrete texture evidence.
+
+train:
+  factor_graph_pair_sampling_seed: 13517

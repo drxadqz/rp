@@ -1,0 +1,20 @@
+extends: c3_farnet_formal_fullmanifest_concrete_film_split_router_s15_20260709.yaml
+
+output_dir: E:/perception_outputs/rscd_surface_classification/c3_farnet_formal_fullmanifest_concrete_film_split_free_energy_s16_20260709
+
+model:
+  # S16: S15 split mechanisms + sharper free-energy route dynamics.
+  backbone: convnext_tiny_family_router_concrete_film_split_free_energy_stem
+
+loss:
+  # Statistical-physics-inspired route free energy for early RSCD mechanisms.
+  # CE selects the correct mechanism family; entropy and target-margin terms
+  # reduce diffuse multi-route activation, so wet/water-concrete smooth,
+  # hidden-slight, and hidden-severe do not overwrite each other.
+  family_mechanism_router_weight: 0.22
+  family_router_entropy_weight: 0.050
+  family_router_entropy_active_only: true
+  family_router_target_margin_weight: 0.065
+  family_router_target_margin: 0.22
+  family_router_margin_active_only: true
+  family_router_protect_leak_weight: 0.040

@@ -1,0 +1,74 @@
+seed: 79
+output_dir: E:/perception/friction_affordance_runs/baseline_current_c3_compatible
+
+data:
+  train_manifest: E:/perception/friction_affordance_field/data/manifests_full/rscd_prepared_train.csv
+  val_manifest: E:/perception/friction_affordance_field/data/manifests_full/rscd_prepared_val.csv
+  test_manifest: E:/perception/friction_affordance_field/data/manifests_full/rscd_prepared_test.csv
+  image_size: 192
+  train_resize_mode: letterbox
+  eval_resize_mode: letterbox
+
+model:
+  name: c3_farnet
+  backbone: convnext_tiny
+  embedding_dim: 768
+  pretrained: false
+  dropout: 0.2
+  head:
+    type: linear
+  head_type: linear
+  use_dry_vor: true
+  use_physics_branch: true
+  physics_dim: 96
+  physics_quality_cues: true
+  physics_quality_region_cues: false
+  boundary_use_physics_feature: false
+  use_semantic_physics_attention_branch: true
+  semantic_physics_attention_dim: 64
+  use_local_physics_field_branch: true
+  local_physics_field_dim: 64
+  local_physics_field_scale: 0.08
+  use_dry_concrete_roughness_vor_residual: true
+  dry_concrete_roughness_scale: 0.12
+
+loss:
+  use_factor_ce: false
+  use_tournament: false
+  use_counterfactual: false
+  use_reliability: false
+  factor_weight: 0.0
+  tournament_weight: 0.0
+  counterfactual_weight: 0.0
+  reliability_weight: 0.0
+
+optimizer:
+  type: AdamW
+  lr: 0.000035
+  weight_decay: 0.003
+
+scheduler:
+  type: none
+
+train:
+  resume_from: D:/NMI_SPWFM_datasets/friction_affordance_outputs/rscd_surface_classification/screen_dry_concrete_vor_residual_scale012_lr1e3_s8k_from_anchor/best.pt
+  trainable_prefixes:
+    - linear_head
+  batch_size: 8
+  grad_accum_steps: 2
+  num_workers: 2
+  prefetch_factor: 2
+  lr: 0.000035
+  weight_decay: 0.003
+  epochs: 1
+  amp: true
+  augmentation: true
+  balanced_sampling: true
+  samples_per_epoch: 4000
+  grad_clip_norm: 5.0
+  log_every_steps: 80
+
+eval:
+  batch_size: 16
+  max_val_samples_per_class: 120
+  max_test_samples_per_class: 120

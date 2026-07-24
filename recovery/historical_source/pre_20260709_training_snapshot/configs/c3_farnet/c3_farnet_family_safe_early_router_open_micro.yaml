@@ -1,0 +1,14 @@
+extends: c3_farnet_family_safe_early_router_micro.yaml
+
+seed: 97
+output_dir: D:/NMI_SPWFM_datasets/friction_affordance_outputs/rscd_surface_classification/c3_farnet_family_safe_early_router_open_micro_20260707
+
+model:
+  backbone: convnext_tiny_family_safe_tensor_coupling_open_stem
+
+train:
+  trainable_prefixes:
+    - backbone.family_safe_tensor_coupling_banks
+  lr: 0.00028
+  samples_per_epoch: 2400
+  log_every_steps: 100

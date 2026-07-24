@@ -1,0 +1,39 @@
+extends: c3_farnet_gate_s131_s7_concrete_state_closedset_20260715.yaml
+
+output_dir: E:/perception_outputs/rscd_surface_classification/c3_farnet_gate_s131b_s7_concrete_state_closedset_stable_20260715
+
+train:
+  resume_from: E:/perception_outputs/rscd_surface_classification/c3_farnet_formal_fullmanifest_source_reliable_router_s7_20260709/best_checkpoint.pth
+  teacher_checkpoint: E:/perception_outputs/rscd_surface_classification/c3_farnet_formal_fullmanifest_source_reliable_router_s7_20260709/best_checkpoint.pth
+  teacher_backbone: convnext_tiny_gate_calibrated_tensor_coupling_concrete_film_rough_stem
+  teacher_head_type: hardpair_error_gated_calibrated
+  teacher_preserve_hardpair_focus: true
+  trainable_prefixes:
+    - closed_set_factor_redistributor
+  evaluate_initial: true
+  lr: 0.00011
+  weight_decay: 0.0012
+  epochs: 1
+  batch_size: 8
+  grad_accum_steps: 2
+  num_workers: 0
+  prefetch_factor:
+  amp: true
+  augmentation: true
+  balanced_sampling: true
+  factor_graph_pair_sampling: true
+  factor_graph_pair_sampling_seed: 13117
+  factor_graph_pair_sampling_pair_slots: 2
+  factor_graph_pair_sampling_positive_slots: 0
+  factor_graph_pair_sampling_wet_concrete_focus_scale: 4.0
+  factor_graph_pair_sampling_roughness_focus_scale: 5.5
+  factor_graph_pair_sampling_wet_water_focus_scale: 2.0
+  max_train_samples_per_class: 250
+  samples_per_epoch: 6750
+  grad_clip_norm: 2.5
+  log_every_steps: 125
+
+eval:
+  batch_size: 16
+  max_val_samples_per_class: 250
+  max_test_samples_per_class: 250

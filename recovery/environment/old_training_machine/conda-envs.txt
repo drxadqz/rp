@@ -1,0 +1,8 @@
+﻿
+# conda environments:
+#
+                       D:\NMI_SPWFM_datasets\conda_envs\faf_paper
+base                   E:\Anaconda
+rl                     E:\Anaconda\envs\rl
+rl2                    E:\Anaconda\envs\rl2
+

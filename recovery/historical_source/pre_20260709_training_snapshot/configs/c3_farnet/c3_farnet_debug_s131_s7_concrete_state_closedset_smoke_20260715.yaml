@@ -1,0 +1,19 @@
+extends: c3_farnet_gate_s131_s7_concrete_state_closedset_20260715.yaml
+
+output_dir: E:/perception_outputs/rscd_surface_classification/c3_farnet_debug_s131_s7_concrete_state_closedset_smoke_20260715
+
+train:
+  evaluate_initial: true
+  epochs: 1
+  batch_size: 2
+  grad_accum_steps: 2
+  num_workers: 0
+  prefetch_factor:
+  samples_per_epoch: 54
+  max_train_samples_per_class: 2
+  log_every_steps: 5
+
+eval:
+  batch_size: 4
+  max_val_samples_per_class: 2
+  max_test_samples_per_class: 2

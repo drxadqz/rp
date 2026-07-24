@@ -1,0 +1,17 @@
+extends: c3_farnet_screen_s68_ordinal_open_concrete_film_20260710.yaml
+
+output_dir: E:/perception_outputs/rscd_surface_classification/c3_farnet_screen_s69_ordinal_open_backbone_projection_20260710
+
+train:
+  trainable_prefixes:
+    - backbone.gate_calibrated_tensor_coupling_banks
+    - backbone.proj
+  lr: 0.000035
+  weight_decay: 0.0018
+  samples_per_epoch: 27000
+  max_train_samples_per_class: 1000
+
+eval:
+  batch_size: 32
+  max_val_samples_per_class: 250
+  max_test_samples_per_class: 250

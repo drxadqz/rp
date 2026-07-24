@@ -1,0 +1,22 @@
+extends: c3_farnet_formal_fullmanifest_morphology_scale_concrete_film_s20_20260709.yaml
+
+output_dir: E:/perception_outputs/rscd_surface_classification/c3_farnet_formal_fullmanifest_spectral_scattering_concrete_film_s21_20260709
+
+model:
+  # S21: S20 plus early spectral/scattering evidence.
+  # This is the task-adapted version of frequency-domain roughness reasoning:
+  # high/mid band energy represents visible aggregate and microtexture, while
+  # low-frequency film and spectral suppression represent wet/water films that
+  # erase texture. The evidence conditions the early tensor router, not a late
+  # residual head.
+  backbone: convnext_tiny_family_router_spectral_scattering_concrete_film_stem
+
+loss:
+  # Frequency evidence targets roughness under wet/water films. Keep the same
+  # formal full-manifest budget and slightly sharpen hidden slight/severe routes.
+  family_mechanism_router_weight: 0.245
+  family_router_target_margin_weight: 0.078
+  family_router_target_margin: 0.255
+  family_router_concrete_slight_weight: 1.32
+  family_router_concrete_severe_weight: 1.18
+  family_router_protect_leak_weight: 0.050

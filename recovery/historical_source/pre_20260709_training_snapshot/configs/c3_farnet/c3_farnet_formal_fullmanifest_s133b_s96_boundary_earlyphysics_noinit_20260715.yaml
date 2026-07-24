@@ -1,0 +1,6 @@
+extends: c3_farnet_formal_fullmanifest_s133_s96_boundary_earlyphysics_20260715.yaml
+
+output_dir: E:/perception_outputs/rscd_surface_classification/c3_farnet_formal_fullmanifest_s133b_s96_boundary_earlyphysics_noinit_20260715
+
+train:
+  evaluate_initial: false

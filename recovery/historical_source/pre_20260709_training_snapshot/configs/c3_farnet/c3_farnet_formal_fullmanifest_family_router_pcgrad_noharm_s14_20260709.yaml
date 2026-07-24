@@ -1,0 +1,71 @@
+extends: c3_farnet_formal_fullmanifest_family_router_tensor_coupling_s13_20260709.yaml
+
+output_dir: E:/perception_outputs/rscd_surface_classification/c3_farnet_formal_fullmanifest_family_router_pcgrad_noharm_s14_20260709
+
+loss:
+  # S14 keeps the S13 early family-router backbone, but adds RSCD-specific
+  # no-harm gradient surgery. The focus set is the weak wet/water paved
+  # boundary family; protected groups are teacher-correct classes selected
+  # per batch, so a weak-class gain cannot silently damage stable classes.
+  rscd_pcgrad_enabled: true
+  rscd_pcgrad_grouped_protect_enabled: true
+  rscd_pcgrad_decompose_main_ce: true
+  rscd_pcgrad_preserve_batch_ce_scale: true
+  rscd_pcgrad_focus_weight: 0.88
+  rscd_pcgrad_protect_loss_weight: 1.0
+  rscd_pcgrad_focus_classes:
+    - water_concrete_slight
+    - water_concrete_severe
+    - wet_concrete_slight
+    - wet_concrete_severe
+    - water_asphalt_slight
+    - water_asphalt_severe
+    - dry_concrete_slight
+    - dry_concrete_severe
+  rscd_pcgrad_focus_physics_extra: 0.42
+  rscd_pcgrad_focus_physics_max_weight: 1.42
+  rscd_pcgrad_protect_focus_teacher_correct: true
+  rscd_pcgrad_protect_group_mode: class
+  rscd_pcgrad_group_min_count: 1
+  rscd_pcgrad_max_protect_groups: 8
+  rscd_pcgrad_protect_group_select: hardest
+  rscd_pcgrad_protect_teacher_correct: true
+  rscd_pcgrad_protect_confidence: 0.62
+  rscd_pcgrad_protect_margin: 0.06
+  rscd_pcgrad_protect_kl_weight: 0.24
+  rscd_pcgrad_protect_temperature: 2.0
+
+  # Keep non-regression barriers, but make the focus-class barrier lighter so
+  # S13's early mechanism still has room to repair the weakest concrete-water
+  # boundaries.
+  anchor_consistency_weight: 0.68
+  anchor_consistency_protect_weight: 0.68
+  anchor_consistency_protect_confidence: 0.66
+  anchor_consistency_protect_margin: 0.14
+  anchor_no_flip_weight: 0.44
+  anchor_no_flip_nonfocus_only: false
+  anchor_nonregression_weight: 0.34
+  anchor_nonregression_focus_weight: 0.14
+  anchor_nonregression_margin: 0.012
+  anchor_nonregression_confidence: 0.64
+  anchor_nonregression_teacher_margin: 0.10
+
+train:
+  # PCGrad disables AMP internally; use 4x4 to keep the effective batch at 16
+  # without exceeding the 4GB laptop GPU memory budget.
+  batch_size: 4
+  grad_accum_steps: 4
+  lr: 0.00008
+  weight_decay: 0.0015
+  amp: false
+  log_every_steps: 1200
+
+  # Use the stable anchor as teacher and explicitly remove later experimental
+  # routers from teacher construction, so the no-harm signal is not polluted by
+  # randomly initialized S13/S14 modules.
+  teacher_checkpoint: D:/NMI_SPWFM_datasets/friction_affordance_outputs/rscd_surface_classification/c3_farnet_errorgate_paircal_screen_20260703/best_checkpoint.pth
+  teacher_backbone: convnext_tiny_gate_calibrated_tensor_coupling_concrete_film_rough_stem
+  teacher_head_type: hardpair_error_gated_calibrated
+  teacher_model_overrides:
+    use_source_reliable_boundary_router: false
+    use_pareto_edge_expert: false

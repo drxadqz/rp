@@ -1,0 +1,60 @@
+extends: c3_farnet_formal_fullmanifest_source_reliable_router_s7_20260709.yaml
+
+output_dir: E:/perception_outputs/rscd_surface_classification/c3_farnet_formal_fullmanifest_source_reliable_router_s10_graph_control_stable_20260709
+
+model:
+  use_source_reliable_boundary_router: true
+  source_reliable_boundary_hidden_dim: 32
+  source_reliable_boundary_scale: 7.0
+  source_reliable_boundary_base_strength: 1.0
+  source_reliable_boundary_physics_gate_floor: 0.45
+  source_reliable_boundary_gate_temperature: 6.0
+  source_reliable_boundary_source_temperature: 28.0
+  source_reliable_boundary_learned_gate_bias: -1.6
+  source_reliable_boundary_dropout: 0.0
+  source_reliable_boundary_routes:
+    - source: dry_concrete_smooth
+      target: dry_concrete_slight
+      topk: 3
+      margin: 1.00
+      source_f1: 0.907292954264524
+      min_source_f1: 0.90
+      route_scale: 1.00
+      kind: dry_concrete_roughness
+    - source: dry_concrete_severe
+      target: dry_concrete_slight
+      topk: 3
+      margin: 0.75
+      source_f1: 0.8652542372881356
+      min_source_f1: 0.845254
+      route_scale: 0.032
+      kind: dry_concrete_roughness
+    - source: water_concrete_smooth
+      target: wet_concrete_smooth
+      topk: 3
+      margin: 0.60
+      source_f1: 0.886140724946695
+      min_source_f1: 0.866141
+      route_scale: 0.030
+      kind: wet_water_smooth_film
+    - source: dry_asphalt_severe
+      target: dry_asphalt_slight
+      topk: 3
+      margin: 0.75
+      source_f1: 0.8659549228944247
+      min_source_f1: 0.845955
+      route_scale: 0.022
+      kind: dry_asphalt_roughness
+    - source: water_concrete_severe
+      target: water_concrete_slight
+      topk: 3
+      margin: 0.75
+      source_f1: 0.8098974049487025
+      min_source_f1: 0.789897
+      route_scale: 0.018
+      kind: water_concrete_moderate_roughness
+
+train:
+  num_workers: 4
+  prefetch_factor: 4
+  persistent_workers: true

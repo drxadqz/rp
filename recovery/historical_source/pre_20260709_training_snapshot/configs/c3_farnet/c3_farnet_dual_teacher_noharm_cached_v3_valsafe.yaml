@@ -1,0 +1,6 @@
+extends: c3_farnet_dual_teacher_noharm_cached_v2_expert_retention.yaml
+
+output_dir: D:/NMI_SPWFM_datasets/friction_affordance_outputs/rscd_surface_classification/c3_farnet_dual_teacher_noharm_cached_v3_valsafe_20260707
+
+train:
+  evaluate_initial: true

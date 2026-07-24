@@ -1,0 +1,9 @@
+extends: c3_farnet_s136_coupled_factor_backbone_smoke_20260715.yaml
+
+output_dir: E:/perception_outputs/rscd_surface_classification/s136_control_fixed_uniform_gate_smoke_20260715
+
+model:
+  coupling_gate_mode: fixed_uniform
+
+loss:
+  coupling_gate_weight: 0.0

@@ -1,0 +1,38 @@
+seed: 23
+output_dir: outputs/runtime_probe
+device: auto
+
+data:
+  train_manifests:
+    - data/manifests/rscd_prepared_train.csv
+    - data/manifests/roadsaw_train.csv
+    - data/manifests/roadsc_train.csv
+  val_manifests:
+    - data/manifests/rscd_prepared_val.csv
+    - data/manifests/roadsaw_val.csv
+    - data/manifests/roadsc_val.csv
+  image_size: 160
+  batch_size: 64
+  num_workers: 0
+  max_train_samples: 1024
+  max_val_samples: 512
+  sample_seed: 23
+
+model:
+  backbone: resnet18
+  embedding_dim: 512
+  dropout: 0.2
+  pretrained: true
+  freeze_backbone: true
+
+optim:
+  epochs: 1
+  lr: 0.001
+  weight_decay: 0.0001
+  grad_clip_norm: 5.0
+  amp: true
+
+loss:
+  task_weight: 1.0
+  interval_weight: 0.35
+  monotonic_weight: 0.05

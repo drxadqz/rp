@@ -1,0 +1,75 @@
+seed: 71
+output_dir: outputs/topjournal_v2_smoke
+device: auto
+
+data:
+  train_manifests:
+    - data/manifests/rscd_prepared_train.csv
+    - data/manifests/roadsaw_train.csv
+    - data/manifests/roadsc_train.csv
+  val_manifests:
+    - data/manifests/rscd_prepared_val.csv
+    - data/manifests/roadsaw_val.csv
+    - data/manifests/roadsc_val.csv
+  test_manifests:
+    - data/manifests/rscd_prepared_test.csv
+    - data/manifests/roadsaw_test.csv
+    - data/manifests/roadsc_test.csv
+  image_size: 160
+  batch_size: 48
+  num_workers: 0
+  max_train_samples: 768
+  max_val_samples: 256
+  max_test_samples: 256
+  balanced_sampling: true
+  balanced_dataset_first: true
+  balanced_group_columns:
+    - dataset
+    - class_label
+  balanced_num_samples_per_epoch: 768
+  sample_seed: 71
+  augmentation:
+    random_resized_crop: true
+    crop_scale: [0.80, 1.0]
+    crop_ratio: [0.9, 1.1]
+    color_jitter:
+      brightness: 0.25
+      contrast: 0.25
+      saturation: 0.15
+      hue: 0.03
+    random_grayscale_p: 0.05
+    gaussian_blur_p: 0.10
+    random_erasing_p: 0.05
+
+model:
+  backbone: resnet18
+  embedding_dim: 512
+  dropout: 0.25
+  pretrained: true
+  freeze_backbone: true
+  use_physics_branch: true
+  physics_dim: 64
+  num_domains: 3
+
+optim:
+  epochs: 1
+  lr: 0.001
+  weight_decay: 0.0001
+  grad_clip_norm: 5.0
+  amp: true
+  early_stop_patience: 1
+  early_stop_min_delta: 0.001
+
+loss:
+  task_weight: 1.0
+  risk_ordinal_weight: 0.2
+  interval_weight: 0.25
+  coverage_weight: 1.5
+  endpoint_weight: 2.5
+  target_width_weight: 1.0
+  width_weight: 0.0
+  coverage_margin: 0.0
+  monotonic_weight: 0.05
+  risk_mu_monotonic_weight: 0.08
+  domain_weight: 0.08
+  domain_grl_lambda: 0.30

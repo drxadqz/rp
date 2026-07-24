@@ -1,0 +1,86 @@
+extends: c3_farnet_errorgate_paircal_full_eval.yaml
+
+output_dir: E:/perception_outputs/rscd_surface_classification/c3_farnet_formal_fullmanifest_source_reliable_router_s7_20260709
+
+model:
+  use_source_reliable_boundary_router: true
+  source_reliable_boundary_hidden_dim: 32
+  source_reliable_boundary_scale: 7.0
+  source_reliable_boundary_base_strength: 1.0
+  source_reliable_boundary_physics_gate_floor: 0.5
+  source_reliable_boundary_gate_temperature: 6.0
+  source_reliable_boundary_source_temperature: 28.0
+  source_reliable_boundary_learned_gate_bias: -1.6
+  source_reliable_boundary_dropout: 0.0
+  source_reliable_boundary_routes:
+    - source: dry_concrete_smooth
+      target: dry_concrete_slight
+      topk: 3
+      margin: 1.00
+      source_f1: 0.907292954264524
+      min_source_f1: 0.90
+      kind: dry_concrete_roughness
+
+loss:
+  factor_weight: 0.0
+  factor_axis_weights:
+    friction: 1.0
+    material: 1.0
+    roughness: 1.0
+  tournament_weight: 0.0
+  counterfactual_weight: 0.0
+  reliability_weight: 0.0
+  counterfactual_margin: 1.0
+  supervise_none: false
+  focus_ce_extra_weight: 0.3
+  focus_ce_classes:
+    - water_concrete_slight
+    - wet_concrete_slight
+    - water_concrete_severe
+    - wet_concrete_severe
+  anchor_consistency_weight: 0.55
+  anchor_consistency_focus_weight: 0.015
+  anchor_consistency_focus_low_margin_threshold: 0.18
+  anchor_consistency_temperature: 2.0
+  anchor_consistency_protect_weight: 0.42
+  anchor_consistency_protect_confidence: 0.7
+  anchor_consistency_protect_margin: 0.2
+  anchor_no_flip_weight: 0.22
+  anchor_no_flip_nonfocus_only: true
+  anchor_error_gate_weight: 0.1
+  anchor_error_gate_pos_weight: 10.0
+  anchor_error_gate_pair_error_only: true
+  anchor_consistency_exempt_classes:
+    - water_concrete_slight
+    - wet_concrete_slight
+    - water_concrete_severe
+    - wet_concrete_severe
+
+train:
+  resume_from: D:/NMI_SPWFM_datasets/friction_affordance_outputs/rscd_surface_classification/c3_farnet_errorgate_paircal_screen_20260703/best_checkpoint.pth
+  teacher_checkpoint: D:/NMI_SPWFM_datasets/friction_affordance_outputs/rscd_surface_classification/screen_dry_concrete_vor_residual_scale012_lr1e3_s8k_from_anchor/best.pt
+  teacher_backbone: convnext_tiny
+  teacher_head_type: linear
+  trainable_prefixes:
+    - backbone.gate_calibrated_tensor_coupling_banks
+    - pairwise_hardpair_experts
+    - pairwise_hardpair_error_gates
+  evaluate_initial: true
+  batch_size: 8
+  grad_accum_steps: 2
+  num_workers: 2
+  prefetch_factor: 2
+  lr: 0.00003
+  weight_decay: 0.002
+  epochs: 1
+  amp: true
+  augmentation: true
+  balanced_sampling: true
+  samples_per_epoch: 0
+  grad_clip_norm: 5.0
+  log_every_steps: 2000
+
+eval:
+  batch_size: 32
+  max_val_samples_per_class:
+  max_test_samples_per_class:

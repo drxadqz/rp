@@ -1,0 +1,13 @@
+extends: c3_farnet_screen_s135c_s96_wc_moderate_film_rough_focus_stem_20260715.yaml
+
+output_dir: E:/perception_outputs/rscd_surface_classification/c3_farnet_screen_s142_s96_wc_topology_texture_stem_current_20260717
+
+# S142 re-runs the S135c early water-concrete topology/texture stem under the
+# current source state. The old S135c queue item was blocked by frozen source
+# integrity drift before screen training, so it never became performance
+# evidence. This config keeps the same task-adapted mechanism but writes to a
+# fresh output directory for an attributable current-source screen.
+
+train:
+  factor_graph_pair_sampling_seed: 14217
+

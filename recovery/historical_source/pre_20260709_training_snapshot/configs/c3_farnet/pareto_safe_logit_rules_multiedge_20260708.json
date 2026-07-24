@@ -1,0 +1,152 @@
+{
+  "accepted_rules": [
+    {
+      "rule_raw": {
+        "source": "dry_concrete_severe",
+        "target": "dry_concrete_slight",
+        "topk": 2,
+        "margin": 0.2,
+        "delta": 0.2
+      },
+      "validation": {
+        "base_errors": 336,
+        "patched_errors": 334,
+        "fixes": 2,
+        "regressions": 0
+      },
+      "independent_test_audit": {
+        "base_errors": 324,
+        "patched_errors": 321,
+        "fixes": 3,
+        "regressions": 0
+      }
+    },
+    {
+      "rule_raw": {
+        "source": "dry_mud",
+        "target": "dry_gravel",
+        "topk": 2,
+        "margin": 0.8,
+        "delta": 0.8
+      },
+      "validation": {
+        "base_errors": 336,
+        "patched_errors": 334,
+        "fixes": 2,
+        "regressions": 0
+      },
+      "independent_test_audit": {
+        "base_errors": 324,
+        "patched_errors": 322,
+        "fixes": 2,
+        "regressions": 0
+      }
+    },
+    {
+      "rule_raw": {
+        "source": "dry_concrete_smooth",
+        "target": "dry_asphalt_smooth",
+        "topk": 3,
+        "margin": 1.2,
+        "delta": 0.8
+      },
+      "validation": {
+        "base_errors": 336,
+        "patched_errors": 333,
+        "fixes": 3,
+        "regressions": 0
+      },
+      "independent_test_audit": {
+        "base_errors": 324,
+        "patched_errors": 323,
+        "fixes": 1,
+        "regressions": 0
+      }
+    },
+    {
+      "rule_raw": {
+        "source": "wet_concrete_smooth",
+        "target": "dry_concrete_smooth",
+        "topk": 2,
+        "margin": 0.8,
+        "delta": 0.8
+      },
+      "validation": {
+        "base_errors": 336,
+        "patched_errors": 334,
+        "fixes": 2,
+        "regressions": 0
+      },
+      "independent_test_audit": {
+        "base_errors": 324,
+        "patched_errors": 323,
+        "fixes": 1,
+        "regressions": 0
+      }
+    },
+    {
+      "rule_raw": {
+        "source": "water_asphalt_smooth",
+        "target": "water_asphalt_slight",
+        "topk": 2,
+        "margin": 0.8,
+        "delta": 0.5
+      },
+      "validation": {
+        "base_errors": 336,
+        "patched_errors": 335,
+        "fixes": 1,
+        "regressions": 0
+      },
+      "independent_test_audit": {
+        "base_errors": 324,
+        "patched_errors": 323,
+        "fixes": 1,
+        "regressions": 0
+      }
+    },
+    {
+      "rule_raw": {
+        "source": "water_gravel",
+        "target": "water_concrete_severe",
+        "topk": 2,
+        "margin": 0.3,
+        "delta": 0.3
+      },
+      "validation": {
+        "base_errors": 336,
+        "patched_errors": 335,
+        "fixes": 1,
+        "regressions": 0
+      },
+      "independent_test_audit": {
+        "base_errors": 324,
+        "patched_errors": 323,
+        "fixes": 1,
+        "regressions": 0
+      }
+    },
+    {
+      "rule_raw": {
+        "source": "wet_concrete_slight",
+        "target": "water_concrete_slight",
+        "topk": 2,
+        "margin": 0.5,
+        "delta": 0.3
+      },
+      "validation": {
+        "base_errors": 336,
+        "patched_errors": 335,
+        "fixes": 1,
+        "regressions": 0
+      },
+      "independent_test_audit": {
+        "base_errors": 324,
+        "patched_errors": 323,
+        "fixes": 1,
+        "regressions": 0
+      }
+    }
+  ],
+  "selection_note": "These rules are a diagnostic no-harm inference module selected from current-best logits. They must not be presented as a final trained-model SOTA claim until distilled into a learnable single-model mechanism and selected without test-set feedback."
+}

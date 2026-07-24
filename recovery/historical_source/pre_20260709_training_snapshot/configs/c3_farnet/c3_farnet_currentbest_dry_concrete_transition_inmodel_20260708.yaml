@@ -1,0 +1,11 @@
+extends: c3_farnet_protected_tristate_dryconcrete_micro.yaml
+
+output_dir: D:/NMI_SPWFM_datasets/friction_affordance_outputs/rscd_surface_classification/c3_farnet_currentbest_dry_concrete_transition_inmodel_20260708
+
+model:
+  use_dry_concrete_validation_transition: true
+  dry_concrete_validation_transition_source: dry_concrete_severe
+  dry_concrete_validation_transition_target: dry_concrete_slight
+  dry_concrete_validation_transition_topk: 2
+  dry_concrete_validation_transition_margin: 0.20
+  dry_concrete_validation_transition_delta: 0.20

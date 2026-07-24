@@ -1,0 +1,49 @@
+seed: 37
+output_dir: outputs/formal_budgeted
+device: auto
+
+data:
+  train_manifests:
+    - data/manifests_full/rscd_prepared_train.csv
+    - data/manifests_full/roadsaw_train.csv
+    - data/manifests_full/roadsc_train.csv
+  val_manifests:
+    - data/manifests_full/rscd_prepared_val.csv
+    - data/manifests_full/roadsaw_val.csv
+    - data/manifests_full/roadsc_val.csv
+  test_manifests:
+    - data/manifests_full/rscd_prepared_test.csv
+    - data/manifests_full/roadsaw_test.csv
+    - data/manifests_full/roadsc_test.csv
+  image_size: 192
+  batch_size: 64
+  num_workers: 6
+  max_train_samples: null
+  max_val_samples: null
+  max_train_samples_per_class: 800
+  max_val_samples_per_class: 200
+  sample_seed: 37
+
+model:
+  backbone: resnet18
+  embedding_dim: 512
+  dropout: 0.2
+  pretrained: true
+  freeze_backbone: false
+
+optim:
+  epochs: 8
+  lr: 0.0001
+  weight_decay: 0.0001
+  grad_clip_norm: 5.0
+  amp: true
+  early_stop_patience: 2
+  early_stop_min_delta: 0.001
+
+loss:
+  task_weight: 1.0
+  interval_weight: 0.35
+  coverage_weight: 1.0
+  width_weight: 0.02
+  coverage_margin: 0.0
+  monotonic_weight: 0.05

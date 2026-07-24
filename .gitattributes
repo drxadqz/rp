@@ -1,2 +1,5 @@
 *.pth filter=lfs diff=lfs merge=lfs -text
 *.pt filter=lfs diff=lfs merge=lfs -text
+recovery/**/*.csv.gz filter=lfs diff=lfs merge=lfs -text
+recovery/**/*.pt filter=lfs diff=lfs merge=lfs -text
+recovery/**/*.pth filter=lfs diff=lfs merge=lfs -text

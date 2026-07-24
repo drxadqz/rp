@@ -1,0 +1,105 @@
+extends: c3_farnet_screen_s79_mechanism_path_student_20260711.yaml
+
+output_dir: E:/perception_outputs/rscd_surface_classification/c3_farnet_screen_s80_mechanism_path_student_linear_20260711
+
+model:
+  backbone: road_cortex_mechanism_path_student_tiny
+  embedding_dim: 768
+  pretrained: false
+  dropout: 0.16
+  head_type: linear
+  use_source_reliable_boundary_router: false
+  use_dry_concrete_roughness_vor_residual: false
+  use_physics_branch: true
+  physics_dim: 96
+  physics_quality_cues: true
+  physics_quality_region_cues: false
+  use_semantic_physics_attention_branch: true
+  semantic_physics_attention_dim: 64
+  use_local_physics_field_branch: true
+  local_physics_field_dim: 64
+  local_physics_field_scale: 0.08
+
+loss:
+  factor_weight: 0.035
+  factor_axis_weights:
+    friction: 1.0
+    material: 1.0
+    roughness: 1.15
+  tournament_weight: 0.0
+  counterfactual_weight: 0.0
+  reliability_weight: 0.0
+  focus_ce_extra_weight: 0.18
+  focus_ce_classes:
+    - wet_concrete_smooth
+    - wet_concrete_slight
+    - wet_concrete_severe
+    - water_concrete_smooth
+    - water_concrete_slight
+    - water_concrete_severe
+    - dry_concrete_slight
+    - dry_concrete_severe
+    - water_asphalt_slight
+    - water_asphalt_severe
+  anchor_consistency_weight: 0.20
+  anchor_consistency_focus_weight: 0.020
+  anchor_consistency_focus_low_margin_threshold: 0.20
+  anchor_consistency_temperature: 2.5
+  anchor_consistency_protect_weight: 0.05
+  anchor_consistency_protect_confidence: 0.78
+  anchor_consistency_protect_margin: 0.25
+  anchor_no_flip_weight: 0.0
+  anchor_error_gate_weight: 0.0
+  anchor_nonregression_weight: 0.0
+  anchor_nonregression_focus_weight: 0.0
+
+train:
+  resume_from:
+  teacher_checkpoint: E:/perception_outputs/rscd_surface_classification/c3_farnet_formal_fullmanifest_source_reliable_router_s7_20260709/best_checkpoint.pth
+  teacher_backbone: convnext_tiny_gate_calibrated_tensor_coupling_concrete_film_rough_stem
+  teacher_head_type: hardpair_error_gated_calibrated
+  teacher_preserve_hardpair_focus: true
+  teacher_model_overrides:
+    use_source_reliable_boundary_router: true
+    source_reliable_boundary_hidden_dim: 32
+    source_reliable_boundary_scale: 7.0
+    source_reliable_boundary_base_strength: 1.0
+    source_reliable_boundary_physics_gate_floor: 0.5
+    source_reliable_boundary_gate_temperature: 6.0
+    source_reliable_boundary_source_temperature: 28.0
+    source_reliable_boundary_learned_gate_bias: -1.6
+    source_reliable_boundary_dropout: 0.0
+    source_reliable_boundary_routes:
+      - source: dry_concrete_smooth
+        target: dry_concrete_slight
+        topk: 3
+        margin: 1.00
+        source_f1: 0.907292954264524
+        min_source_f1: 0.90
+        kind: dry_concrete_roughness
+    use_dry_concrete_roughness_vor_residual: true
+    dry_concrete_roughness_hidden_dim: 48
+    dry_concrete_roughness_scale: 0.12
+    dry_concrete_roughness_gate_threshold: 0.12
+    dry_concrete_roughness_gate_temperature: 14.0
+  trainable_prefixes:
+  evaluate_initial: false
+  lr: 0.0007
+  weight_decay: 0.012
+  epochs: 1
+  batch_size: 4
+  grad_accum_steps: 4
+  num_workers: 2
+  prefetch_factor: 2
+  amp: true
+  augmentation: true
+  balanced_sampling: true
+  max_train_samples_per_class: 1000
+  samples_per_epoch: 27000
+  grad_clip_norm: 4.0
+  log_every_steps: 500
+
+eval:
+  batch_size: 16
+  max_val_samples_per_class: 250
+  max_test_samples_per_class: 250

@@ -1,0 +1,8 @@
+extends: c3_farnet_debug_s122_family_safe_warm_smoke_20260715.yaml
+
+output_dir: E:/perception_outputs/rscd_surface_classification/c3_farnet_debug_s122_family_safe_warm_smoke_safeeval_20260715
+
+eval:
+  batch_size: 2
+  max_val_samples_per_class: 2
+  max_test_samples_per_class: 2

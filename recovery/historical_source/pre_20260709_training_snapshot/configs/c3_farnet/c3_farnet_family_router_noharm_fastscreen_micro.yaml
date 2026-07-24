@@ -1,0 +1,26 @@
+extends: c3_farnet_family_router_corrected_pcgrad_micro.yaml
+
+seed: 97
+output_dir: D:/NMI_SPWFM_datasets/friction_affordance_outputs/rscd_surface_classification/c3_farnet_family_router_noharm_fastscreen_micro_20260708
+
+loss:
+  rscd_pcgrad_enabled: false
+  rscd_pcgrad_grouped_protect_enabled: false
+  rscd_pcgrad_decompose_main_ce: false
+
+  family_mechanism_router_weight: 0.22
+  family_router_protect_leak_weight: 0.035
+
+  anchor_consistency_weight: 0.68
+  anchor_consistency_protect_weight: 0.68
+  anchor_no_flip_weight: 0.46
+  anchor_nonregression_weight: 0.32
+  anchor_nonregression_focus_weight: 0.14
+
+train:
+  batch_size: 8
+  grad_accum_steps: 2
+  lr: 0.00016
+  amp: true
+  samples_per_epoch: 1200
+  log_every_steps: 60

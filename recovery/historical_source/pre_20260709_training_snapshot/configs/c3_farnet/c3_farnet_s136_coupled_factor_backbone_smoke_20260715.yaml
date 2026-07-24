@@ -1,0 +1,45 @@
+seed: 136
+output_dir: E:/perception_outputs/rscd_surface_classification/s136_coupled_factor_backbone_smoke_20260715
+
+data:
+  train_manifest: E:/perception/friction_affordance_field/data/manifests_full/rscd_prepared_train.csv
+  val_manifest: E:/perception/friction_affordance_field/data/manifests_full/rscd_prepared_val.csv
+  test_manifest: E:/perception/friction_affordance_field/data/manifests_full/rscd_prepared_test.csv
+  image_size: 128
+  train_resize_mode: letterbox
+  eval_resize_mode: letterbox
+
+model:
+  stem_dim: 32
+  stage_dims: [64, 128, 256]
+  dropout: 0.15
+
+loss:
+  class_weight: 1.0
+  factor_weight: 0.25
+  factor_axis_weights:
+    friction: 1.0
+    material: 1.0
+    roughness: 1.4
+  coupling_gate_weight: 0.06
+
+train:
+  batch_size: 4
+  grad_accum_steps: 1
+  num_workers: 0
+  prefetch_factor:
+  lr: 0.0003
+  weight_decay: 0.01
+  epochs: 1
+  amp: false
+  augmentation: true
+  balanced_sampling: true
+  max_train_samples_per_class: 2
+  samples_per_epoch: 54
+  grad_clip_norm: 5.0
+  log_every_steps: 4
+
+eval:
+  batch_size: 4
+  max_val_samples_per_class: 2
+  max_test_samples_per_class: 2

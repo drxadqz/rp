@@ -1,0 +1,20 @@
+extends: c3_farnet_wc_error_replay_pcgrad_micro_20260708.yaml
+
+output_dir: D:/NMI_SPWFM_datasets/friction_affordance_outputs/rscd_surface_classification/c3_farnet_wc_error_replay_agem_micro_20260708
+
+loss:
+  rscd_agem_total_projection_enabled: true
+  rscd_pcgrad_focus_weight: 1.15
+  rscd_pcgrad_focus_physics_extra: 0.45
+  rscd_pcgrad_focus_physics_max_weight: 1.45
+  rscd_pcgrad_protect_confidence: 0.58
+  rscd_pcgrad_protect_margin: 0.04
+  rscd_pcgrad_protect_kl_weight: 0.38
+
+train:
+  lr: 0.000008
+  grad_accum_steps: 1
+  samples_per_epoch: 3600
+  anchor_error_sampler_error_boost: 900.0
+  anchor_error_sampler_focus_boost: 30.0
+  log_every_steps: 100

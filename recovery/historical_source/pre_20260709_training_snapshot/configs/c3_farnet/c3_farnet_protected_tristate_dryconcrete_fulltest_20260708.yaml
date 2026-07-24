@@ -1,0 +1,8 @@
+extends: c3_farnet_protected_tristate_dryconcrete_micro.yaml
+
+output_dir: E:/perception_outputs/rscd_surface_classification/c3_farnet_protected_tristate_dryconcrete_fulltest_20260708
+
+eval:
+  batch_size: 32
+  max_val_samples_per_class:
+  max_test_samples_per_class:

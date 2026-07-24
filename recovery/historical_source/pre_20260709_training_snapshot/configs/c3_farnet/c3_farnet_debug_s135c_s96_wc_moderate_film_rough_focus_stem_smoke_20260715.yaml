@@ -1,0 +1,18 @@
+extends: c3_farnet_screen_s135c_s96_wc_moderate_film_rough_focus_stem_20260715.yaml
+
+output_dir: E:/perception_outputs/rscd_surface_classification/c3_farnet_debug_s135c_s96_wc_moderate_film_rough_focus_stem_smoke_20260715
+
+train:
+  max_train_samples_per_class: 8
+  samples_per_epoch: 216
+  epochs: 1
+  batch_size: 8
+  grad_accum_steps: 1
+  num_workers: 0
+  prefetch_factor:
+  log_every_steps: 2
+
+eval:
+  batch_size: 8
+  max_val_samples_per_class: 4
+  max_test_samples_per_class: 4

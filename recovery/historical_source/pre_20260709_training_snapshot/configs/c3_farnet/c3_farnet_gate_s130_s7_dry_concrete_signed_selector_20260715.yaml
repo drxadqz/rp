@@ -1,0 +1,104 @@
+extends: c3_farnet_formal_fullmanifest_source_reliable_router_s7_20260709.yaml
+
+output_dir: E:/perception_outputs/rscd_surface_classification/c3_farnet_gate_s130_s7_dry_concrete_signed_selector_20260715
+
+# S130: dry-concrete signed ordinal selector.
+# Targeted RSCD factors:
+# - friction: dry only, with wet/water classes protected by anchor consistency;
+# - material: concrete only, using anti-glare dry-concrete roughness statistics;
+# - roughness: slight <-> severe, the largest full-test confusion boundary;
+# - coupling: dry + concrete + roughness is treated as a closed ordinal chart,
+#   so the update cannot directly rewrite wet/water-concrete decisions.
+
+model:
+  hardpair_focus_classes:
+    - water_concrete_slight
+    - wet_concrete_slight
+    - water_concrete_severe
+    - wet_concrete_severe
+    - dry_concrete_slight
+    - dry_concrete_severe
+  use_dry_concrete_pair_signed_selector: true
+  dry_concrete_pair_selector_pairs:
+    - dry_concrete_severe|dry_concrete_slight
+  dry_concrete_pair_selector_hidden_dim: 64
+  dry_concrete_pair_selector_shift_scale: 0.58
+  dry_concrete_pair_selector_gain_scale: 0.32
+  dry_concrete_pair_selector_direct_delta_scale: 0.18
+  dry_concrete_pair_selector_safe_margin: 0.24
+  dry_concrete_pair_selector_safe_temperature: 24.0
+  hardpair_pair_scales:
+    dry_concrete_severe|dry_concrete_slight: 1.35
+    water_concrete_slight|water_concrete_severe: 1.0
+    wet_concrete_slight|wet_concrete_severe: 1.0
+    water_concrete_slight|wet_concrete_slight: 1.0
+    water_concrete_severe|wet_concrete_severe: 1.0
+
+loss:
+  focus_ce_extra_weight: 0.22
+  focus_ce_classes:
+    - dry_concrete_slight
+    - dry_concrete_severe
+  dry_concrete_bidirectional_ordinal_weight: 0.18
+  dry_concrete_bidirectional_margin: 0.48
+  dry_concrete_bidirectional_low_margin_threshold: 0.34
+  dry_concrete_bidirectional_delta_weight: 0.05
+  dry_concrete_bidirectional_delta_margin: 0.010
+  dry_concrete_bidirectional_pairs:
+    - dry_concrete_severe|dry_concrete_slight
+  anchor_consistency_weight: 0.48
+  anchor_consistency_focus_weight: 0.010
+  anchor_consistency_focus_low_margin_threshold: 0.18
+  anchor_consistency_temperature: 2.0
+  anchor_consistency_protect_weight: 0.58
+  anchor_consistency_protect_confidence: 0.74
+  anchor_consistency_protect_margin: 0.24
+  anchor_no_flip_weight: 0.42
+  anchor_no_flip_nonfocus_only: true
+  anchor_nonregression_weight: 0.26
+  anchor_nonregression_focus_weight: 0.012
+  anchor_nonregression_margin: 0.012
+  anchor_nonregression_confidence: 0.70
+  anchor_nonregression_teacher_margin: 0.12
+  anchor_error_gate_weight: 0.06
+  anchor_consistency_exempt_classes:
+    - dry_concrete_slight
+    - dry_concrete_severe
+
+train:
+  resume_from: E:/perception_outputs/rscd_surface_classification/c3_farnet_formal_fullmanifest_source_reliable_router_s7_20260709/best_checkpoint.pth
+  teacher_checkpoint: E:/perception_outputs/rscd_surface_classification/c3_farnet_formal_fullmanifest_source_reliable_router_s7_20260709/best_checkpoint.pth
+  teacher_backbone: convnext_tiny_gate_calibrated_tensor_coupling_concrete_film_rough_stem
+  teacher_head_type: hardpair_error_gated_calibrated
+  teacher_preserve_hardpair_focus: true
+  trainable_prefixes:
+    - dry_concrete_pair_signed_selector
+    - pairwise_hardpair_experts
+    - pairwise_hardpair_error_gates
+  evaluate_initial: true
+  lr: 0.00012
+  weight_decay: 0.0010
+  epochs: 1
+  batch_size: 4
+  grad_accum_steps: 4
+  num_workers: 2
+  prefetch_factor: 2
+  amp: true
+  augmentation: true
+  balanced_sampling: true
+  factor_graph_pair_sampling: true
+  factor_graph_pair_sampling_seed: 13007
+  factor_graph_pair_sampling_pair_slots: 2
+  factor_graph_pair_sampling_positive_slots: 0
+  factor_graph_pair_sampling_wet_concrete_focus_scale: 1.0
+  factor_graph_pair_sampling_roughness_focus_scale: 6.0
+  factor_graph_pair_sampling_wet_water_focus_scale: 1.0
+  max_train_samples_per_class: 250
+  samples_per_epoch: 6750
+  grad_clip_norm: 2.5
+  log_every_steps: 125
+
+eval:
+  batch_size: 8
+  max_val_samples_per_class: 250
+  max_test_samples_per_class: 250

@@ -1,0 +1,25 @@
+extends: c3_farnet_s136_coupled_factor_backbone_screen_20260715.yaml
+
+output_dir: E:/perception_outputs/rscd_surface_classification/s138_dual_film_texture_roughness_screen_20260716
+
+# S138 is a fallback route only after S137 fails. It is a task-adapted early
+# custom-backbone mechanism, not a late feature-value reranker. The mechanism
+# separates two RSCD coupling laws:
+# 1) dry concrete roughness is visible meso/gradient/Laplacian texture;
+# 2) wet/water concrete roughness is partly hidden under film and must use
+#    film erasure, wet connectedness, and texture-under-film residuals.
+
+model:
+  use_dual_film_texture_coupling: true
+  dual_film_texture_coupling_mode: learned
+  dual_film_texture_coupling_scale: 0.16
+
+loss:
+  class_weight: 1.0
+  factor_weight: 0.25
+  factor_axis_weights:
+    friction: 1.0
+    material: 1.0
+    roughness: 1.55
+  coupling_gate_weight: 0.06
+  dual_film_texture_route_weight: 0.045

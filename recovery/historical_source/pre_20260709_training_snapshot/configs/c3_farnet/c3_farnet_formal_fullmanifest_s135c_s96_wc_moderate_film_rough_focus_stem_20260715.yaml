@@ -1,0 +1,26 @@
+extends: c3_farnet_screen_s135c_s96_wc_moderate_film_rough_focus_stem_20260715.yaml
+
+output_dir: E:/perception_outputs/rscd_surface_classification/c3_farnet_formal_fullmanifest_s135c_s96_wc_moderate_film_rough_focus_stem_20260715
+
+# Full RSCD promotion config for S135c. This is only launched automatically
+# after the same-budget cap250 screen beats the S96 screen baseline under the
+# conservative promotion checks in scripts/decide_s135c_screen_promotion.py.
+
+train:
+  resume_from: E:/perception_outputs/rscd_surface_classification/c3_farnet_screen_s135c_s96_wc_moderate_film_rough_focus_stem_20260715/best_checkpoint.pth
+  teacher_checkpoint: E:/perception_outputs/rscd_surface_classification/c3_farnet_screen_s96_wc_pair_relative_boundary_20260712/best_checkpoint.pth
+  evaluate_initial: false
+  batch_size: 4
+  grad_accum_steps: 4
+  num_workers: 2
+  prefetch_factor: 2
+  max_train_samples_per_class:
+  samples_per_epoch: 0
+  log_every_steps: 2000
+  resume_step_checkpoint: true
+  save_step_checkpoint_every: 2000
+
+eval:
+  batch_size: 32
+  max_val_samples_per_class:
+  max_test_samples_per_class:

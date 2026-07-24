@@ -1,0 +1,24 @@
+extends: c3_farnet_screen_s135b_s96_wc_occluded_film_topology_stem_20260715.yaml
+
+output_dir: E:/perception_outputs/rscd_surface_classification/c3_farnet_screen_s135c_s96_wc_moderate_film_rough_focus_stem_20260715
+
+# S135c: tighter water-concrete weak-boundary focus with contrast visibility.
+# Val-only mechanism audit showed generic film-boundary/topology responses also
+# fire on wet/water asphalt, snow, and gravel. Stable S7/S96 cue synthesis then
+# showed water_concrete_slight vs water_concrete_severe is best separated by
+# local gray contrast, low-brightness film quantiles, and saturation variance.
+# The forward gate is therefore restricted to the RSCD weak boundary pattern:
+#   concrete candidate + moderate water film + moderate roughness + weak film
+#   boundary + signed occluded-film-vs-visible-texture evidence + contrast
+#   visibility under water film.
+
+train:
+  factor_graph_pair_sampling_seed: 13519
+
+loss:
+  focus_ce_extra_weight: 0.20
+  anchor_consistency_weight: 0.46
+  anchor_consistency_protect_weight: 0.72
+  anchor_no_flip_weight: 0.55
+  anchor_nonregression_weight: 0.30
+  anchor_nonregression_focus_weight: 0.026

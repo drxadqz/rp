@@ -1,0 +1,34 @@
+extends: c3_farnet_screen_s123_asphalt_film_lite_s96_anchor_20260715.yaml
+
+output_dir: E:/perception_outputs/rscd_surface_classification/c3_farnet_gate_s124_asphalt_film_lite_open_s96_anchor_20260715
+
+model:
+  backbone: convnext_tiny_family_safe_asphalt_film_lite_open_stem
+
+loss:
+  focus_ce_extra_weight: 0.070
+  anchor_consistency_weight: 0.34
+  anchor_consistency_focus_weight: 0.006
+  anchor_consistency_protect_weight: 0.42
+  anchor_consistency_protect_confidence: 0.72
+  anchor_consistency_protect_margin: 0.20
+  anchor_no_flip_weight: 0.22
+  anchor_no_flip_nonfocus_only: true
+  anchor_nonregression_weight: 0.14
+  anchor_nonregression_focus_weight: 0.045
+  anchor_nonregression_margin: 0.010
+  anchor_nonregression_confidence: 0.68
+  pair_value_selective_margin_weight: 0.075
+  pair_value_selective_margin_target: 0.46
+  pair_value_selective_margin_min_weight: 0.16
+
+train:
+  lr: 0.00032
+  max_train_samples_per_class: 250
+  samples_per_epoch: 6750
+  log_every_steps: 75
+
+eval:
+  batch_size: 8
+  max_val_samples_per_class: 250
+  max_test_samples_per_class: 250

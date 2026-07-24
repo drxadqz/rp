@@ -1,0 +1,31 @@
+extends: c3_farnet_screen_s64_factorized_rep_pyramid_20260710.yaml
+
+output_dir: E:/perception_outputs/rscd_surface_classification/c3_farnet_screen_s65_paved_aware_rep_pyramid_20260710
+
+model:
+  backbone: road_cortex_paved_aware_rep_pyramid_tiny
+  pretrained: false
+  use_source_reliable_boundary_router: false
+
+loss:
+  factor_weight: 0.06
+  factor_axis_weights:
+    friction: 0.80
+    material: 1.15
+    roughness: 1.20
+  tournament_weight: 0.015
+  focus_ce_extra_weight: 0.20
+  anchor_consistency_weight: 0.0
+  anchor_consistency_focus_weight: 0.0
+  anchor_no_flip_weight: 0.0
+  anchor_error_gate_weight: 0.0
+
+train:
+  lr: 0.00034
+  weight_decay: 0.003
+  epochs: 1
+  batch_size: 8
+  grad_accum_steps: 2
+  max_train_samples_per_class: 1000
+  samples_per_epoch: 27000
+  log_every_steps: 250

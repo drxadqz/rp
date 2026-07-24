@@ -1,0 +1,36 @@
+extends: c3_farnet_errorgate_paircal_full_eval.yaml
+
+output_dir: E:/perception_outputs/rscd_surface_classification/c3_farnet_official_anchor_source_reliable_router_asphalt_midrough_s075_screen_20260709
+
+model:
+  use_source_reliable_boundary_router: true
+  source_reliable_boundary_hidden_dim: 32
+  source_reliable_boundary_scale: 7.0
+  source_reliable_boundary_base_strength: 1.0
+  source_reliable_boundary_physics_gate_floor: 0.5
+  source_reliable_boundary_gate_temperature: 6.0
+  source_reliable_boundary_source_temperature: 28.0
+  source_reliable_boundary_learned_gate_bias: -1.6
+  source_reliable_boundary_dropout: 0.0
+  source_reliable_boundary_routes:
+    - source: dry_concrete_smooth
+      target: dry_concrete_slight
+      topk: 3
+      margin: 1.00
+      source_f1: 0.907292954264524
+      min_source_f1: 0.90
+      route_scale: 1.00
+      kind: dry_concrete_roughness
+    - source: dry_asphalt_severe
+      target: dry_asphalt_slight
+      topk: 3
+      margin: 0.75
+      source_f1: 0.9107806691449815
+      min_source_f1: 0.90
+      route_scale: 0.75
+      kind: dry_asphalt_roughness
+
+eval:
+  batch_size: 32
+  max_val_samples_per_class: 120
+  max_test_samples_per_class: 120

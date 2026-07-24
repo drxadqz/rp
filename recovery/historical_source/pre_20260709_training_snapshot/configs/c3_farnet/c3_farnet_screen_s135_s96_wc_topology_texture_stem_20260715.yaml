@@ -1,0 +1,53 @@
+extends: c3_farnet_screen_s96_wc_pair_relative_boundary_20260712.yaml
+
+output_dir: E:/perception_outputs/rscd_surface_classification/c3_farnet_screen_s135_s96_wc_topology_texture_stem_20260715
+
+# S135: early topology-texture stem for water-concrete roughness coupling.
+# Target: water/wet film + concrete material + slight/severe roughness.
+# Rationale: CPU evidence audit showed global scalar roughness values overlap
+# between water_concrete_slight and water_concrete_severe. This mechanism uses
+# soft morphology maps before the backbone: local rough islands, rough rings,
+# multi-scale roughness persistence, and water-film boundaries inside
+# concrete-like wet regions.
+
+model:
+  use_water_concrete_topology_texture_stem_conditioner: true
+  water_concrete_topology_texture_stem_hidden_dim: 40
+  water_concrete_topology_texture_stem_scale: 0.028
+  water_concrete_topology_texture_stem_gate_floor: 0.035
+  water_concrete_topology_texture_stem_learned_gate_bias: -1.15
+
+train:
+  resume_from: E:/perception_outputs/rscd_surface_classification/c3_farnet_screen_s96_wc_pair_relative_boundary_20260712/best_checkpoint.pth
+  teacher_checkpoint: E:/perception_outputs/rscd_surface_classification/c3_farnet_screen_s96_wc_pair_relative_boundary_20260712/best_checkpoint.pth
+  teacher_backbone: convnext_tiny_gate_calibrated_tensor_coupling_concrete_film_rough_stem
+  teacher_head_type: hardpair_error_gated_calibrated
+  teacher_preserve_hardpair_focus: true
+  trainable_prefixes:
+    - water_concrete_topology_texture_stem_conditioner
+  evaluate_initial: true
+  lr: 0.00012
+  weight_decay: 0.0010
+  epochs: 1
+  batch_size: 4
+  grad_accum_steps: 4
+  num_workers: 2
+  prefetch_factor: 2
+  amp: true
+  augmentation: true
+  factor_graph_pair_sampling: true
+  factor_graph_pair_sampling_seed: 13507
+  factor_graph_pair_sampling_pair_slots: 2
+  factor_graph_pair_sampling_positive_slots: 0
+  factor_graph_pair_sampling_wet_concrete_focus_scale: 9.0
+  factor_graph_pair_sampling_roughness_focus_scale: 5.5
+  factor_graph_pair_sampling_wet_water_focus_scale: 3.0
+  max_train_samples_per_class: 1000
+  samples_per_epoch: 27000
+  grad_clip_norm: 2.0
+  log_every_steps: 500
+
+eval:
+  batch_size: 16
+  max_val_samples_per_class: 250
+  max_test_samples_per_class: 250

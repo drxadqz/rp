@@ -1,0 +1,77 @@
+extends: c3_farnet_screen_s96_wc_pair_relative_boundary_20260712.yaml
+
+output_dir: E:/perception_outputs/rscd_surface_classification/c3_farnet_screen_s113_open_ordinal_dry_concrete_branch_s96_20260713
+
+model:
+  backbone: convnext_tiny_dry_concrete_isolated_branch_open_stem
+  pretrained: false
+  use_backbone_isolated_dry_concrete_adapter: true
+  backbone_isolated_dry_concrete_branch_dim: 96
+  backbone_isolated_dry_concrete_hidden_dim: 72
+  backbone_isolated_dry_concrete_scale: 0.34
+  backbone_isolated_dry_concrete_gate_threshold: 0.04
+  backbone_isolated_dry_concrete_gate_temperature: 10.0
+  backbone_isolated_dry_concrete_dropout: 0.02
+  backbone_isolated_dry_concrete_output_mode: ordinal
+  use_feature_value_boundary_corrector: true
+
+loss:
+  focus_ce_extra_weight: 0.28
+  focus_ce_classes:
+    - dry_concrete_smooth
+    - dry_concrete_slight
+    - dry_concrete_severe
+  anchor_consistency_weight: 0.40
+  anchor_consistency_focus_weight: 0.006
+  anchor_consistency_focus_low_margin_threshold: 0.18
+  anchor_consistency_temperature: 2.2
+  anchor_consistency_protect_weight: 0.58
+  anchor_consistency_protect_confidence: 0.74
+  anchor_consistency_protect_margin: 0.24
+  anchor_no_flip_weight: 0.42
+  anchor_no_flip_nonfocus_only: true
+  anchor_nonregression_weight: 0.26
+  anchor_nonregression_focus_weight: 0.014
+  anchor_nonregression_margin: 0.014
+  anchor_nonregression_confidence: 0.70
+  anchor_nonregression_teacher_margin: 0.12
+  anchor_consistency_exempt_classes:
+    - dry_concrete_smooth
+    - dry_concrete_slight
+    - dry_concrete_severe
+
+train:
+  resume_from: E:/perception_outputs/rscd_surface_classification/c3_farnet_screen_s96_wc_pair_relative_boundary_20260712/best_checkpoint.pth
+  teacher_checkpoint: E:/perception_outputs/rscd_surface_classification/c3_farnet_screen_s96_wc_pair_relative_boundary_20260712/best_checkpoint.pth
+  teacher_backbone: convnext_tiny_gate_calibrated_tensor_coupling_concrete_film_rough_stem
+  teacher_head_type: hardpair_error_gated_calibrated
+  teacher_preserve_hardpair_focus: true
+  trainable_prefixes:
+    - backbone.dry_concrete_isolated_branch
+    - backbone_isolated_dry_concrete_adapter
+  evaluate_initial: true
+  lr: 0.00016
+  weight_decay: 0.0010
+  epochs: 1
+  batch_size: 4
+  grad_accum_steps: 4
+  num_workers: 2
+  prefetch_factor: 2
+  amp: true
+  augmentation: true
+  factor_graph_pair_sampling: true
+  factor_graph_pair_sampling_seed: 11307
+  factor_graph_pair_sampling_pair_slots: 2
+  factor_graph_pair_sampling_positive_slots: 0
+  factor_graph_pair_sampling_wet_concrete_focus_scale: 1.2
+  factor_graph_pair_sampling_roughness_focus_scale: 5.0
+  factor_graph_pair_sampling_wet_water_focus_scale: 1.0
+  max_train_samples_per_class: 1000
+  samples_per_epoch: 27000
+  grad_clip_norm: 2.5
+  log_every_steps: 500
+
+eval:
+  batch_size: 16
+  max_val_samples_per_class: 250
+  max_test_samples_per_class: 250

@@ -1,0 +1,13 @@
+extends: c3_farnet_gate_s128_s113_water_concrete_rough_opponent_20260715.yaml
+
+output_dir: E:/perception_outputs/rscd_surface_classification/c3_farnet_debug_s128_s113_water_concrete_rough_opponent_smoke_20260715
+
+train:
+  max_train_samples_per_class: 4
+  samples_per_epoch: 108
+  log_every_steps: 1
+
+eval:
+  batch_size: 4
+  max_val_samples_per_class: 4
+  max_test_samples_per_class: 4

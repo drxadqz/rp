@@ -1,0 +1,40 @@
+extends: c3_farnet_protected_tristate_dryconcrete_micro.yaml
+
+output_dir: E:/perception_outputs/rscd_surface_classification/c3_farnet_source_reliable_boundary_router_micro_20260708
+
+model:
+  use_source_reliable_boundary_router: true
+  source_reliable_boundary_hidden_dim: 32
+  source_reliable_boundary_scale: 0.018
+  source_reliable_boundary_gate_temperature: 6.0
+  source_reliable_boundary_source_temperature: 28.0
+  source_reliable_boundary_learned_gate_bias: -1.6
+  source_reliable_boundary_dropout: 0.0
+  source_reliable_boundary_routes:
+    - source: dry_concrete_smooth
+      target: dry_concrete_slight
+      topk: 3
+      margin: 1.00
+      source_f1: 0.907292954264524
+      min_source_f1: 0.90
+      kind: dry_concrete_roughness
+
+train:
+  resume_from: D:/NMI_SPWFM_datasets/friction_affordance_outputs/rscd_surface_classification/c3_farnet_protected_tristate_dryconcrete_micro_20260706/best_checkpoint.pth
+  teacher_checkpoint: D:/NMI_SPWFM_datasets/friction_affordance_outputs/rscd_surface_classification/c3_farnet_protected_tristate_dryconcrete_micro_20260706/best_checkpoint.pth
+  trainable_prefixes:
+    - source_reliable_boundary_router
+  batch_size: 8
+  grad_accum_steps: 2
+  num_workers: 2
+  prefetch_factor: 2
+  lr: 0.00018
+  weight_decay: 0.0008
+  epochs: 1
+  samples_per_epoch: 3000
+  log_every_steps: 100
+
+eval:
+  batch_size: 16
+  max_val_samples_per_class: 120
+  max_test_samples_per_class: 120

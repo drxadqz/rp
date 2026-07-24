@@ -1,0 +1,27 @@
+extends: c3_farnet_formal_fullmanifest_road_cortex_protected_opponent_refinement_s62_20260709.yaml
+
+output_dir: E:/perception_outputs/rscd_surface_classification/c3_farnet_screen_s62_protected_opponent_refinement_20260709
+
+train:
+  resume_from:
+  trainable_prefixes:
+  evaluate_initial: false
+  lr: 0.000095
+  weight_decay: 0.0035
+  epochs: 1
+  batch_size: 8
+  grad_accum_steps: 2
+  num_workers: 2
+  prefetch_factor: 2
+  amp: true
+  augmentation: true
+  balanced_sampling: true
+  max_train_samples_per_class: 1000
+  samples_per_epoch: 27000
+  grad_clip_norm: 5.0
+  log_every_steps: 500
+
+eval:
+  batch_size: 32
+  max_val_samples_per_class:
+  max_test_samples_per_class:

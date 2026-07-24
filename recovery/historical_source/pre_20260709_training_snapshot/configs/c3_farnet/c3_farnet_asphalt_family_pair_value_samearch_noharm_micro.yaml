@@ -1,0 +1,112 @@
+extends: c3_farnet_protected_tristate_dryconcrete_micro.yaml
+
+seed: 97
+output_dir: D:/NMI_SPWFM_datasets/friction_affordance_outputs/rscd_surface_classification/c3_farnet_asphalt_family_pair_value_samearch_noharm_micro_20260707
+
+model:
+  # Keep the exact current-best architecture. The inherited hardpair_focus_classes
+  # remain the dry-concrete tri-state module, so this run tests only the loss-side
+  # asphalt-family repair, not a new inference structure.
+  expose_hardpair_pair_value_evidence: true
+
+loss:
+  # Disable the inherited dry-concrete updater during this specialist step; the
+  # anchor/non-regression terms protect it instead.
+  protected_tristate_roughness_weight: 0.0
+
+  focus_ce_extra_weight: 0.010
+  focus_ce_classes:
+    - water_asphalt_smooth
+    - water_asphalt_slight
+    - water_asphalt_severe
+    - wet_asphalt_severe
+
+  # RSCD-adapted hard-pair repair. The gate uses PhysicsTexture pair evidence,
+  # so updates concentrate on samples whose wetness/roughness cues actually
+  # support the selected asphalt-family boundary.
+  pair_value_selective_margin_weight: 0.055
+  pair_value_selective_margin_target: 0.42
+  pair_value_selective_margin_low_margin_threshold: 1.05
+  pair_value_selective_margin_min_weight: 0.08
+  pair_value_selective_margin_gate_threshold: 0.34
+  pair_value_selective_margin_gate_temperature: 9.0
+  pair_value_selective_margin_uncertainty_temperature: 2.2
+  pair_value_selective_margin_value_aug_std: 0.004
+  pair_value_selective_margin_pairs:
+    - water_asphalt_slight|water_asphalt_severe
+    - water_asphalt_smooth|water_asphalt_slight
+    - water_asphalt_smooth|water_asphalt_severe
+    - water_asphalt_severe|wet_asphalt_severe
+  pair_value_selective_margin_pair_weights:
+    water_asphalt_slight|water_asphalt_severe: 1.15
+    water_asphalt_smooth|water_asphalt_slight: 0.80
+    water_asphalt_smooth|water_asphalt_severe: 0.65
+    water_asphalt_severe|wet_asphalt_severe: 0.75
+
+  # LwF-style teacher anchor. Asphalt-family classes are allowed tiny movement;
+  # all other classes are anchored strongly to prevent cross-family harm.
+  anchor_consistency_weight: 0.78
+  anchor_consistency_focus_weight: 0.004
+  anchor_consistency_focus_low_margin_threshold: 0.16
+  anchor_consistency_temperature: 2.0
+  anchor_consistency_protect_weight: 0.72
+  anchor_consistency_protect_confidence: 0.68
+  anchor_consistency_protect_margin: 0.14
+  anchor_no_flip_weight: 0.46
+  anchor_no_flip_nonfocus_only: true
+  anchor_consistency_exempt_classes:
+    - water_asphalt_smooth
+    - water_asphalt_slight
+    - water_asphalt_severe
+    - wet_asphalt_severe
+
+  # Class-balanced no-regression barrier: if the anchor is already correct and
+  # confident, the new model is penalized only when its true-label CE becomes
+  # worse than the anchor by more than a small tolerance.
+  anchor_nonregression_weight: 0.24
+  anchor_nonregression_focus_weight: 0.055
+  anchor_nonregression_margin: 0.018
+  anchor_nonregression_confidence: 0.68
+  anchor_nonregression_teacher_margin: 0.14
+  anchor_nonregression_squared: true
+  anchor_nonregression_focus_classes:
+    - water_asphalt_smooth
+    - water_asphalt_slight
+    - water_asphalt_severe
+    - wet_asphalt_severe
+
+  # Pareto-safe distillation protects the pairwise margins that were damaged by
+  # the previous asphalt specialist, especially dry/water concrete boundaries.
+  pareto_safe_distill_weight: 0.12
+  pareto_safe_margin_weight: 0.16
+  pareto_safe_hardpair_margin_weight: 0.12
+  pareto_safe_temperature: 2.0
+  pareto_safe_confidence: 0.68
+  pareto_safe_teacher_margin: 0.14
+  pareto_safe_margin_tolerance: 0.025
+  pareto_safe_focus_protect_scale: 0.25
+  pareto_safe_focus_classes:
+    - water_asphalt_smooth
+    - water_asphalt_slight
+    - water_asphalt_severe
+    - wet_asphalt_severe
+  pareto_safe_hardpair_pairs:
+    - dry_concrete_slight|water_concrete_slight
+    - water_concrete_slight|water_concrete_severe
+    - dry_concrete_severe|dry_concrete_slight
+    - water_asphalt_slight|water_concrete_slight
+
+train:
+  resume_from: D:/NMI_SPWFM_datasets/friction_affordance_outputs/rscd_surface_classification/c3_farnet_protected_tristate_dryconcrete_micro_20260706/best_checkpoint.pth
+  teacher_checkpoint: D:/NMI_SPWFM_datasets/friction_affordance_outputs/rscd_surface_classification/c3_farnet_protected_tristate_dryconcrete_micro_20260706/best_checkpoint.pth
+  teacher_backbone: convnext_tiny_gate_calibrated_tensor_coupling_concrete_film_rough_stem
+  teacher_head_type: hardpair_error_gated_calibrated
+  evaluate_initial: true
+  trainable_prefixes:
+    - linear_head
+  lr: 0.000025
+  weight_decay: 0.0015
+  epochs: 1
+  amp: true
+  samples_per_epoch: 2400
+  log_every_steps: 100

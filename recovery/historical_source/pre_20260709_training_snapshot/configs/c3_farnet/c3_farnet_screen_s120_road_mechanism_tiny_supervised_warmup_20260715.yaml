@@ -1,0 +1,79 @@
+extends: _base.yaml
+
+output_dir: E:/perception_outputs/rscd_surface_classification/c3_farnet_screen_s120_road_mechanism_tiny_supervised_warmup_20260715
+
+model:
+  backbone: road_mechanism_tiny
+  embedding_dim: 768
+  pretrained: false
+  dropout: 0.14
+  head_type: hybrid_coupled
+  hybrid_coupled_scale: 0.16
+  use_source_reliable_boundary_router: false
+  use_dry_concrete_roughness_vor_residual: false
+  use_physics_branch: true
+  physics_dim: 96
+  physics_quality_cues: true
+  physics_quality_region_cues: false
+  use_semantic_physics_attention_branch: true
+  semantic_physics_attention_dim: 64
+  use_local_physics_field_branch: true
+  local_physics_field_dim: 64
+  local_physics_field_scale: 0.08
+
+loss:
+  factor_weight: 0.10
+  factor_axis_weights:
+    friction: 1.10
+    material: 1.15
+    roughness: 1.30
+  tournament_weight: 0.0
+  counterfactual_weight: 0.0
+  reliability_weight: 0.0
+  focus_ce_extra_weight: 0.20
+  focus_ce_classes:
+    - wet_concrete_smooth
+    - wet_concrete_slight
+    - wet_concrete_severe
+    - water_concrete_smooth
+    - water_concrete_slight
+    - water_concrete_severe
+    - dry_concrete_slight
+    - dry_concrete_severe
+    - water_asphalt_slight
+    - water_asphalt_severe
+  teacher_feature_distill_weight: 0.0
+  anchor_consistency_weight: 0.0
+  anchor_consistency_focus_weight: 0.0
+  anchor_no_flip_weight: 0.0
+  anchor_error_gate_weight: 0.0
+  anchor_nonregression_weight: 0.0
+  anchor_nonregression_focus_weight: 0.0
+
+train:
+  resume_from:
+  teacher_checkpoint:
+  teacher_logits_cache:
+  expert_teacher_checkpoint:
+  expert_teacher_logits_cache:
+  trainable_prefixes:
+  evaluate_initial: false
+  lr: 0.00085
+  weight_decay: 0.006
+  epochs: 3
+  batch_size: 16
+  grad_accum_steps: 1
+  num_workers: 2
+  prefetch_factor: 2
+  amp: true
+  augmentation: true
+  balanced_sampling: true
+  max_train_samples_per_class: 1000
+  samples_per_epoch: 27000
+  grad_clip_norm: 4.0
+  log_every_steps: 400
+
+eval:
+  batch_size: 32
+  max_val_samples_per_class: 250
+  max_test_samples_per_class: 250

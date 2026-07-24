@@ -1,0 +1,15 @@
+extends: c3_farnet_s137_concrete_roughness_scalespace_screen_20260715.yaml
+
+output_dir: E:/perception_outputs/rscd_surface_classification/s137_concrete_roughness_scalespace_control_20260715
+
+# Same-budget control for S137. It keeps the S137 code path and training
+# budget but disables the concrete roughness conditioner effect, isolating
+# whether the early scale-space route itself adds value.
+
+model:
+  use_concrete_roughness_scale_space: true
+  concrete_roughness_scale_space_mode: "off"
+  concrete_roughness_scale_space_scale: 0.18
+
+loss:
+  concrete_roughness_route_weight: 0.0

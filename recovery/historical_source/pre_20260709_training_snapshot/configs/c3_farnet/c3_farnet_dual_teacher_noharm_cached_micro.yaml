@@ -1,0 +1,18 @@
+extends: c3_farnet_dual_teacher_noharm_micro.yaml
+
+output_dir: D:/NMI_SPWFM_datasets/friction_affordance_outputs/rscd_surface_classification/c3_farnet_dual_teacher_noharm_cached_micro_20260707
+
+train:
+  max_train_samples_per_class: 160
+  samples_per_epoch: 3000
+  batch_size: 8
+  grad_accum_steps: 2
+  teacher_logits_cache: D:/NMI_SPWFM_datasets/friction_affordance_outputs/rscd_surface_classification/c3_farnet_dual_teacher_noharm_cached_micro_20260707/cache_anchor_train.pt
+  expert_teacher_logits_cache: D:/NMI_SPWFM_datasets/friction_affordance_outputs/rscd_surface_classification/c3_farnet_dual_teacher_noharm_cached_micro_20260707/cache_expert_train.pt
+  teacher_logits_cache_strict: true
+  teacher_cache_online_fallback: false
+
+eval:
+  batch_size: 16
+  max_val_samples_per_class: 120
+  max_test_samples_per_class: 120

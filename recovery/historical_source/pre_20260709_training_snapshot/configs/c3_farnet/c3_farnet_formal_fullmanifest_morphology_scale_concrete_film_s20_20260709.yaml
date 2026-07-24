@@ -1,0 +1,19 @@
+extends: c3_farnet_formal_fullmanifest_precision_observer_concrete_film_s19_20260709.yaml
+
+output_dir: E:/perception_outputs/rscd_surface_classification/c3_farnet_formal_fullmanifest_morphology_scale_concrete_film_s20_20260709
+
+model:
+  # S20: S19 plus morphology scale-space roughness evidence.
+  # Opening/closing top-hat and granulometric scale balance are injected before
+  # early tensor coupling, so the model learns smooth/slight/severe roughness
+  # from aggregate/pit size instead of relying only on generic texture contrast.
+  backbone: convnext_tiny_family_router_morphology_scale_concrete_film_stem
+
+loss:
+  # Morphology mainly targets roughness-order boundaries, so keep the same route
+  # objective but slightly emphasize concrete slight/severe separation.
+  family_mechanism_router_weight: 0.242
+  family_router_target_margin_weight: 0.075
+  family_router_target_margin: 0.252
+  family_router_concrete_slight_weight: 1.28
+  family_router_concrete_severe_weight: 1.16

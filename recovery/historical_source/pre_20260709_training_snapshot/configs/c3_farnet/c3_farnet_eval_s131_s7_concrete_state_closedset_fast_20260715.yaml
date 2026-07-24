@@ -1,0 +1,17 @@
+extends: c3_farnet_gate_s131_s7_concrete_state_closedset_20260715.yaml
+
+output_dir: E:/perception_outputs/rscd_surface_classification/s131_eval_test_cap250_fast_20260715
+
+train:
+  batch_size: 16
+  num_workers: 0
+  prefetch_factor:
+  balanced_sampling: false
+  factor_graph_pair_sampling: false
+  max_train_samples_per_class: 1
+  samples_per_epoch: 27
+
+eval:
+  batch_size: 16
+  max_val_samples_per_class: 250
+  max_test_samples_per_class: 250

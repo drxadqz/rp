@@ -1,0 +1,6 @@
+extends: c3_farnet_screen_s121d_bccn_wetconcrete_s96_anchor_fast_20260715.yaml
+
+output_dir: E:/perception_outputs/rscd_surface_classification/c3_farnet_screen_s122_bccn_wetconcrete_filmonly_s96_anchor_fast_20260715
+
+model:
+  backbone: convnext_tiny_bccn_wetconcrete_filmonly_stem

@@ -1,0 +1,278 @@
+{
+  "run_dir": "D:\\NMI_SPWFM_datasets\\friction_affordance_outputs\\rscd_surface_classification\\tta_local_physics_hflip_consistency_w002_fulltest",
+  "samples": 49500,
+  "exact_top1": 0.9068080808080808,
+  "factor_metrics": {
+    "friction": {
+      "accuracy": 0.9662222222222222,
+      "macro_f1": 0.9733548221158443,
+      "rows": [
+        {
+          "label": "dry",
+          "precision": 0.9870956440499825,
+          "recall": 0.98,
+          "f1": 0.9835350244356528,
+          "support": 17250
+        },
+        {
+          "label": "fresh_snow",
+          "precision": 0.9893435635123614,
+          "recall": 0.987659574468085,
+          "f1": 0.9885008517887564,
+          "support": 2350
+        },
+        {
+          "label": "ice",
+          "precision": 0.9822033898305085,
+          "recall": 0.9863829787234043,
+          "f1": 0.9842887473460722,
+          "support": 2350
+        },
+        {
+          "label": "melted_snow",
+          "precision": 0.9790004199916001,
+          "recall": 0.9919148936170212,
+          "f1": 0.9854153455928979,
+          "support": 2350
+        },
+        {
+          "label": "water",
+          "precision": 0.9469724113221067,
+          "recall": 0.9567420814479638,
+          "f1": 0.9518321779058252,
+          "support": 11050
+        },
+        {
+          "label": "wet",
+          "precision": 0.9474615874814133,
+          "recall": 0.9456537102473498,
+          "f1": 0.9465567856258621,
+          "support": 14150
+        }
+      ]
+    },
+    "material": {
+      "accuracy": 0.9724646464646465,
+      "macro_f1": 0.9677119383307489,
+      "rows": [
+        {
+          "label": "asphalt",
+          "precision": 0.9787134659015081,
+          "recall": 0.9810702341137124,
+          "f1": 0.9798904329235703,
+          "support": 14950
+        },
+        {
+          "label": "concrete",
+          "precision": 0.9812744173514751,
+          "recall": 0.9744481605351171,
+          "f1": 0.9778493757551349,
+          "support": 14950
+        },
+        {
+          "label": "gravel",
+          "precision": 0.9244196508907684,
+          "recall": 0.934,
+          "f1": 0.9291851315908475,
+          "support": 5500
+        },
+        {
+          "label": "mud",
+          "precision": 0.9582858769931663,
+          "recall": 0.9547517730496454,
+          "f1": 0.9565155606082137,
+          "support": 7050
+        },
+        {
+          "label": "winter",
+          "precision": 0.992521518272894,
+          "recall": 0.9977304964539007,
+          "f1": 0.9951191907759779,
+          "support": 7050
+        }
+      ]
+    },
+    "roughness": {
+      "accuracy": 0.9516767676767677,
+      "macro_f1": 0.9451136147148442,
+      "rows": [
+        {
+          "label": "granular",
+          "precision": 0.9833876480406963,
+          "recall": 0.9858167330677291,
+          "f1": 0.9846006923719709,
+          "support": 12550
+        },
+        {
+          "label": "severe",
+          "precision": 0.8796557120500782,
+          "recall": 0.8851968503937008,
+          "f1": 0.8824175824175824,
+          "support": 6350
+        },
+        {
+          "label": "slight",
+          "precision": 0.8874276696475539,
+          "recall": 0.8925925925925926,
+          "f1": 0.8900026378264311,
+          "support": 9450
+        },
+        {
+          "label": "smooth",
+          "precision": 0.9791203271866256,
+          "recall": 0.9678014184397163,
+          "f1": 0.9734279701822591,
+          "support": 14100
+        },
+        {
+          "label": "winter",
+          "precision": 0.992521518272894,
+          "recall": 0.9977304964539007,
+          "f1": 0.9951191907759779,
+          "support": 7050
+        }
+      ]
+    }
+  },
+  "factor_pair_accuracy": {
+    "friction_material": 0.941939393939394,
+    "friction_roughness": 0.9225454545454546,
+    "material_roughness": 0.935030303030303,
+    "all_three": 0.9068080808080808
+  },
+  "error_patterns": [
+    {
+      "wrong_factors": "roughness",
+      "count": 1739,
+      "share_of_errors": 0.3769781053544331
+    },
+    {
+      "wrong_factors": "friction",
+      "count": 1397,
+      "share_of_errors": 0.30283980056362453
+    },
+    {
+      "wrong_factors": "material",
+      "count": 779,
+      "share_of_errors": 0.16887058313461956
+    },
+    {
+      "wrong_factors": "material+roughness",
+      "count": 423,
+      "share_of_errors": 0.09169737697810536
+    },
+    {
+      "wrong_factors": "friction+material+roughness",
+      "count": 116,
+      "share_of_errors": 0.025146325601560805
+    },
+    {
+      "wrong_factors": "friction+roughness",
+      "count": 114,
+      "share_of_errors": 0.02471276826360286
+    },
+    {
+      "wrong_factors": "friction+material",
+      "count": 45,
+      "share_of_errors": 0.009755040104053762
+    }
+  ],
+  "lowest_classes": [
+    {
+      "class": "water_concrete_slight",
+      "support": 800,
+      "accuracy": 0.755,
+      "friction_acc": 0.925,
+      "material_acc": 0.96,
+      "roughness_acc": 0.835
+    },
+    {
+      "class": "dry_concrete_slight",
+      "support": 2350,
+      "accuracy": 0.8114893617021277,
+      "friction_acc": 0.9940425531914894,
+      "material_acc": 0.9663829787234043,
+      "roughness_acc": 0.8238297872340425
+    },
+    {
+      "class": "water_concrete_severe",
+      "support": 800,
+      "accuracy": 0.81875,
+      "friction_acc": 0.97125,
+      "material_acc": 0.9525,
+      "roughness_acc": 0.84625
+    },
+    {
+      "class": "wet_concrete_severe",
+      "support": 800,
+      "accuracy": 0.82375,
+      "friction_acc": 0.94375,
+      "material_acc": 0.97125,
+      "roughness_acc": 0.8675
+    },
+    {
+      "class": "water_asphalt_severe",
+      "support": 800,
+      "accuracy": 0.8325,
+      "friction_acc": 0.96875,
+      "material_acc": 0.94125,
+      "roughness_acc": 0.87375
+    },
+    {
+      "class": "wet_concrete_slight",
+      "support": 800,
+      "accuracy": 0.83625,
+      "friction_acc": 0.94,
+      "material_acc": 0.97625,
+      "roughness_acc": 0.88875
+    },
+    {
+      "class": "wet_asphalt_severe",
+      "support": 800,
+      "accuracy": 0.84625,
+      "friction_acc": 0.94,
+      "material_acc": 0.98875,
+      "roughness_acc": 0.9025
+    },
+    {
+      "class": "water_asphalt_slight",
+      "support": 800,
+      "accuracy": 0.87,
+      "friction_acc": 0.955,
+      "material_acc": 0.985,
+      "roughness_acc": 0.915
+    },
+    {
+      "class": "dry_concrete_severe",
+      "support": 2350,
+      "accuracy": 0.8706382978723404,
+      "friction_acc": 0.987659574468085,
+      "material_acc": 0.9808510638297873,
+      "roughness_acc": 0.8876595744680851
+    },
+    {
+      "class": "wet_concrete_smooth",
+      "support": 2350,
+      "accuracy": 0.8727659574468085,
+      "friction_acc": 0.8940425531914894,
+      "material_acc": 0.9863829787234043,
+      "roughness_acc": 0.9838297872340426
+    },
+    {
+      "class": "water_concrete_smooth",
+      "support": 2350,
+      "accuracy": 0.882127659574468,
+      "friction_acc": 0.9119148936170213,
+      "material_acc": 0.9829787234042553,
+      "roughness_acc": 0.9744680851063829
+    },
+    {
+      "class": "water_gravel",
+      "support": 800,
+      "accuracy": 0.88875,
+      "friction_acc": 0.98375,
+      "material_acc": 0.90125,
+      "roughness_acc": 0.9425
+    }
+  ]
+}

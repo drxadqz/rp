@@ -1,0 +1,24 @@
+extends: c3_farnet_currentbest_dryconcrete_selector_noharm_micro.yaml
+
+seed: 97
+output_dir: D:/NMI_SPWFM_datasets/friction_affordance_outputs/rscd_surface_classification/c3_farnet_currentbest_dryconcrete_selector_direct_noharm_micro_20260708
+
+model:
+  dry_concrete_pair_selector_shift_scale: 0.65
+  dry_concrete_pair_selector_gain_scale: 0.35
+  dry_concrete_pair_selector_direct_delta_scale: 0.22
+  dry_concrete_pair_selector_safe_margin: 0.20
+  dry_concrete_pair_selector_safe_temperature: 28.0
+
+loss:
+  dry_concrete_bidirectional_ordinal_weight: 0.16
+  dry_concrete_bidirectional_margin: 0.45
+  dry_concrete_bidirectional_low_margin_threshold: 0.32
+  anchor_consistency_weight: 0.66
+  anchor_consistency_protect_weight: 0.64
+  anchor_no_flip_weight: 0.46
+  anchor_nonregression_weight: 0.38
+
+train:
+  lr: 0.00060
+  samples_per_epoch: 2400

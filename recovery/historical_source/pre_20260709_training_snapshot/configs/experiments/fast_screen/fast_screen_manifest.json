@@ -1,0 +1,123 @@
+{
+  "protocol": "fast_screen",
+  "claim_boundary": "Fast-screen runs are for direction finding only. They must not be used as final paper evidence or as fair SOTA comparisons.",
+  "source_config_dir": "E:\\perception\\friction_affordance_field\\configs\\experiments\\paper_protocol",
+  "config_dir": "E:\\perception\\friction_affordance_field\\configs\\experiments\\fast_screen",
+  "run_root": "D:\\NMI_SPWFM_datasets\\friction_affordance_outputs\\fast_screen",
+  "runs": [
+    {
+      "source_run": "v1_physics_texture",
+      "screen_run": "screen_v1_physics_texture",
+      "config": "E:\\perception\\friction_affordance_field\\configs\\experiments\\fast_screen\\screen_v1_physics_texture.yaml"
+    },
+    {
+      "source_run": "v6_full_faf_fourier",
+      "screen_run": "screen_v6_full_faf_fourier",
+      "config": "E:\\perception\\friction_affordance_field\\configs\\experiments\\fast_screen\\screen_v6_full_faf_fourier.yaml"
+    },
+    {
+      "source_run": "v7_full_faf_fourier_dann",
+      "screen_run": "screen_v7_full_faf_fourier_dann",
+      "config": "E:\\perception\\friction_affordance_field\\configs\\experiments\\fast_screen\\screen_v7_full_faf_fourier_dann.yaml"
+    },
+    {
+      "source_run": "v8_full_faf_fourier_roadprior",
+      "screen_run": "screen_v8_full_faf_fourier_roadprior",
+      "config": "E:\\perception\\friction_affordance_field\\configs\\experiments\\fast_screen\\screen_v8_full_faf_fourier_roadprior.yaml"
+    },
+    {
+      "source_run": "v9_full_faf_roadsaw_hard_sampling",
+      "screen_run": "screen_v9_full_faf_roadsaw_hard_sampling",
+      "config": "E:\\perception\\friction_affordance_field\\configs\\experiments\\fast_screen\\screen_v9_full_faf_roadsaw_hard_sampling.yaml"
+    },
+    {
+      "source_run": "v10_full_faf_consistency",
+      "screen_run": "screen_v10_full_faf_consistency",
+      "config": "E:\\perception\\friction_affordance_field\\configs\\experiments\\fast_screen\\screen_v10_full_faf_consistency.yaml"
+    },
+    {
+      "source_run": "v11_full_faf_domain_adapter",
+      "screen_run": "screen_v11_full_faf_domain_adapter",
+      "config": "E:\\perception\\friction_affordance_field\\configs\\experiments\\fast_screen\\screen_v11_full_faf_domain_adapter.yaml"
+    },
+    {
+      "source_run": "v12_full_faf_roi_interval_safety",
+      "screen_run": "screen_v12_full_faf_roi_interval_safety",
+      "config": "E:\\perception\\friction_affordance_field\\configs\\experiments\\fast_screen\\screen_v12_full_faf_roi_interval_safety.yaml"
+    },
+    {
+      "source_run": "v13_lean_physics_evidence",
+      "screen_run": "screen_v13_lean_physics_evidence",
+      "config": "E:\\perception\\friction_affordance_field\\configs\\experiments\\fast_screen\\screen_v13_lean_physics_evidence.yaml"
+    },
+    {
+      "source_run": "v14_lean_road_roi_safety",
+      "screen_run": "screen_v14_lean_road_roi_safety",
+      "config": "E:\\perception\\friction_affordance_field\\configs\\experiments\\fast_screen\\screen_v14_lean_road_roi_safety.yaml"
+    },
+    {
+      "source_run": "v15_lean_bottom_square_style_safety",
+      "screen_run": "screen_v15_lean_bottom_square_style_safety",
+      "config": "E:\\perception\\friction_affordance_field\\configs\\experiments\\fast_screen\\screen_v15_lean_bottom_square_style_safety.yaml"
+    },
+    {
+      "source_run": "v16_lean_bottom_square_color_constancy_safety",
+      "screen_run": "screen_v16_lean_bottom_square_color_constancy_safety",
+      "config": "E:\\perception\\friction_affordance_field\\configs\\experiments\\fast_screen\\screen_v16_lean_bottom_square_color_constancy_safety.yaml"
+    },
+    {
+      "source_run": "v17_lean_quality_physics_safety",
+      "screen_run": "screen_v17_lean_quality_physics_safety",
+      "config": "E:\\perception\\friction_affordance_field\\configs\\experiments\\fast_screen\\screen_v17_lean_quality_physics_safety.yaml"
+    },
+    {
+      "source_run": "v18_lean_mixstyle_quality_safety",
+      "screen_run": "screen_v18_lean_mixstyle_quality_safety",
+      "config": "E:\\perception\\friction_affordance_field\\configs\\experiments\\fast_screen\\screen_v18_lean_mixstyle_quality_safety.yaml"
+    },
+    {
+      "source_run": "v19_lean_state_contrast_quality_safety",
+      "screen_run": "screen_v19_lean_state_contrast_quality_safety",
+      "config": "E:\\perception\\friction_affordance_field\\configs\\experiments\\fast_screen\\screen_v19_lean_state_contrast_quality_safety.yaml"
+    },
+    {
+      "source_run": "v20_lean_interval_order_quality_safety",
+      "screen_run": "screen_v20_lean_interval_order_quality_safety",
+      "config": "E:\\perception\\friction_affordance_field\\configs\\experiments\\fast_screen\\screen_v20_lean_interval_order_quality_safety.yaml"
+    },
+    {
+      "source_run": "v21_lean_quality_uncertainty_safety",
+      "screen_run": "screen_v21_lean_quality_uncertainty_safety",
+      "config": "E:\\perception\\friction_affordance_field\\configs\\experiments\\fast_screen\\screen_v21_lean_quality_uncertainty_safety.yaml"
+    },
+    {
+      "source_run": "v22_lean_quality_order_contrast_safety",
+      "screen_run": "screen_v22_lean_quality_order_contrast_safety",
+      "config": "E:\\perception\\friction_affordance_field\\configs\\experiments\\fast_screen\\screen_v22_lean_quality_order_contrast_safety.yaml"
+    },
+    {
+      "source_run": "v23_lean_region_mixture_evidence_safety",
+      "screen_run": "screen_v23_lean_region_mixture_evidence_safety",
+      "config": "E:\\perception\\friction_affordance_field\\configs\\experiments\\fast_screen\\screen_v23_lean_region_mixture_evidence_safety.yaml"
+    },
+    {
+      "source_run": "v24_lean_multi_query_region_evidence_safety",
+      "screen_run": "screen_v24_lean_multi_query_region_evidence_safety",
+      "config": "E:\\perception\\friction_affordance_field\\configs\\experiments\\fast_screen\\screen_v24_lean_multi_query_region_evidence_safety.yaml"
+    },
+    {
+      "source_run": "v25_lean_masked_query_consistency_safety",
+      "screen_run": "screen_v25_lean_masked_query_consistency_safety",
+      "config": "E:\\perception\\friction_affordance_field\\configs\\experiments\\fast_screen\\screen_v25_lean_masked_query_consistency_safety.yaml"
+    }
+  ],
+  "budget": {
+    "epochs": 4,
+    "balanced_num_samples_per_epoch": 4800,
+    "max_train_samples_per_class": 300,
+    "max_val_samples_per_class": 80,
+    "max_test_samples_per_class": 120,
+    "max_val_samples": 6000,
+    "max_test_samples": 9000
+  }
+}

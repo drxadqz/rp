@@ -1,0 +1,13 @@
+extends: c3_farnet_screen_s66_lite_early_mechanism_conditioned_s7_anchor_20260710.yaml
+
+output_dir: E:/perception_outputs/rscd_surface_classification/c3_farnet_screen_s66_quick_early_mechanism_conditioned_s7_anchor_20260710
+
+train:
+  samples_per_epoch: 12000
+  max_train_samples_per_class: 600
+  log_every_steps: 250
+
+eval:
+  batch_size: 32
+  max_val_samples_per_class: 100
+  max_test_samples_per_class: 100

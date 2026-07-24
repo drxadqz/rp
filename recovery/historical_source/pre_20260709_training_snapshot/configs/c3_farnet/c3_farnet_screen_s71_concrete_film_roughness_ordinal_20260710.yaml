@@ -1,0 +1,31 @@
+extends: c3_farnet_screen_s68_ordinal_open_concrete_film_20260710.yaml
+
+output_dir: E:/perception_outputs/rscd_surface_classification/c3_farnet_screen_s71_concrete_film_roughness_ordinal_20260710
+
+model:
+  backbone: convnext_tiny_concrete_film_roughness_ordinal_stem
+  pretrained: false
+  use_source_reliable_boundary_router: true
+  expose_hardpair_pair_value_evidence: true
+
+loss:
+  focus_ce_extra_weight: 0.14
+  protected_tristate_roughness_weight: 0.050
+  protected_tristate_roughness_margin: 0.44
+  protected_tristate_roughness_min_weight: 0.15
+  protected_tristate_roughness_severe_boost: 0.60
+  protected_tristate_roughness_slight_protect: 0.66
+
+train:
+  trainable_prefixes:
+    - backbone.gate_calibrated_tensor_coupling_banks
+    - backbone.roughness_ordinal_conditioners
+  lr: 0.000045
+  weight_decay: 0.0018
+  samples_per_epoch: 27000
+  max_train_samples_per_class: 1000
+
+eval:
+  batch_size: 32
+  max_val_samples_per_class: 250
+  max_test_samples_per_class: 250

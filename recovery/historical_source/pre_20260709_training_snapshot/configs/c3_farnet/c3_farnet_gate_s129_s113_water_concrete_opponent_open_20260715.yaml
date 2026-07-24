@@ -1,0 +1,106 @@
+extends: c3_farnet_screen_s113_open_ordinal_dry_concrete_branch_s96_20260713.yaml
+
+output_dir: E:/perception_outputs/rscd_surface_classification/c3_farnet_gate_s129_s113_water_concrete_opponent_open_20260715
+
+# S129: open the S128 water-concrete opponent mechanism enough to test
+# whether the feature-space pair axis has real decision value.
+# Targeted RSCD factors:
+# - friction: water-state evidence versus merely wet/dry concrete;
+# - material: concrete-only boundary to avoid asphalt spillover;
+# - roughness: smooth/slight/severe hidden roughness under water film;
+# - coupling: water + concrete + roughness is treated as a distinct mechanism,
+#   not as an additive sum of water evidence and concrete roughness.
+
+model:
+  backbone: convnext_tiny_dry_concrete_isolated_branch_open_stem
+  pretrained: false
+  use_water_concrete_opponent_feature_conditioner: true
+  water_concrete_opponent_pairs:
+    - water_concrete_smooth|water_concrete_slight
+    - water_concrete_slight|water_concrete_severe
+  water_concrete_opponent_hidden_dim: 96
+  water_concrete_opponent_scale: 0.075
+  water_concrete_opponent_gate_margin: 1.45
+  water_concrete_opponent_gate_temperature: 5.2
+  water_concrete_opponent_gate_floor: 0.10
+  water_concrete_opponent_value_aug_std: 0.010
+  water_concrete_opponent_dropout: 0.04
+
+loss:
+  focus_ce_extra_weight: 0.24
+  focus_ce_classes:
+    - water_concrete_smooth
+    - water_concrete_slight
+    - water_concrete_severe
+  feature_value_boundary_pairwise_loss_weight: 0.0
+  water_concrete_opponent_pairwise_loss_weight: 0.46
+  water_concrete_opponent_pairwise_loss_pairs:
+    - water_concrete_smooth|water_concrete_slight
+    - water_concrete_slight|water_concrete_severe
+  water_concrete_opponent_pairwise_pair_weights:
+    water_concrete_slight|water_concrete_severe: 2.6
+    water_concrete_smooth|water_concrete_slight: 1.4
+  value_guided_hardpair_margin_weight: 0.060
+  value_guided_hardpair_margin_pairs:
+    - water_concrete_smooth|water_concrete_slight
+    - water_concrete_slight|water_concrete_severe
+  value_guided_hardpair_margin_pair_weights:
+    water_concrete_slight|water_concrete_severe: 2.2
+    water_concrete_smooth|water_concrete_slight: 1.3
+  value_guided_hardpair_margin_target: 0.46
+  value_guided_hardpair_margin_low_margin_threshold: 1.20
+  value_guided_hardpair_margin_min_weight: 0.24
+  anchor_consistency_weight: 0.24
+  anchor_consistency_focus_weight: 0.002
+  anchor_consistency_focus_low_margin_threshold: 0.12
+  anchor_consistency_temperature: 2.0
+  anchor_consistency_protect_weight: 0.56
+  anchor_consistency_protect_confidence: 0.80
+  anchor_consistency_protect_margin: 0.30
+  anchor_no_flip_weight: 0.36
+  anchor_no_flip_nonfocus_only: true
+  anchor_nonregression_weight: 0.12
+  anchor_nonregression_focus_weight: 0.004
+  anchor_nonregression_margin: 0.010
+  anchor_nonregression_confidence: 0.74
+  anchor_nonregression_teacher_margin: 0.15
+  anchor_error_gate_weight: 0.0
+  anchor_consistency_exempt_classes:
+    - water_concrete_smooth
+    - water_concrete_slight
+    - water_concrete_severe
+
+train:
+  resume_from: E:/perception_outputs/rscd_surface_classification/c3_farnet_screen_s113_open_ordinal_dry_concrete_branch_s96_20260713/best_checkpoint.pth
+  teacher_checkpoint: E:/perception_outputs/rscd_surface_classification/c3_farnet_screen_s113_open_ordinal_dry_concrete_branch_s96_20260713/best_checkpoint.pth
+  teacher_backbone: convnext_tiny_dry_concrete_isolated_branch_open_stem
+  teacher_head_type: hardpair_error_gated_calibrated
+  teacher_preserve_hardpair_focus: true
+  trainable_prefixes:
+    - water_concrete_opponent_feature_conditioner
+  evaluate_initial: true
+  lr: 0.00018
+  weight_decay: 0.0008
+  epochs: 1
+  batch_size: 4
+  grad_accum_steps: 4
+  num_workers: 2
+  prefetch_factor: 2
+  amp: true
+  augmentation: true
+  factor_graph_pair_sampling: true
+  factor_graph_pair_sampling_seed: 12907
+  factor_graph_pair_sampling_pair_slots: 2
+  factor_graph_pair_sampling_positive_slots: 0
+  factor_graph_pair_sampling_wet_concrete_focus_scale: 1.0
+  factor_graph_pair_sampling_roughness_focus_scale: 6.0
+  factor_graph_pair_sampling_wet_water_focus_scale: 1.0
+  max_train_samples_per_class: 250
+  samples_per_epoch: 6750
+  grad_clip_norm: 2.0
+  log_every_steps: 125
+
+eval:
+  batch_size: 8
+  max_val_samples_per_class: 250
+  max_test_samples_per_class: 250

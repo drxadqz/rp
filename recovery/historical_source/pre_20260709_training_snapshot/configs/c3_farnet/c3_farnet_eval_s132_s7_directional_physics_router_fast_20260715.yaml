@@ -1,0 +1,11 @@
+extends: c3_farnet_gate_s132_s7_directional_physics_router_20260715.yaml
+
+output_dir: E:/perception_outputs/rscd_surface_classification/c3_farnet_eval_s132_s7_directional_physics_router_fast_20260715
+
+train:
+  evaluate_initial: false
+
+eval:
+  batch_size: 16
+  max_val_samples_per_class: 250
+  max_test_samples_per_class: 250

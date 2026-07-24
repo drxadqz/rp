@@ -1,0 +1,16 @@
+extends: c3_farnet_family_router_asphalt_only_fastscreen_micro.yaml
+
+seed: 97
+output_dir: D:/NMI_SPWFM_datasets/friction_affordance_outputs/rscd_surface_classification/c3_farnet_family_router_asphalt_strict_fastscreen_micro_20260708
+
+model:
+  backbone: convnext_tiny_family_router_strict_tensor_coupling_warm_stem
+
+loss:
+  family_mechanism_router_weight: 0.34
+  family_router_asphalt_weight: 1.80
+  family_router_protect_sample_weight: 0.58
+  family_router_protect_leak_weight: 0.080
+
+train:
+  lr: 0.00018

@@ -1,0 +1,78 @@
+extends: c3_farnet_formal_fullmanifest_source_reliable_router_s7_20260709.yaml
+
+output_dir: E:/perception_outputs/rscd_surface_classification/c3_farnet_screen_s74_protected_mechanism_boundary_cotune_20260711
+
+model:
+  backbone: convnext_tiny_gate_calibrated_tensor_coupling_concrete_film_rough_stem
+  pretrained: false
+  head_type: hardpair_error_gated_calibrated
+  use_source_reliable_boundary_router: true
+  expose_hardpair_pair_value_evidence: true
+
+loss:
+  focus_ce_extra_weight: 0.22
+  focus_ce_classes:
+    - wet_concrete_smooth
+    - wet_concrete_slight
+    - wet_concrete_severe
+    - water_concrete_smooth
+    - water_concrete_slight
+    - water_concrete_severe
+  anchor_consistency_weight: 0.46
+  anchor_consistency_focus_weight: 0.006
+  anchor_consistency_focus_low_margin_threshold: 0.18
+  anchor_consistency_temperature: 2.0
+  anchor_consistency_protect_weight: 0.48
+  anchor_consistency_protect_confidence: 0.70
+  anchor_consistency_protect_margin: 0.20
+  anchor_no_flip_weight: 0.25
+  anchor_no_flip_nonfocus_only: true
+  anchor_error_gate_weight: 0.08
+  anchor_error_gate_pos_weight: 10.0
+  anchor_error_gate_pair_error_only: true
+  anchor_consistency_exempt_classes:
+    - wet_concrete_smooth
+    - wet_concrete_slight
+    - wet_concrete_severe
+    - water_concrete_smooth
+    - water_concrete_slight
+    - water_concrete_severe
+  anchor_nonregression_weight: 0.16
+  anchor_nonregression_focus_weight: 0.055
+  anchor_nonregression_margin: 0.010
+  anchor_nonregression_confidence: 0.64
+  anchor_nonregression_teacher_margin: 0.10
+
+train:
+  resume_from: E:/perception_outputs/rscd_surface_classification/c3_farnet_formal_fullmanifest_source_reliable_router_s7_20260709/best_checkpoint.pth
+  teacher_checkpoint: E:/perception_outputs/rscd_surface_classification/c3_farnet_formal_fullmanifest_source_reliable_router_s7_20260709/best_checkpoint.pth
+  teacher_backbone: convnext_tiny_gate_calibrated_tensor_coupling_concrete_film_rough_stem
+  teacher_head_type: hardpair_error_gated_calibrated
+  teacher_preserve_hardpair_focus: true
+  teacher_logits_cache:
+  expert_teacher_checkpoint:
+  expert_teacher_logits_cache:
+  trainable_prefixes:
+    - backbone.gate_calibrated_tensor_coupling_banks
+    - pairwise_hardpair_experts
+    - pairwise_hardpair_error_gates
+  evaluate_initial: true
+  lr: 0.000025
+  weight_decay: 0.0018
+  epochs: 1
+  batch_size: 8
+  grad_accum_steps: 2
+  num_workers: 2
+  prefetch_factor: 2
+  amp: true
+  augmentation: true
+  balanced_sampling: true
+  max_train_samples_per_class: 1000
+  samples_per_epoch: 27000
+  grad_clip_norm: 5.0
+  log_every_steps: 500
+
+eval:
+  batch_size: 32
+  max_val_samples_per_class: 250
+  max_test_samples_per_class: 250

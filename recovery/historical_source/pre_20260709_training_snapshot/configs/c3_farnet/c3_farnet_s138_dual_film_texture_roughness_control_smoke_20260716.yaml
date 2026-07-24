@@ -1,0 +1,26 @@
+extends: c3_farnet_s138_dual_film_texture_roughness_control_20260716.yaml
+
+output_dir: E:/perception_outputs/rscd_surface_classification/s138_dual_film_texture_roughness_control_smoke_20260716
+
+data:
+  image_size: 128
+
+model:
+  stem_dim: 32
+  stage_dims: [64, 128, 256]
+
+train:
+  max_train_samples_per_class: 3
+  samples_per_epoch: 81
+  epochs: 1
+  batch_size: 3
+  grad_accum_steps: 1
+  num_workers: 0
+  prefetch_factor:
+  amp: false
+  log_every_steps: 4
+
+eval:
+  batch_size: 6
+  max_val_samples_per_class: 3
+  max_test_samples_per_class: 3

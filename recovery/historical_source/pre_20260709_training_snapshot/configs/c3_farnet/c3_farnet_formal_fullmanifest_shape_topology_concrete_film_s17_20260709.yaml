@@ -1,0 +1,23 @@
+extends: c3_farnet_formal_fullmanifest_concrete_film_split_free_energy_s16_20260709.yaml
+
+output_dir: E:/perception_outputs/rscd_surface_classification/c3_farnet_formal_fullmanifest_shape_topology_concrete_film_s17_20260709
+
+model:
+  # S17: topology/shape-gated concrete-film router.
+  # It keeps S16's split wet/water-concrete mechanism charts, but the early
+  # tensor route now receives direction coherence, roughness connectivity,
+  # film-roughness interface, and isotropic microtexture evidence. This targets
+  # hidden slight/severe roughness under concrete water film without using a late
+  # classifier trick.
+  backbone: convnext_tiny_family_router_shape_topology_concrete_film_stem
+
+loss:
+  # Keep the free-energy router objective, but slightly emphasize concrete
+  # hidden-slight/severe classes where topology evidence should matter most.
+  family_mechanism_router_weight: 0.23
+  family_router_entropy_weight: 0.050
+  family_router_target_margin_weight: 0.070
+  family_router_target_margin: 0.24
+  family_router_concrete_slight_weight: 1.24
+  family_router_concrete_severe_weight: 1.12
+  family_router_protect_leak_weight: 0.042

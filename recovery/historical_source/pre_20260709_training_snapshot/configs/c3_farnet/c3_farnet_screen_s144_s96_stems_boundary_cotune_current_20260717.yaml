@@ -1,0 +1,34 @@
+extends: c3_farnet_screen_s143_s96_early_mid_cotune_current_20260717.yaml
+
+output_dir: E:/perception_outputs/rscd_surface_classification/c3_farnet_screen_s144_s96_stems_boundary_cotune_current_20260717
+
+# S144: narrow early-physics stem co-tuning.
+# S143 showed that opening the broad gate-calibrated tensor-coupling banks can
+# move a few friction-boundary predictions but hurts material/roughness and hard
+# concrete classes. S144 keeps the task-adapted early physical evidence route
+# but removes the broad mid-level tensor-bank update.
+#
+# This isolates whether the PhysicsTexture/scale-space/pair-value/topology
+# stems can adapt the water-concrete slight/severe boundary without globally
+# disturbing factor-coupling banks.
+
+loss:
+  focus_ce_extra_weight: 0.20
+  anchor_consistency_weight: 0.48
+  anchor_consistency_protect_weight: 0.74
+  anchor_no_flip_weight: 0.58
+  anchor_nonregression_weight: 0.32
+  anchor_nonregression_focus_weight: 0.028
+
+train:
+  trainable_prefixes:
+    - input_stem_adapter
+    - scale_space_roughness_stem_adapter
+    - pair_value_stem_conditioner
+    - water_concrete_topology_texture_stem_conditioner
+    - feature_value_boundary_corrector
+  lr: 0.00009
+  weight_decay: 0.0010
+  factor_graph_pair_sampling_seed: 14417
+  grad_clip_norm: 1.8
+

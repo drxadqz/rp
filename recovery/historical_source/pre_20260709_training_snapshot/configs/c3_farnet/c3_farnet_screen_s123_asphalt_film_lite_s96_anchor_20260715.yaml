@@ -1,0 +1,68 @@
+extends: c3_farnet_screen_s96_wc_pair_relative_boundary_20260712.yaml
+
+output_dir: E:/perception_outputs/rscd_surface_classification/c3_farnet_screen_s123_asphalt_film_lite_s96_anchor_20260715
+
+model:
+  backbone: convnext_tiny_family_safe_asphalt_film_lite_stem
+
+loss:
+  focus_ce_extra_weight: 0.035
+  focus_ce_classes:
+    - water_asphalt_slight
+    - water_asphalt_severe
+    - wet_asphalt_slight
+    - wet_asphalt_severe
+  feature_value_boundary_pairwise_loss_weight: 0.0
+  value_guided_hardpair_margin_weight: 0.0
+  pair_value_selective_margin_weight: 0.052
+  pair_value_selective_margin_target: 0.43
+  pair_value_selective_margin_low_margin_threshold: 1.05
+  pair_value_selective_margin_min_weight: 0.12
+  pair_value_selective_margin_gate_threshold: 0.34
+  pair_value_selective_margin_gate_temperature: 9.0
+  pair_value_selective_margin_uncertainty_temperature: 2.2
+  pair_value_selective_margin_value_aug_std: 0.003
+  pair_value_selective_margin_pairs:
+    - water_asphalt_slight|water_asphalt_severe
+    - wet_asphalt_slight|wet_asphalt_severe
+  pair_value_selective_margin_pair_weights:
+    water_asphalt_slight|water_asphalt_severe: 1.00
+    wet_asphalt_slight|wet_asphalt_severe: 0.70
+  anchor_consistency_weight: 0.62
+  anchor_consistency_focus_weight: 0.012
+  anchor_consistency_protect_weight: 0.70
+  anchor_consistency_protect_confidence: 0.70
+  anchor_consistency_protect_margin: 0.18
+  anchor_no_flip_weight: 0.54
+  anchor_no_flip_nonfocus_only: false
+  anchor_nonregression_weight: 0.34
+  anchor_nonregression_focus_weight: 0.14
+  anchor_nonregression_margin: 0.012
+  anchor_nonregression_confidence: 0.66
+  anchor_nonregression_teacher_margin: 0.10
+  anchor_nonregression_focus_classes:
+    - water_asphalt_slight
+    - water_asphalt_severe
+    - wet_asphalt_slight
+    - wet_asphalt_severe
+
+train:
+  resume_from: E:/perception_outputs/rscd_surface_classification/c3_farnet_screen_s96_wc_pair_relative_boundary_20260712/best_checkpoint.pth
+  teacher_checkpoint: E:/perception_outputs/rscd_surface_classification/c3_farnet_screen_s96_wc_pair_relative_boundary_20260712/best_checkpoint.pth
+  teacher_backbone: convnext_tiny_gate_calibrated_tensor_coupling_concrete_film_rough_stem
+  teacher_head_type: hardpair_error_gated_calibrated
+  teacher_preserve_hardpair_focus: true
+  trainable_prefixes:
+    - backbone.family_safe_tensor_coupling_banks
+  evaluate_initial: false
+  factor_graph_pair_sampling: false
+  lr: 0.00018
+  weight_decay: 0.0010
+  batch_size: 8
+  grad_accum_steps: 2
+  log_every_steps: 125
+
+eval:
+  batch_size: 8
+  max_val_samples_per_class: 250
+  max_test_samples_per_class: 250

@@ -1,0 +1,38 @@
+extends: c3_farnet_screen_s76_released_physics_stem_early_cotune_20260711.yaml
+
+output_dir: E:/perception_outputs/rscd_surface_classification/c3_farnet_screen_s81_timm_in22k_convnext_feature_20260711
+
+model:
+  backbone: timm_convnext_tiny_in22k_feature
+  pretrained: true
+  head_type: hardpair_error_gated_calibrated
+
+train:
+  resume_from: E:/perception_outputs/rscd_surface_classification/c3_farnet_formal_fullmanifest_source_reliable_router_s7_20260709/best_checkpoint.pth
+  resume_skip_prefixes:
+    - backbone.
+  teacher_checkpoint: E:/perception_outputs/rscd_surface_classification/c3_farnet_formal_fullmanifest_source_reliable_router_s7_20260709/best_checkpoint.pth
+  teacher_backbone: convnext_tiny_gate_calibrated_tensor_coupling_concrete_film_rough_stem
+  teacher_head_type: hardpair_error_gated_calibrated
+  teacher_preserve_hardpair_focus: true
+  trainable_prefixes:
+  evaluate_initial: true
+  lr: 0.00006
+  weight_decay: 0.0016
+  epochs: 1
+  batch_size: 4
+  grad_accum_steps: 4
+  num_workers: 2
+  prefetch_factor: 2
+  amp: true
+  augmentation: true
+  balanced_sampling: true
+  max_train_samples_per_class: 1000
+  samples_per_epoch: 27000
+  grad_clip_norm: 4.0
+  log_every_steps: 500
+
+eval:
+  batch_size: 16
+  max_val_samples_per_class: 250
+  max_test_samples_per_class: 250

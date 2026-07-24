@@ -1,0 +1,101 @@
+extends: c3_farnet_screen_s96_wc_pair_relative_boundary_20260712.yaml
+
+output_dir: E:/perception_outputs/rscd_surface_classification/c3_farnet_screen_s107_mechanism_path_feature_distill_20260713
+
+model:
+  backbone: road_cortex_mechanism_path_student_tiny
+  embedding_dim: 768
+  pretrained: false
+  dropout: 0.18
+  head_type: hardpair_error_gated_calibrated
+  use_source_reliable_boundary_router: true
+  expose_hardpair_pair_value_evidence: true
+  use_physics_branch: true
+  physics_dim: 96
+  physics_quality_cues: true
+  physics_quality_region_cues: false
+  use_semantic_physics_attention_branch: true
+  semantic_physics_attention_dim: 64
+  use_local_physics_field_branch: true
+  local_physics_field_dim: 64
+  local_physics_field_scale: 0.08
+  use_physics_texture_stem_adapter: false
+  use_scale_space_roughness_stem_adapter: false
+  use_pair_value_stem_conditioner: false
+  use_feature_value_boundary_corrector: false
+
+loss:
+  teacher_feature_distill_weight: 1.35
+  teacher_feature_distill_key: feature
+  teacher_feature_distill_mode: cosine_mse
+  factor_weight: 0.05
+  factor_axis_weights:
+    friction: 1.0
+    material: 1.0
+    roughness: 1.25
+  focus_ce_extra_weight: 0.22
+  focus_ce_classes:
+    - wet_concrete_smooth
+    - wet_concrete_slight
+    - wet_concrete_severe
+    - water_concrete_smooth
+    - water_concrete_slight
+    - water_concrete_severe
+    - dry_concrete_slight
+    - dry_concrete_severe
+    - water_asphalt_slight
+    - water_asphalt_severe
+  anchor_consistency_weight: 0.46
+  anchor_consistency_focus_weight: 0.018
+  anchor_consistency_focus_low_margin_threshold: 0.20
+  anchor_consistency_temperature: 2.5
+  anchor_consistency_protect_weight: 0.18
+  anchor_consistency_protect_confidence: 0.74
+  anchor_consistency_protect_margin: 0.22
+  anchor_no_flip_weight: 0.08
+  anchor_no_flip_nonfocus_only: true
+  anchor_error_gate_weight: 0.02
+  anchor_nonregression_weight: 0.04
+  anchor_nonregression_focus_weight: 0.010
+  anchor_nonregression_margin: 0.014
+  anchor_nonregression_confidence: 0.70
+  anchor_nonregression_teacher_margin: 0.12
+  anchor_consistency_exempt_classes:
+    - wet_concrete_smooth
+    - wet_concrete_slight
+    - wet_concrete_severe
+    - water_concrete_smooth
+    - water_concrete_slight
+    - water_concrete_severe
+    - dry_concrete_slight
+    - dry_concrete_severe
+
+train:
+  resume_from: E:/perception_outputs/rscd_surface_classification/c3_farnet_screen_s96_wc_pair_relative_boundary_20260712/best_checkpoint.pth
+  resume_skip_prefixes:
+    - backbone.
+  teacher_checkpoint: E:/perception_outputs/rscd_surface_classification/c3_farnet_screen_s96_wc_pair_relative_boundary_20260712/best_checkpoint.pth
+  teacher_backbone: convnext_tiny_gate_calibrated_tensor_coupling_concrete_film_rough_stem
+  teacher_head_type: hardpair_error_gated_calibrated
+  teacher_preserve_hardpair_focus: true
+  trainable_prefixes:
+  evaluate_initial: false
+  lr: 0.00022
+  weight_decay: 0.010
+  epochs: 1
+  batch_size: 4
+  grad_accum_steps: 4
+  num_workers: 2
+  prefetch_factor: 2
+  amp: true
+  augmentation: true
+  balanced_sampling: true
+  max_train_samples_per_class: 1000
+  samples_per_epoch: 27000
+  grad_clip_norm: 4.0
+  log_every_steps: 250
+
+eval:
+  batch_size: 16
+  max_val_samples_per_class: 250
+  max_test_samples_per_class: 250

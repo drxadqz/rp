@@ -1,0 +1,31 @@
+extends: c3_farnet_family_router_noharm_fastscreen_micro.yaml
+
+seed: 97
+output_dir: D:/NMI_SPWFM_datasets/friction_affordance_outputs/rscd_surface_classification/c3_farnet_family_router_asphalt_only_fastscreen_micro_20260708
+
+loss:
+  family_router_dry_as_protect: true
+  family_router_concrete_as_protect: true
+  family_mechanism_router_weight: 0.24
+  family_router_asphalt_weight: 1.55
+  family_router_protect_sample_weight: 0.46
+  family_router_protect_leak_weight: 0.050
+
+  focus_ce_classes:
+    - water_asphalt_severe
+    - water_asphalt_slight
+    - wet_asphalt_severe
+    - wet_asphalt_slight
+
+  anchor_nonregression_focus_classes:
+    - water_asphalt_severe
+    - water_asphalt_slight
+    - wet_asphalt_severe
+    - wet_asphalt_slight
+
+train:
+  trainable_prefixes:
+    - backbone.family_route_routers
+    - backbone.family_safe_tensor_coupling_banks.0.asphalt_film
+  lr: 0.00016
+  samples_per_epoch: 1200

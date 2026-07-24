@@ -1,0 +1,19 @@
+extends: c3_farnet_s137_concrete_roughness_scalespace_screen_20260715.yaml
+
+output_dir: E:/perception_outputs/rscd_surface_classification/s137_concrete_roughness_scalespace_smoke_20260715
+
+train:
+  max_train_samples_per_class: 4
+  samples_per_epoch: 108
+  epochs: 1
+  batch_size: 4
+  grad_accum_steps: 1
+  num_workers: 0
+  prefetch_factor:
+  log_every_steps: 5
+
+eval:
+  batch_size: 8
+  max_val_samples_per_class: 4
+  max_test_samples_per_class: 4
+

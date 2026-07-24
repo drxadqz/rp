@@ -1,0 +1,50 @@
+extends: c3_farnet_formal_fullmanifest_factor_graph_metric_pair_sampler_s12_20260709.yaml
+
+output_dir: E:/perception_outputs/rscd_surface_classification/c3_farnet_formal_fullmanifest_family_router_tensor_coupling_s13_20260709
+
+model:
+  # RSCD-adapted early mechanism conditioning.
+  # This is not a late residual/head: the router modulates ConvNeXt's early
+  # feature map through family-separated tensor-coupling banks.
+  backbone: convnext_tiny_family_router_tensor_coupling_warm_stem
+
+loss:
+  # Supervise early route selection with RSCD mechanism families:
+  # protect / dry-concrete roughness / asphalt wet-film / concrete smooth-film.
+  family_mechanism_router_weight: 0.18
+  family_router_protect_sample_weight: 0.40
+  family_router_dry_weight: 1.10
+  family_router_asphalt_weight: 1.35
+  family_router_concrete_weight: 1.55
+  family_router_protect_leak_weight: 0.030
+
+  # Keep the S12 factor-graph objective, but reduce the extra pair-value margin
+  # pressure that previously tended to help one class while hurting neighbors.
+  pair_value_selective_margin_weight: 0.030
+  pair_value_selective_margin_target: 0.42
+  pair_value_selective_margin_low_margin_threshold: 1.05
+  pair_value_selective_margin_min_weight: 0.12
+  pair_value_selective_margin_gate_threshold: 0.34
+  pair_value_selective_margin_gate_temperature: 9.0
+  pair_value_selective_margin_uncertainty_temperature: 2.2
+  pair_value_selective_margin_value_aug_std: 0.001
+  pair_value_selective_margin_pairs:
+    - water_asphalt_slight|water_asphalt_severe
+    - wet_asphalt_slight|wet_asphalt_severe
+    - dry_concrete_slight|dry_concrete_severe
+    - water_concrete_slight|water_concrete_severe
+  pair_value_selective_margin_pair_weights:
+    water_asphalt_slight|water_asphalt_severe: 1.00
+    wet_asphalt_slight|wet_asphalt_severe: 0.45
+    dry_concrete_slight|dry_concrete_severe: 0.70
+    water_concrete_slight|water_concrete_severe: 0.30
+
+train:
+  trainable_prefixes:
+    - backbone.gate_calibrated_tensor_coupling_banks
+    - backbone.family_route_routers
+    - backbone.family_safe_tensor_coupling_banks
+    - decoder.projectors
+    - decoder.queries
+    - pairwise_hardpair_experts
+    - pairwise_hardpair_error_gates

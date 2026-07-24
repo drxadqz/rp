@@ -1,0 +1,92 @@
+seed: 73
+output_dir: outputs/topvenue_v3_heterogeneous
+device: auto
+
+data:
+  train_manifests:
+    - data/manifests_full/rscd_prepared_train.csv
+    - data/manifests_full/roadsaw_train.csv
+    - data/manifests_full/roadsc_train.csv
+  val_manifests:
+    - data/manifests_full/rscd_prepared_val.csv
+    - data/manifests_full/roadsaw_val.csv
+    - data/manifests_full/roadsc_val.csv
+  test_manifests:
+    - data/manifests_full/rscd_prepared_test.csv
+    - data/manifests_full/roadsaw_test.csv
+    - data/manifests_full/roadsc_test.csv
+  image_size: 192
+  batch_size: 16
+  num_workers: 4
+  prefetch_factor: 2
+  max_train_samples: null
+  max_val_samples: null
+  max_test_samples: null
+  max_train_samples_per_class: 1200
+  max_val_samples_per_class: 300
+  max_test_samples_per_class: 300
+  balanced_sampling: true
+  balanced_dataset_first: true
+  balanced_group_columns:
+    - dataset
+    - class_label
+  balanced_num_samples_per_epoch: 36000
+  sample_seed: 73
+  augmentation:
+    random_resized_crop: true
+    crop_scale: [0.78, 1.0]
+    crop_ratio: [0.88, 1.12]
+    color_jitter:
+      brightness: 0.30
+      contrast: 0.30
+      saturation: 0.18
+      hue: 0.035
+    random_grayscale_p: 0.08
+    gaussian_blur_p: 0.12
+    blur_sigma: [0.1, 1.2]
+    random_erasing_p: 0.06
+    erase_scale: [0.015, 0.07]
+
+model:
+  backbone: convnext_tiny
+  embedding_dim: 768
+  dropout: 0.30
+  pretrained: true
+  freeze_backbone: false
+  use_physics_branch: true
+  physics_dim: 96
+  use_friction_set: true
+  friction_set_entropy_expansion: 0.12
+  friction_set_interval_mix: 1.0
+  num_domains: 3
+
+optim:
+  epochs: 16
+  lr: 0.00008
+  weight_decay: 0.05
+  grad_clip_norm: 5.0
+  grad_accum_steps: 2
+  amp: true
+  early_stop_patience: 5
+  early_stop_min_delta: 0.0005
+
+loss:
+  task_weight: 0.35
+  compatibility_weight: 1.0
+  group_dro_weight: 0.25
+  group_vrex_weight: 0.08
+  group_dro_temperature: 0.05
+  risk_ordinal_weight: 0.20
+  interval_weight: 0.05
+  coverage_weight: 1.0
+  endpoint_weight: 1.5
+  target_width_weight: 0.5
+  width_weight: 0.0
+  coverage_margin: 0.0
+  monotonic_weight: 0.05
+  risk_mu_monotonic_weight: 0.08
+  domain_weight: 0.0
+  domain_grl_lambda: 0.0
+  feature_coral_weight: 0.01
+  risk_conditional_coral_weight: 0.02
+  coral_min_samples_per_domain: 2

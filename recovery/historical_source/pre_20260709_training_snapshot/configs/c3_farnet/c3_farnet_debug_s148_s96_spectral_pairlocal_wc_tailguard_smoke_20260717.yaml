@@ -1,0 +1,17 @@
+extends: c3_farnet_screen_s148_s96_spectral_pairlocal_wc_tailguard_20260717.yaml
+
+output_dir: E:/perception_outputs/rscd_surface_classification/c3_farnet_debug_s148_s96_spectral_pairlocal_wc_tailguard_smoke_20260717
+
+train:
+  epochs: 1
+  samples_per_epoch: 64
+  max_train_samples_per_class: 4
+  batch_size: 4
+  grad_accum_steps: 2
+  log_every_steps: 4
+  evaluate_initial: false
+
+eval:
+  batch_size: 8
+  max_val_samples_per_class: 5
+  max_test_samples_per_class: 5

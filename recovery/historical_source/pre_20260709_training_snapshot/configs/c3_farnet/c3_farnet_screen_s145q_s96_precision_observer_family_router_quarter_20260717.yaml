@@ -1,0 +1,22 @@
+extends: c3_farnet_screen_s145_s96_precision_observer_family_router_current_20260717.yaml
+
+output_dir: E:/perception_outputs/rscd_surface_classification/c3_farnet_screen_s145q_s96_precision_observer_family_router_quarter_20260717
+
+# S145q: compute-aware quarter-budget screen for the heavy precision-observer
+# router. It keeps the same cap250 validation/test protocol as S96/S143/S144,
+# but uses fewer training samples before deciding whether a full-budget run is
+# worth the GPU time.
+
+train:
+  batch_size: 4
+  grad_accum_steps: 4
+  max_train_samples_per_class: 250
+  samples_per_epoch: 6750
+  factor_graph_pair_sampling_seed: 14571
+  log_every_steps: 250
+
+eval:
+  batch_size: 16
+  max_val_samples_per_class: 250
+  max_test_samples_per_class: 250
+

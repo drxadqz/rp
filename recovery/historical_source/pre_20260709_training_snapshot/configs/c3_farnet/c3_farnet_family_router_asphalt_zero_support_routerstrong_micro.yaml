@@ -1,0 +1,20 @@
+extends: c3_farnet_family_router_asphalt_zero_support_fastscreen_micro.yaml
+
+seed: 97
+output_dir: D:/NMI_SPWFM_datasets/friction_affordance_outputs/rscd_surface_classification/c3_farnet_family_router_asphalt_zero_support_routerstrong_micro_20260708
+
+loss:
+  family_mechanism_router_weight: 0.85
+  family_router_asphalt_weight: 3.00
+  family_router_protect_sample_weight: 0.90
+  family_router_protect_leak_weight: 0.20
+
+  anchor_consistency_weight: 0.72
+  anchor_consistency_protect_weight: 0.74
+  anchor_no_flip_weight: 0.56
+  anchor_nonregression_weight: 0.42
+  anchor_nonregression_focus_weight: 0.20
+
+train:
+  lr: 0.00022
+  samples_per_epoch: 1200

@@ -1,0 +1,15 @@
+extends: c3_farnet_formal_fullmanifest_factor_graph_metric_s11_20260709.yaml
+
+output_dir: E:/perception_outputs/rscd_surface_classification/c3_farnet_formal_fullmanifest_factor_graph_metric_pair_sampler_s12_20260709
+
+train:
+  num_workers: 4
+  prefetch_factor: 4
+  persistent_workers: true
+  factor_graph_pair_sampling: true
+  factor_graph_pair_sampling_seed: 20260709
+  factor_graph_pair_sampling_pair_slots: 2
+  factor_graph_pair_sampling_positive_slots: 1
+  factor_graph_pair_sampling_wet_concrete_focus_scale: 4.0
+  factor_graph_pair_sampling_roughness_focus_scale: 1.75
+  factor_graph_pair_sampling_wet_water_focus_scale: 2.0

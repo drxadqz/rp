@@ -1,0 +1,37 @@
+extends: c3_farnet_classwise_pareto_groupdro_micro.yaml
+
+seed: 109
+output_dir: D:/NMI_SPWFM_datasets/friction_affordance_outputs/rscd_surface_classification/c3_farnet_classwise_pareto_groupdro_v2_safe_micro_20260707
+
+loss:
+  focus_ce_extra_weight: 0.12
+  pareto_safe_distill_weight: 0.30
+  pareto_safe_margin_weight: 0.46
+  pareto_safe_hardpair_margin_weight: 0.38
+  pareto_safe_confidence: 0.66
+  pareto_safe_teacher_margin: 0.10
+  pareto_safe_focus_protect_scale: 0.45
+  classwise_pareto_groupdro_weight: 0.10
+  classwise_pareto_groupdro_group_temperature: 3.0
+  classwise_pareto_groupdro_physics_extra: 0.20
+  classwise_pareto_groupdro_protect_weight: 0.36
+  classwise_pareto_groupdro_protect_nonfocus_only: false
+  classwise_pareto_groupdro_protect_confidence: 0.58
+  classwise_pareto_groupdro_protect_teacher_margin: 0.08
+  classwise_pareto_groupdro_kl_weight: 0.65
+  classwise_pareto_groupdro_margin_weight: 0.95
+  classwise_pareto_groupdro_ce_barrier_weight: 0.40
+  classwise_pareto_groupdro_ce_tolerance: 0.012
+  classwise_pareto_groupdro_no_flip_weight: 0.16
+  classwise_pareto_groupdro_margin_tolerance: 0.018
+
+train:
+  trainable_prefixes:
+    - pairwise_hardpair_experts
+    - pairwise_hardpair_error_gates
+    - pairwise_hardpair_value_adapters
+    - boundary_experts
+  lr: 0.000025
+  epochs: 1
+  samples_per_epoch: 6000
+  log_every_steps: 100

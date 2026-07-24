@@ -1,0 +1,25 @@
+extends: c3_farnet_formal_fullmanifest_source_reliable_router_s7_20260709.yaml
+
+output_dir: E:/perception_outputs/rscd_surface_classification/c3_farnet_formal_fullmanifest_factor_graph_metric_s11_20260709
+
+loss:
+  factor_graph_metric_weight: 0.025
+  factor_graph_metric_axis_weight: 0.35
+  factor_graph_metric_coupling_weight: 0.15
+  factor_graph_metric_neighbor_weight: 0.45
+  factor_graph_metric_temperature: 0.12
+  factor_graph_metric_neighbor_margin: 0.62
+  factor_graph_metric_roughness_neighbor_scale: 0.45
+  factor_graph_metric_wet_concrete_focus_scale: 1.35
+  factor_graph_metric_supervise_none: false
+
+train:
+  num_workers: 4
+  prefetch_factor: 4
+  persistent_workers: true
+  trainable_prefixes:
+    - backbone.gate_calibrated_tensor_coupling_banks
+    - decoder.projectors
+    - decoder.queries
+    - pairwise_hardpair_experts
+    - pairwise_hardpair_error_gates

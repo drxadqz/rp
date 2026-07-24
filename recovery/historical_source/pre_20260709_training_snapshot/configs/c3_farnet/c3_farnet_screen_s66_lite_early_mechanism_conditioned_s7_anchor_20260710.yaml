@@ -1,0 +1,26 @@
+extends: c3_farnet_screen_s66_early_mechanism_conditioned_s7_anchor_20260710.yaml
+
+output_dir: E:/perception_outputs/rscd_surface_classification/c3_farnet_screen_s66_lite_early_mechanism_conditioned_s7_anchor_20260710
+
+loss:
+  anchor_consistency_weight: 0.0
+  anchor_consistency_focus_weight: 0.0
+  anchor_consistency_protect_weight: 0.0
+  anchor_no_flip_weight: 0.0
+  anchor_error_gate_weight: 0.0
+
+train:
+  teacher_checkpoint:
+  teacher_logits_cache:
+  expert_teacher_checkpoint:
+  expert_teacher_logits_cache:
+  evaluate_initial: true
+  lr: 0.000045
+  samples_per_epoch: 27000
+  max_train_samples_per_class: 1000
+  log_every_steps: 500
+
+eval:
+  batch_size: 32
+  max_val_samples_per_class: 500
+  max_test_samples_per_class: 800

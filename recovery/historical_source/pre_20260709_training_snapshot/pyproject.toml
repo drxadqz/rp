@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "friction-affordance-field"
+version = "0.1.0"
+description = "Heterogeneous weakly supervised visual road-state learning for calibrated friction-risk intervals"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+  "torch",
+  "torchvision",
+  "numpy",
+  "pandas",
+  "Pillow",
+  "PyYAML",
+  "scikit-learn",
+  "tqdm",
+  "opencv-python",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+

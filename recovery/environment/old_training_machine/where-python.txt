@@ -1,0 +1,9 @@
+﻿E:\Anaconda\python.exe
+C:\Users\DELL\AppData\Local\Programs\Python\Python310\python.exe
+C:\Users\DELL\AppData\Local\Microsoft\WindowsApps\python.exe
+faf_python=D:\NMI_SPWFM_datasets\conda_envs\faf_paper\python.exe
+python_version=3.11.15 | packaged by Anaconda, Inc. | (main, Jun 11 2026, 15:12:53) [MSC v.1942 64 bit (AMD64)]
+torch_version=2.11.0+cu128
+cuda_available=True
+cuda_version=12.8
+device=NVIDIA GeForce RTX 3050 Laptop GPU

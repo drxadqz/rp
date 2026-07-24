@@ -1,0 +1,36 @@
+seed: 13
+output_dir: outputs/smoke_joint
+device: auto
+
+data:
+  train_manifests:
+    - data/manifests/rscd_prepared_train.csv
+    - data/manifests/roadsaw_train.csv
+    - data/manifests/roadsc_train.csv
+  val_manifests:
+    - data/manifests/rscd_prepared_val.csv
+    - data/manifests/roadsaw_val.csv
+    - data/manifests/roadsc_val.csv
+  image_size: 160
+  batch_size: 32
+  num_workers: 0
+  max_train_samples: 512
+  max_val_samples: 256
+
+model:
+  backbone: simple_cnn
+  embedding_dim: 256
+  dropout: 0.1
+
+optim:
+  epochs: 2
+  lr: 0.0005
+  weight_decay: 0.0001
+  grad_clip_norm: 5.0
+  amp: true
+
+loss:
+  task_weight: 1.0
+  interval_weight: 0.2
+  monotonic_weight: 0.02
+

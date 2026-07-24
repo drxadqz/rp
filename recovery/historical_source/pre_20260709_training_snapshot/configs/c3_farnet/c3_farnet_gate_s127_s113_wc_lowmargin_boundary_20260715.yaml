@@ -1,0 +1,91 @@
+extends: c3_farnet_screen_s113_open_ordinal_dry_concrete_branch_s96_20260713.yaml
+
+output_dir: E:/perception_outputs/rscd_surface_classification/c3_farnet_gate_s127_s113_wc_lowmargin_boundary_20260715
+
+# S127: low-margin wet/water-concrete boundary expert on top of S113.
+# Targeted label structure: friction and roughness coupling inside concrete
+# under wet/water visual ambiguity. The dry-concrete branch is kept frozen.
+
+loss:
+  focus_ce_extra_weight: 0.22
+  focus_ce_classes:
+    - wet_concrete_smooth
+    - wet_concrete_slight
+    - wet_concrete_severe
+    - water_concrete_smooth
+    - water_concrete_slight
+    - water_concrete_severe
+  feature_value_boundary_pairwise_loss_weight: 0.40
+  feature_value_boundary_pairwise_loss_pairs:
+    - water_concrete_smooth|water_concrete_slight
+    - water_concrete_slight|water_concrete_severe
+    - water_concrete_slight|wet_concrete_slight
+    - wet_concrete_smooth|wet_concrete_slight
+    - wet_concrete_slight|wet_concrete_severe
+  feature_value_boundary_pairwise_pair_weights:
+    water_concrete_slight|water_concrete_severe: 2.4
+    water_concrete_smooth|water_concrete_slight: 1.5
+    water_concrete_slight|wet_concrete_slight: 1.6
+    wet_concrete_slight|wet_concrete_severe: 1.0
+    wet_concrete_smooth|wet_concrete_slight: 0.8
+  value_guided_hardpair_margin_weight: 0.060
+  value_guided_hardpair_margin_pairs:
+    - water_concrete_smooth|water_concrete_slight
+    - water_concrete_slight|water_concrete_severe
+    - water_concrete_slight|wet_concrete_slight
+    - wet_concrete_smooth|wet_concrete_slight
+    - wet_concrete_slight|wet_concrete_severe
+  value_guided_hardpair_margin_pair_weights:
+    water_concrete_slight|water_concrete_severe: 2.2
+    water_concrete_smooth|water_concrete_slight: 1.4
+    water_concrete_slight|wet_concrete_slight: 1.6
+    wet_concrete_slight|wet_concrete_severe: 0.9
+    wet_concrete_smooth|wet_concrete_slight: 0.7
+  value_guided_hardpair_margin_target: 0.43
+  value_guided_hardpair_margin_low_margin_threshold: 1.03
+  value_guided_hardpair_margin_min_weight: 0.18
+  anchor_consistency_weight: 0.36
+  anchor_consistency_focus_weight: 0.004
+  anchor_consistency_focus_low_margin_threshold: 0.16
+  anchor_consistency_temperature: 2.0
+  anchor_consistency_protect_weight: 0.66
+  anchor_consistency_protect_confidence: 0.76
+  anchor_consistency_protect_margin: 0.25
+  anchor_no_flip_weight: 0.52
+  anchor_no_flip_nonfocus_only: true
+  anchor_nonregression_weight: 0.18
+  anchor_nonregression_focus_weight: 0.010
+  anchor_nonregression_margin: 0.010
+  anchor_nonregression_confidence: 0.70
+  anchor_nonregression_teacher_margin: 0.10
+  anchor_consistency_exempt_classes:
+    - wet_concrete_smooth
+    - wet_concrete_slight
+    - wet_concrete_severe
+    - water_concrete_smooth
+    - water_concrete_slight
+    - water_concrete_severe
+
+train:
+  resume_from: E:/perception_outputs/rscd_surface_classification/c3_farnet_screen_s113_open_ordinal_dry_concrete_branch_s96_20260713/best_checkpoint.pth
+  teacher_checkpoint: E:/perception_outputs/rscd_surface_classification/c3_farnet_screen_s113_open_ordinal_dry_concrete_branch_s96_20260713/best_checkpoint.pth
+  teacher_backbone: convnext_tiny_dry_concrete_isolated_branch_open_stem
+  teacher_head_type: hardpair_error_gated_calibrated
+  teacher_preserve_hardpair_focus: true
+  trainable_prefixes:
+    - feature_value_boundary_corrector
+  evaluate_initial: true
+  lr: 0.00016
+  weight_decay: 0.0008
+  factor_graph_pair_sampling_seed: 12715
+  factor_graph_pair_sampling_wet_concrete_focus_scale: 9.0
+  factor_graph_pair_sampling_roughness_focus_scale: 3.5
+  factor_graph_pair_sampling_wet_water_focus_scale: 2.4
+  max_train_samples_per_class: 250
+  samples_per_epoch: 6750
+  log_every_steps: 125
+
+eval:
+  batch_size: 8
+  max_val_samples_per_class: 250
+  max_test_samples_per_class: 250

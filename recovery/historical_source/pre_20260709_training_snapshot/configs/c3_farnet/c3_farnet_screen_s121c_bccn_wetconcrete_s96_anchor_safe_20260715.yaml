@@ -1,0 +1,17 @@
+extends: c3_farnet_screen_s121b_bccn_wetconcrete_s96_anchor_noinit_20260715.yaml
+
+output_dir: E:/perception_outputs/rscd_surface_classification/c3_farnet_screen_s121c_bccn_wetconcrete_s96_anchor_safe_20260715
+
+train:
+  batch_size: 2
+  grad_accum_steps: 8
+  num_workers: 0
+  prefetch_factor: null
+  samples_per_epoch: 6750
+  max_train_samples_per_class: 500
+  log_every_steps: 100
+
+eval:
+  batch_size: 4
+  max_val_samples_per_class: 250
+  max_test_samples_per_class: 250

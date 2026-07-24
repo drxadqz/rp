@@ -1,0 +1,19 @@
+extends: c3_farnet_screen_s71_concrete_film_roughness_ordinal_20260710.yaml
+
+output_dir: E:/perception_outputs/rscd_surface_classification/c3_farnet_screen_s72_roughness_ordinal_early_cotune_20260710
+
+train:
+  trainable_prefixes:
+    - backbone.features.0
+    - backbone.features.1
+    - backbone.gate_calibrated_tensor_coupling_banks
+    - backbone.roughness_ordinal_conditioners
+  lr: 0.000018
+  weight_decay: 0.0012
+  samples_per_epoch: 27000
+  max_train_samples_per_class: 1000
+
+eval:
+  batch_size: 32
+  max_val_samples_per_class: 250
+  max_test_samples_per_class: 250

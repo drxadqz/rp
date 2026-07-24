@@ -1,0 +1,79 @@
+extends: c3_farnet_screen_s96_wc_pair_relative_boundary_20260712.yaml
+
+output_dir: E:/perception_outputs/rscd_surface_classification/c3_farnet_screen_s146_s96_frequency_physics_gate_current_20260717
+
+# S146: non-wavelet frequency physics conditioning on the S96 anchor.
+#
+# This borrows frequency-domain CV ideas without overlapping RSPNet's WTConv /
+# wavelet backbone. It does not decompose images with wavelets and does not use
+# star-op blocks. Instead, it builds fixed local frequency evidence from:
+#
+#   - high-frequency isotropic energy: aggregate / gravel / severe roughness
+#   - mid-frequency material texture: asphalt/concrete texture distinction
+#   - low-frequency film suppression: wet/water film erases high-frequency cues
+#   - directional anisotropy: lane marking / shadow line protection
+#
+# The evidence is injected before the existing S96 wet/water-concrete tensor
+# route. Target RSCD factors:
+#
+#   friction: wet/water film versus dry texture
+#   material: asphalt/concrete texture visibility
+#   roughness: smooth/slight/severe via spectral energy ratios
+#   coupling: water/wet + concrete + slight/severe, where film suppresses
+#             the very high-frequency signal needed for roughness separation.
+
+model:
+  backbone: convnext_tiny_gate_calibrated_frequency_physics_concrete_film_rough_stem
+  pretrained: false
+  head_type: hardpair_error_gated_calibrated
+  use_source_reliable_boundary_router: true
+  expose_hardpair_pair_value_evidence: true
+  use_physics_texture_stem_adapter: true
+  use_scale_space_roughness_stem_adapter: true
+  use_pair_value_stem_conditioner: true
+  use_feature_value_boundary_corrector: true
+
+loss:
+  focus_ce_extra_weight: 0.20
+  anchor_consistency_weight: 0.48
+  anchor_consistency_protect_weight: 0.74
+  anchor_no_flip_weight: 0.58
+  anchor_nonregression_weight: 0.32
+  anchor_nonregression_focus_weight: 0.028
+
+train:
+  resume_from: E:/perception_outputs/rscd_surface_classification/c3_farnet_screen_s96_wc_pair_relative_boundary_20260712/best_checkpoint.pth
+  teacher_checkpoint: E:/perception_outputs/rscd_surface_classification/c3_farnet_screen_s96_wc_pair_relative_boundary_20260712/best_checkpoint.pth
+  teacher_backbone: convnext_tiny_gate_calibrated_tensor_coupling_concrete_film_rough_stem
+  teacher_head_type: hardpair_error_gated_calibrated
+  teacher_preserve_hardpair_focus: true
+  trainable_prefixes:
+    - backbone.frequency_physics_stem_adapters
+    - feature_value_boundary_corrector
+  evaluate_initial: true
+  lr: 0.000075
+  weight_decay: 0.0010
+  epochs: 1
+  batch_size: 4
+  grad_accum_steps: 4
+  num_workers: 2
+  prefetch_factor: 2
+  amp: true
+  augmentation: true
+  factor_graph_pair_sampling: true
+  factor_graph_pair_sampling_seed: 14617
+  factor_graph_pair_sampling_pair_slots: 2
+  factor_graph_pair_sampling_positive_slots: 0
+  factor_graph_pair_sampling_wet_concrete_focus_scale: 10.0
+  factor_graph_pair_sampling_roughness_focus_scale: 3.5
+  factor_graph_pair_sampling_wet_water_focus_scale: 2.0
+  max_train_samples_per_class: 1000
+  samples_per_epoch: 27000
+  grad_clip_norm: 1.8
+  log_every_steps: 500
+
+eval:
+  batch_size: 16
+  max_val_samples_per_class: 250
+  max_test_samples_per_class: 250
+

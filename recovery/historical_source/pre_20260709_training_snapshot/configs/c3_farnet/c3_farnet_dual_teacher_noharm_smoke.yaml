@@ -1,0 +1,17 @@
+extends: c3_farnet_dual_teacher_noharm_micro.yaml
+
+output_dir: D:/NMI_SPWFM_datasets/friction_affordance_outputs/rscd_surface_classification/c3_farnet_dual_teacher_noharm_smoke_20260707
+
+train:
+  batch_size: 4
+  grad_accum_steps: 2
+  samples_per_epoch: 64
+  num_workers: 0
+  prefetch_factor: null
+  log_every_steps: 8
+  amp: false
+
+eval:
+  batch_size: 8
+  max_val_samples_per_class: 4
+  max_test_samples_per_class: 4

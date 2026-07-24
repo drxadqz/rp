@@ -1,0 +1,44 @@
+extends: c3_farnet_screen_s142_s96_wc_topology_texture_stem_current_20260717.yaml
+
+output_dir: E:/perception_outputs/rscd_surface_classification/c3_farnet_screen_s143_s96_early_mid_cotune_current_20260717
+
+# S143: strong-anchor early/mid co-tuning after S141/S142.
+# S141 and S142 preserved the S96 boundary but did not move predictions because
+# they trained only tiny late/new paths. This candidate keeps the same RSCD-
+# adapted water-concrete topology/texture mechanism, but opens a narrow early-
+# to-mid feature path:
+#   - PhysicsTexture input stem: wet/specular/film evidence into early features
+#   - scale-space roughness stem: slight/severe texture visibility under film
+#   - pair-value stem: hard-pair signed evidence before the classifier head
+#   - topology-texture stem: water-concrete film occlusion vs visible texture
+#   - gate-calibrated tensor-coupling banks: mid-level factor coupling updates
+#   - feature-value boundary corrector: final local boundary calibration
+#
+# Target RSCD factors:
+#   friction: wet/water boundary
+#   material: concrete texture under water film
+#   roughness: slight/severe with film occlusion
+#   coupling: water/wet + concrete + slight/severe is not additive; water film
+#             can erase the exact texture needed to separate slight from severe.
+
+loss:
+  focus_ce_extra_weight: 0.18
+  anchor_consistency_weight: 0.52
+  anchor_consistency_protect_weight: 0.78
+  anchor_no_flip_weight: 0.64
+  anchor_nonregression_weight: 0.36
+  anchor_nonregression_focus_weight: 0.030
+
+train:
+  trainable_prefixes:
+    - input_stem_adapter
+    - scale_space_roughness_stem_adapter
+    - pair_value_stem_conditioner
+    - water_concrete_topology_texture_stem_conditioner
+    - feature_value_boundary_corrector
+    - backbone.gate_calibrated_tensor_coupling_banks
+  lr: 0.000035
+  weight_decay: 0.0012
+  factor_graph_pair_sampling_seed: 14317
+  grad_clip_norm: 1.6
+

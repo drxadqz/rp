@@ -1,0 +1,20 @@
+extends: c3_farnet_formal_fullmanifest_s133_s96_boundary_earlyphysics_20260715.yaml
+
+output_dir: E:/perception_outputs/rscd_surface_classification/c3_farnet_formal_fullmanifest_s133c_s96_boundary_earlyphysics_b16_20260715
+
+# Same effective batch as S133b (16), but uses batch_size=16 and
+# grad_accum_steps=1 to reduce Python/DataLoader overhead on the RTX 3050.
+train:
+  evaluate_initial: false
+  batch_size: 16
+  grad_accum_steps: 1
+  num_workers: 2
+  prefetch_factor: 2
+  log_every_steps: 2000
+  resume_step_checkpoint: true
+  save_step_checkpoint_every: 2000
+
+eval:
+  batch_size: 32
+  max_val_samples_per_class:
+  max_test_samples_per_class:

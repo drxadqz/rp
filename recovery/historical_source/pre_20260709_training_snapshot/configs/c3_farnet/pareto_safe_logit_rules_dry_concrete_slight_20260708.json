@@ -1,0 +1,27 @@
+{
+  "accepted_rules": [
+    {
+      "rule_raw": {
+        "source": "dry_concrete_severe",
+        "target": "dry_concrete_slight",
+        "topk": 2,
+        "margin": 0.20,
+        "delta": 0.20
+      },
+      "validation": {
+        "split": "val",
+        "base_errors": 336,
+        "patched_errors": 334,
+        "fixes": 2,
+        "regressions": 0,
+        "selection_policy": "accept only if validation regressions are zero and validation errors do not increase"
+      },
+      "test_screen": {
+        "base_errors": 324,
+        "patched_errors": 321,
+        "fixes": 3,
+        "regressions": 0
+      }
+    }
+  ]
+}

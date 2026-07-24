@@ -1,0 +1,22 @@
+extends: c3_farnet_family_safe_early_router_open_micro.yaml
+
+seed: 97
+output_dir: D:/NMI_SPWFM_datasets/friction_affordance_outputs/rscd_surface_classification/c3_farnet_family_safe_early_router_headcal_micro_20260707
+
+loss:
+  anchor_consistency_weight: 0.72
+  anchor_consistency_protect_weight: 0.70
+  anchor_no_flip_weight: 0.48
+  anchor_nonregression_weight: 0.34
+  anchor_nonregression_focus_weight: 0.10
+  pareto_safe_distill_weight: 0.14
+  pareto_safe_margin_weight: 0.16
+  pareto_safe_hardpair_margin_weight: 0.14
+
+train:
+  trainable_prefixes:
+    - backbone.family_safe_tensor_coupling_banks
+    - linear_head
+  lr: 0.000035
+  samples_per_epoch: 1600
+  log_every_steps: 80

@@ -1,0 +1,38 @@
+extends: c3_farnet_formal_fullmanifest_s133_s96_boundary_earlyphysics_20260715.yaml
+
+output_dir: E:/perception_outputs/rscd_surface_classification/c3_farnet_screen_s134_s96_wc_severe_tail_noharm_20260715
+
+# S134: single-mechanism screen on top of S96/S133.
+# Targeted RSCD coupling: water + concrete + severe roughness is not simply
+# water_concrete_slight plus more texture; water film partially hides geometric
+# roughness, so the useful cue is a high-percentile hidden roughness tail under
+# wet/dark-water concrete context. The no-harm gate only suppresses feature-value
+# boundary corrections that would move a likely water_concrete_severe sample
+# toward water_concrete_slight.
+
+model:
+  feature_value_boundary_severe_tail_protect: true
+  feature_value_boundary_severe_tail_protect_pairs:
+    - water_concrete_slight|water_concrete_severe
+  feature_value_boundary_severe_tail_protect_strength: 0.82
+  feature_value_boundary_severe_tail_protect_prob: 0.32
+  feature_value_boundary_severe_tail_protect_tail_threshold: 0.105
+  feature_value_boundary_severe_tail_protect_temperature: 18.0
+
+train:
+  evaluate_initial: true
+  lr: 0.00010
+  weight_decay: 0.0008
+  epochs: 1
+  batch_size: 4
+  grad_accum_steps: 4
+  num_workers: 2
+  prefetch_factor: 2
+  max_train_samples_per_class: 1000
+  samples_per_epoch: 27000
+  log_every_steps: 500
+
+eval:
+  batch_size: 16
+  max_val_samples_per_class: 250
+  max_test_samples_per_class: 250

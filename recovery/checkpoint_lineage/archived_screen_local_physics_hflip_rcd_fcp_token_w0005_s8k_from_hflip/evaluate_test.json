@@ -1,0 +1,850 @@
+{
+  "summary": {
+    "loss": 0.3371922276207076,
+    "top1": 0.8949382716049382,
+    "mean_precision": 0.895919882961535,
+    "mean_recall": 0.8949382716049383,
+    "macro_f1": 0.8950514701129231,
+    "weighted_f1": 0.8950514701129229,
+    "balanced_accuracy": 0.8949382716049383,
+    "num_samples": 8100,
+    "num_classes": 27
+  },
+  "classification_report": {
+    "dry_asphalt_severe": {
+      "precision": 0.9204152249134948,
+      "recall": 0.8866666666666667,
+      "f1-score": 0.9032258064516129,
+      "support": 300.0
+    },
+    "dry_asphalt_slight": {
+      "precision": 0.8679867986798679,
+      "recall": 0.8766666666666667,
+      "f1-score": 0.8723051409618574,
+      "support": 300.0
+    },
+    "dry_asphalt_smooth": {
+      "precision": 0.9022801302931596,
+      "recall": 0.9233333333333333,
+      "f1-score": 0.9126853377265239,
+      "support": 300.0
+    },
+    "dry_concrete_severe": {
+      "precision": 0.867109634551495,
+      "recall": 0.87,
+      "f1-score": 0.8685524126455907,
+      "support": 300.0
+    },
+    "dry_concrete_slight": {
+      "precision": 0.8489932885906041,
+      "recall": 0.8433333333333334,
+      "f1-score": 0.8461538461538461,
+      "support": 300.0
+    },
+    "dry_concrete_smooth": {
+      "precision": 0.9381443298969072,
+      "recall": 0.91,
+      "f1-score": 0.9238578680203046,
+      "support": 300.0
+    },
+    "dry_gravel": {
+      "precision": 0.9161073825503355,
+      "recall": 0.91,
+      "f1-score": 0.9130434782608695,
+      "support": 300.0
+    },
+    "dry_mud": {
+      "precision": 0.921311475409836,
+      "recall": 0.9366666666666666,
+      "f1-score": 0.9289256198347108,
+      "support": 300.0
+    },
+    "fresh_snow": {
+      "precision": 0.9966777408637874,
+      "recall": 1.0,
+      "f1-score": 0.9983361064891847,
+      "support": 300.0
+    },
+    "ice": {
+      "precision": 0.9900332225913622,
+      "recall": 0.9933333333333333,
+      "f1-score": 0.9916805324459235,
+      "support": 300.0
+    },
+    "melted_snow": {
+      "precision": 0.9833887043189369,
+      "recall": 0.9866666666666667,
+      "f1-score": 0.9850249584026622,
+      "support": 300.0
+    },
+    "water_asphalt_severe": {
+      "precision": 0.8767605633802817,
+      "recall": 0.83,
+      "f1-score": 0.8527397260273972,
+      "support": 300.0
+    },
+    "water_asphalt_slight": {
+      "precision": 0.822742474916388,
+      "recall": 0.82,
+      "f1-score": 0.8213689482470785,
+      "support": 300.0
+    },
+    "water_asphalt_smooth": {
+      "precision": 0.9304635761589404,
+      "recall": 0.9366666666666666,
+      "f1-score": 0.9335548172757475,
+      "support": 300.0
+    },
+    "water_concrete_severe": {
+      "precision": 0.804416403785489,
+      "recall": 0.85,
+      "f1-score": 0.826580226904376,
+      "support": 300.0
+    },
+    "water_concrete_slight": {
+      "precision": 0.802013422818792,
+      "recall": 0.7966666666666666,
+      "f1-score": 0.7993311036789298,
+      "support": 300.0
+    },
+    "water_concrete_smooth": {
+      "precision": 0.8817567567567568,
+      "recall": 0.87,
+      "f1-score": 0.8758389261744967,
+      "support": 300.0
+    },
+    "water_gravel": {
+      "precision": 0.916083916083916,
+      "recall": 0.8733333333333333,
+      "f1-score": 0.89419795221843,
+      "support": 300.0
+    },
+    "water_mud": {
+      "precision": 0.9228295819935691,
+      "recall": 0.9566666666666667,
+      "f1-score": 0.939443535188216,
+      "support": 300.0
+    },
+    "wet_asphalt_severe": {
+      "precision": 0.9550561797752809,
+      "recall": 0.85,
+      "f1-score": 0.8994708994708994,
+      "support": 300.0
+    },
+    "wet_asphalt_slight": {
+      "precision": 0.7852941176470588,
+      "recall": 0.89,
+      "f1-score": 0.834375,
+      "support": 300.0
+    },
+    "wet_asphalt_smooth": {
+      "precision": 0.9025974025974026,
+      "recall": 0.9266666666666666,
+      "f1-score": 0.9144736842105263,
+      "support": 300.0
+    },
+    "wet_concrete_severe": {
+      "precision": 0.8815331010452961,
+      "recall": 0.8433333333333334,
+      "f1-score": 0.8620102214650767,
+      "support": 300.0
+    },
+    "wet_concrete_slight": {
+      "precision": 0.8415841584158416,
+      "recall": 0.85,
+      "f1-score": 0.845771144278607,
+      "support": 300.0
+    },
+    "wet_concrete_smooth": {
+      "precision": 0.8612903225806452,
+      "recall": 0.89,
+      "f1-score": 0.8754098360655738,
+      "support": 300.0
+    },
+    "wet_gravel": {
+      "precision": 0.9141914191419142,
+      "recall": 0.9233333333333333,
+      "f1-score": 0.9187396351575456,
+      "support": 300.0
+    },
+    "wet_mud": {
+      "precision": 0.9387755102040817,
+      "recall": 0.92,
+      "f1-score": 0.9292929292929293,
+      "support": 300.0
+    },
+    "accuracy": 0.8949382716049382,
+    "macro avg": {
+      "precision": 0.895919882961535,
+      "recall": 0.8949382716049383,
+      "f1-score": 0.8950514701129231,
+      "support": 8100.0
+    },
+    "weighted avg": {
+      "precision": 0.8959198829615348,
+      "recall": 0.8949382716049382,
+      "f1-score": 0.8950514701129229,
+      "support": 8100.0
+    }
+  },
+  "confusion": [
+    {
+      "class_label": "dry_asphalt_severe",
+      "support": 300,
+      "top_predictions": [
+        {
+          "pred": "dry_asphalt_severe",
+          "count": 266
+        },
+        {
+          "pred": "dry_asphalt_slight",
+          "count": 19
+        },
+        {
+          "pred": "dry_concrete_severe",
+          "count": 4
+        },
+        {
+          "pred": "wet_asphalt_severe",
+          "count": 3
+        },
+        {
+          "pred": "dry_asphalt_smooth",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "class_label": "dry_asphalt_slight",
+      "support": 300,
+      "top_predictions": [
+        {
+          "pred": "dry_asphalt_slight",
+          "count": 263
+        },
+        {
+          "pred": "wet_asphalt_slight",
+          "count": 12
+        },
+        {
+          "pred": "dry_asphalt_severe",
+          "count": 12
+        },
+        {
+          "pred": "dry_asphalt_smooth",
+          "count": 11
+        },
+        {
+          "pred": "dry_concrete_slight",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "class_label": "dry_asphalt_smooth",
+      "support": 300,
+      "top_predictions": [
+        {
+          "pred": "dry_asphalt_smooth",
+          "count": 277
+        },
+        {
+          "pred": "wet_asphalt_smooth",
+          "count": 8
+        },
+        {
+          "pred": "dry_concrete_smooth",
+          "count": 5
+        },
+        {
+          "pred": "dry_asphalt_slight",
+          "count": 4
+        },
+        {
+          "pred": "dry_asphalt_severe",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "class_label": "dry_concrete_severe",
+      "support": 300,
+      "top_predictions": [
+        {
+          "pred": "dry_concrete_severe",
+          "count": 261
+        },
+        {
+          "pred": "dry_concrete_slight",
+          "count": 27
+        },
+        {
+          "pred": "wet_concrete_severe",
+          "count": 5
+        },
+        {
+          "pred": "dry_asphalt_slight",
+          "count": 3
+        },
+        {
+          "pred": "dry_gravel",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "class_label": "dry_concrete_slight",
+      "support": 300,
+      "top_predictions": [
+        {
+          "pred": "dry_concrete_slight",
+          "count": 253
+        },
+        {
+          "pred": "dry_concrete_severe",
+          "count": 31
+        },
+        {
+          "pred": "dry_concrete_smooth",
+          "count": 5
+        },
+        {
+          "pred": "dry_gravel",
+          "count": 3
+        },
+        {
+          "pred": "dry_asphalt_slight",
+          "count": 3
+        }
+      ]
+    },
+    {
+      "class_label": "dry_concrete_smooth",
+      "support": 300,
+      "top_predictions": [
+        {
+          "pred": "dry_concrete_smooth",
+          "count": 273
+        },
+        {
+          "pred": "dry_concrete_slight",
+          "count": 10
+        },
+        {
+          "pred": "dry_asphalt_smooth",
+          "count": 8
+        },
+        {
+          "pred": "wet_concrete_smooth",
+          "count": 5
+        },
+        {
+          "pred": "ice",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "class_label": "dry_gravel",
+      "support": 300,
+      "top_predictions": [
+        {
+          "pred": "dry_gravel",
+          "count": 273
+        },
+        {
+          "pred": "dry_mud",
+          "count": 18
+        },
+        {
+          "pred": "dry_asphalt_severe",
+          "count": 2
+        },
+        {
+          "pred": "dry_concrete_slight",
+          "count": 2
+        },
+        {
+          "pred": "dry_concrete_severe",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "class_label": "dry_mud",
+      "support": 300,
+      "top_predictions": [
+        {
+          "pred": "dry_mud",
+          "count": 281
+        },
+        {
+          "pred": "dry_gravel",
+          "count": 16
+        },
+        {
+          "pred": "wet_mud",
+          "count": 2
+        },
+        {
+          "pred": "dry_concrete_slight",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "class_label": "fresh_snow",
+      "support": 300,
+      "top_predictions": [
+        {
+          "pred": "fresh_snow",
+          "count": 300
+        }
+      ]
+    },
+    {
+      "class_label": "ice",
+      "support": 300,
+      "top_predictions": [
+        {
+          "pred": "ice",
+          "count": 298
+        },
+        {
+          "pred": "melted_snow",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "class_label": "melted_snow",
+      "support": 300,
+      "top_predictions": [
+        {
+          "pred": "melted_snow",
+          "count": 296
+        },
+        {
+          "pred": "water_asphalt_smooth",
+          "count": 3
+        },
+        {
+          "pred": "ice",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "class_label": "water_asphalt_severe",
+      "support": 300,
+      "top_predictions": [
+        {
+          "pred": "water_asphalt_severe",
+          "count": 249
+        },
+        {
+          "pred": "water_asphalt_slight",
+          "count": 28
+        },
+        {
+          "pred": "water_gravel",
+          "count": 8
+        },
+        {
+          "pred": "water_concrete_severe",
+          "count": 6
+        },
+        {
+          "pred": "wet_asphalt_severe",
+          "count": 3
+        }
+      ]
+    },
+    {
+      "class_label": "water_asphalt_slight",
+      "support": 300,
+      "top_predictions": [
+        {
+          "pred": "water_asphalt_slight",
+          "count": 246
+        },
+        {
+          "pred": "wet_asphalt_slight",
+          "count": 19
+        },
+        {
+          "pred": "water_asphalt_severe",
+          "count": 17
+        },
+        {
+          "pred": "water_asphalt_smooth",
+          "count": 10
+        },
+        {
+          "pred": "water_concrete_slight",
+          "count": 3
+        }
+      ]
+    },
+    {
+      "class_label": "water_asphalt_smooth",
+      "support": 300,
+      "top_predictions": [
+        {
+          "pred": "water_asphalt_smooth",
+          "count": 281
+        },
+        {
+          "pred": "water_asphalt_slight",
+          "count": 8
+        },
+        {
+          "pred": "wet_asphalt_smooth",
+          "count": 6
+        },
+        {
+          "pred": "water_concrete_smooth",
+          "count": 4
+        },
+        {
+          "pred": "melted_snow",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "class_label": "water_concrete_severe",
+      "support": 300,
+      "top_predictions": [
+        {
+          "pred": "water_concrete_severe",
+          "count": 255
+        },
+        {
+          "pred": "water_concrete_slight",
+          "count": 27
+        },
+        {
+          "pred": "wet_concrete_severe",
+          "count": 9
+        },
+        {
+          "pred": "water_asphalt_slight",
+          "count": 3
+        },
+        {
+          "pred": "water_gravel",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "class_label": "water_concrete_slight",
+      "support": 300,
+      "top_predictions": [
+        {
+          "pred": "water_concrete_slight",
+          "count": 239
+        },
+        {
+          "pred": "water_concrete_severe",
+          "count": 35
+        },
+        {
+          "pred": "wet_concrete_slight",
+          "count": 15
+        },
+        {
+          "pred": "water_concrete_smooth",
+          "count": 6
+        },
+        {
+          "pred": "water_asphalt_slight",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "class_label": "water_concrete_smooth",
+      "support": 300,
+      "top_predictions": [
+        {
+          "pred": "water_concrete_smooth",
+          "count": 261
+        },
+        {
+          "pred": "wet_concrete_smooth",
+          "count": 27
+        },
+        {
+          "pred": "water_concrete_slight",
+          "count": 5
+        },
+        {
+          "pred": "water_asphalt_smooth",
+          "count": 2
+        },
+        {
+          "pred": "wet_concrete_slight",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "class_label": "water_gravel",
+      "support": 300,
+      "top_predictions": [
+        {
+          "pred": "water_gravel",
+          "count": 262
+        },
+        {
+          "pred": "water_concrete_severe",
+          "count": 13
+        },
+        {
+          "pred": "water_mud",
+          "count": 12
+        },
+        {
+          "pred": "wet_gravel",
+          "count": 5
+        },
+        {
+          "pred": "water_asphalt_severe",
+          "count": 3
+        }
+      ]
+    },
+    {
+      "class_label": "water_mud",
+      "support": 300,
+      "top_predictions": [
+        {
+          "pred": "water_mud",
+          "count": 287
+        },
+        {
+          "pred": "water_gravel",
+          "count": 6
+        },
+        {
+          "pred": "wet_mud",
+          "count": 3
+        },
+        {
+          "pred": "water_concrete_slight",
+          "count": 2
+        },
+        {
+          "pred": "water_asphalt_smooth",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "class_label": "wet_asphalt_severe",
+      "support": 300,
+      "top_predictions": [
+        {
+          "pred": "wet_asphalt_severe",
+          "count": 255
+        },
+        {
+          "pred": "wet_asphalt_slight",
+          "count": 25
+        },
+        {
+          "pred": "water_asphalt_severe",
+          "count": 12
+        },
+        {
+          "pred": "wet_gravel",
+          "count": 2
+        },
+        {
+          "pred": "water_asphalt_slight",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "class_label": "wet_asphalt_slight",
+      "support": 300,
+      "top_predictions": [
+        {
+          "pred": "wet_asphalt_slight",
+          "count": 267
+        },
+        {
+          "pred": "water_asphalt_slight",
+          "count": 9
+        },
+        {
+          "pred": "wet_asphalt_smooth",
+          "count": 9
+        },
+        {
+          "pred": "dry_asphalt_slight",
+          "count": 6
+        },
+        {
+          "pred": "wet_asphalt_severe",
+          "count": 4
+        }
+      ]
+    },
+    {
+      "class_label": "wet_asphalt_smooth",
+      "support": 300,
+      "top_predictions": [
+        {
+          "pred": "wet_asphalt_smooth",
+          "count": 278
+        },
+        {
+          "pred": "wet_asphalt_slight",
+          "count": 8
+        },
+        {
+          "pred": "dry_asphalt_smooth",
+          "count": 6
+        },
+        {
+          "pred": "water_asphalt_smooth",
+          "count": 4
+        },
+        {
+          "pred": "wet_concrete_smooth",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "class_label": "wet_concrete_severe",
+      "support": 300,
+      "top_predictions": [
+        {
+          "pred": "wet_concrete_severe",
+          "count": 253
+        },
+        {
+          "pred": "wet_concrete_slight",
+          "count": 25
+        },
+        {
+          "pred": "water_concrete_slight",
+          "count": 5
+        },
+        {
+          "pred": "water_concrete_severe",
+          "count": 5
+        },
+        {
+          "pred": "wet_gravel",
+          "count": 3
+        }
+      ]
+    },
+    {
+      "class_label": "wet_concrete_slight",
+      "support": 300,
+      "top_predictions": [
+        {
+          "pred": "wet_concrete_slight",
+          "count": 255
+        },
+        {
+          "pred": "wet_concrete_severe",
+          "count": 18
+        },
+        {
+          "pred": "water_concrete_slight",
+          "count": 13
+        },
+        {
+          "pred": "wet_concrete_smooth",
+          "count": 6
+        },
+        {
+          "pred": "water_concrete_severe",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "class_label": "wet_concrete_smooth",
+      "support": 300,
+      "top_predictions": [
+        {
+          "pred": "wet_concrete_smooth",
+          "count": 267
+        },
+        {
+          "pred": "water_concrete_smooth",
+          "count": 21
+        },
+        {
+          "pred": "dry_concrete_smooth",
+          "count": 5
+        },
+        {
+          "pred": "wet_asphalt_slight",
+          "count": 2
+        },
+        {
+          "pred": "wet_asphalt_smooth",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "class_label": "wet_gravel",
+      "support": 300,
+      "top_predictions": [
+        {
+          "pred": "wet_gravel",
+          "count": 277
+        },
+        {
+          "pred": "wet_mud",
+          "count": 13
+        },
+        {
+          "pred": "water_gravel",
+          "count": 5
+        },
+        {
+          "pred": "dry_gravel",
+          "count": 2
+        },
+        {
+          "pred": "wet_asphalt_slight",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "class_label": "wet_mud",
+      "support": 300,
+      "top_predictions": [
+        {
+          "pred": "wet_mud",
+          "count": 276
+        },
+        {
+          "pred": "wet_gravel",
+          "count": 12
+        },
+        {
+          "pred": "water_mud",
+          "count": 7
+        },
+        {
+          "pred": "dry_mud",
+          "count": 5
+        }
+      ]
+    }
+  ]
+}

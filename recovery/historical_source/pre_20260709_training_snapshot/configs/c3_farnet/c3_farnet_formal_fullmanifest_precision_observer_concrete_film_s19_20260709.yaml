@@ -1,0 +1,20 @@
+extends: c3_farnet_formal_fullmanifest_opponent_retinex_concrete_film_s18_20260709.yaml
+
+output_dir: E:/perception_outputs/rscd_surface_classification/c3_farnet_formal_fullmanifest_precision_observer_concrete_film_s19_20260709
+
+model:
+  # S19: S18 plus a precision-weighted early observer.
+  # It injects material, film, roughness, and nuisance precision maps into the
+  # early tensor route. The goal is to let high-confidence wet/water evidence
+  # update the route while contradictory or marking/exposure-heavy evidence is
+  # pushed toward the protect route instead of damaging stable classes.
+  backbone: convnext_tiny_family_router_precision_observer_concrete_film_stem
+
+loss:
+  # The precision observer already suppresses unreliable active routes, so keep
+  # free-energy pressure but slightly increase the protect leak penalty.
+  family_mechanism_router_weight: 0.240
+  family_router_target_margin_weight: 0.074
+  family_router_target_margin: 0.250
+  family_router_protect_leak_weight: 0.048
+  family_router_protect_sample_weight: 0.45

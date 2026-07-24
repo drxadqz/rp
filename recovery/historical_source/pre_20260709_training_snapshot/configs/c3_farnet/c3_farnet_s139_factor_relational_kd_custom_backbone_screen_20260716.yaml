@@ -1,0 +1,82 @@
+seed: 136
+output_dir: E:/perception_outputs/rscd_surface_classification/s139_factor_relational_kd_custom_backbone_screen_20260716
+
+# S139 keeps the S136 custom RSCD backbone, but changes the teacher transfer
+# from no-harm protection into task-structured RSCD knowledge transfer.
+# The teacher distribution is decomposed into:
+#   1) 27-class soft distribution,
+#   2) friction/material/roughness marginal distributions,
+#   3) hard-pair local ratios for labels differing in exactly one factor.
+# This targets the first-principles RSCD bottleneck: each label is a coupled
+# physical/visual state, not an independent flat class.
+
+data:
+  train_manifest: E:/perception/friction_affordance_field/data/manifests_full/rscd_prepared_train.csv
+  val_manifest: E:/perception/friction_affordance_field/data/manifests_full/rscd_prepared_val.csv
+  test_manifest: E:/perception/friction_affordance_field/data/manifests_full/rscd_prepared_test.csv
+  image_size: 192
+  train_resize_mode: letterbox
+  eval_resize_mode: letterbox
+
+model:
+  stem_dim: 48
+  stage_dims: [96, 192, 384]
+  dropout: 0.15
+  coupling_gate_mode: learned
+
+loss:
+  class_weight: 1.0
+  factor_weight: 0.35
+  factor_axis_weights:
+    friction: 1.0
+    material: 1.0
+    roughness: 1.4
+  coupling_gate_weight: 0.06
+
+  # RSCD-specific factor-relational distillation from the S7 full-data teacher.
+  teacher_kd_temperature: 2.5
+  teacher_class_kd_weight: 0.70
+  teacher_factor_marginal_kd_weight: 1.10
+  teacher_factor_marginal_axis_weights:
+    friction: 1.0
+    material: 0.8
+    roughness: 1.5
+  teacher_hardpair_relation_kd_weight: 0.45
+  teacher_hardpair_axis_weights:
+    friction: 1.2
+    material: 0.7
+    roughness: 1.5
+
+  # Disable S136d's protective losses in this route so the screen isolates the
+  # structured teacher transfer mechanism.
+  anchor_consistency_weight: 0.0
+  anchor_consistency_focus_weight: 0.0
+  anchor_nonregression_weight: 0.0
+  pareto_safe_distill_weight: 0.0
+  safe_distill_warmup_epochs: 0
+  safe_distill_ramp_epochs: 0
+  safe_distill_initial_scale: 1.0
+  safe_distill_final_scale: 1.0
+
+train:
+  batch_size: 16
+  grad_accum_steps: 1
+  num_workers: 2
+  prefetch_factor: 2
+  lr: 0.0003
+  weight_decay: 0.01
+  epochs: 6
+  amp: true
+  augmentation: true
+  balanced_sampling: true
+  max_train_samples_per_class: 1000
+  samples_per_epoch: 27000
+  grad_clip_norm: 5.0
+  log_every_steps: 120
+  teacher_logits_cache: E:/perception_outputs/rscd_surface_classification/s136d_coupled_factor_backbone_safe_distill_screen_20260715/s7_teacher_logits_train_cap1000.pt
+  teacher_logits_cache_strict: true
+
+eval:
+  batch_size: 32
+  max_val_samples_per_class: 250
+  max_test_samples_per_class: 250

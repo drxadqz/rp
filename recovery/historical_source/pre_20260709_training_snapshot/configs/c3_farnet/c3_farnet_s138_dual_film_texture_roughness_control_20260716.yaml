@@ -1,0 +1,15 @@
+extends: c3_farnet_s138_dual_film_texture_roughness_screen_20260716.yaml
+
+output_dir: E:/perception_outputs/rscd_surface_classification/s138_dual_film_texture_roughness_control_20260716
+
+# Same-budget S138 control: keep the code path/config shape but disable the
+# learned dual-coupling effect. This isolates whether the dry-concrete and
+# wet/water-concrete early experts are responsible for any gain.
+
+model:
+  use_dual_film_texture_coupling: true
+  dual_film_texture_coupling_mode: "off"
+  dual_film_texture_coupling_scale: 0.16
+
+loss:
+  dual_film_texture_route_weight: 0.0

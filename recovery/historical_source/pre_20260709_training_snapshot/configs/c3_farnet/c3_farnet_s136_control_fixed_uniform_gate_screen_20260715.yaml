@@ -1,0 +1,13 @@
+extends: c3_farnet_s136_coupled_factor_backbone_screen_20260715.yaml
+
+output_dir: E:/perception_outputs/rscd_surface_classification/s136_control_fixed_uniform_gate_screen_20260715
+
+# Same-budget S136 control. It keeps the custom evidence maps, expert stem,
+# stage dimensions, train cap, and cap250 evaluation, but removes adaptive
+# factor-coupling by using a fixed uniform expert mixture.
+
+model:
+  coupling_gate_mode: fixed_uniform
+
+loss:
+  coupling_gate_weight: 0.0

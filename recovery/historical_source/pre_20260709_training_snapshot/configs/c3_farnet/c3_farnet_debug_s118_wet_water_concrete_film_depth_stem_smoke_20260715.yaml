@@ -1,0 +1,15 @@
+extends: c3_farnet_screen_s118_wet_water_concrete_film_depth_stem_s96_20260714.yaml
+
+output_dir: E:/perception_outputs/rscd_surface_classification/c3_farnet_debug_s118_wet_water_concrete_film_depth_stem_smoke_20260715
+
+train:
+  num_workers: 0
+  prefetch_factor: 2
+  samples_per_epoch: 216
+  max_train_samples_per_class: 20
+  log_every_steps: 25
+
+eval:
+  batch_size: 16
+  max_val_samples_per_class: 10
+  max_test_samples_per_class: 10

@@ -1,0 +1,94 @@
+extends: c3_farnet_screen_s96_wc_pair_relative_boundary_20260712.yaml
+
+output_dir: E:/perception_outputs/rscd_surface_classification/c3_farnet_screen_s145_s96_precision_observer_family_router_current_20260717
+
+# S145: precision-observer family router on the current S96 anchor.
+#
+# S143 showed that opening broad tensor-coupling banks can move several
+# friction-boundary predictions but damages material/roughness classes. S144
+# showed that only retuning the existing early stems is too weak. S145 therefore
+# inserts a factor-specific protected early route instead of another late head:
+#
+#   route 0: protect stable/non-target samples
+#   route 1: dry concrete visible roughness
+#   route 2: wet/water asphalt film
+#   route 3: wet/water concrete smooth film bridge
+#   route 4: wet/water concrete hidden slight roughness
+#   route 5: wet/water concrete hidden severe roughness
+#
+# The precision observer supplies material, film, roughness, and nuisance
+# reliability evidence. This is a Kalman/control-style idea adapted to RSCD:
+# high-precision road evidence is allowed to update the early feature state,
+# while marking/exposure/material-ambiguous evidence is pushed toward the
+# protect route to reduce no-harm regressions.
+
+model:
+  backbone: convnext_tiny_family_router_precision_observer_concrete_film_stem
+  pretrained: false
+  head_type: hardpair_error_gated_calibrated
+  use_source_reliable_boundary_router: true
+  expose_hardpair_pair_value_evidence: true
+  use_physics_texture_stem_adapter: true
+  use_scale_space_roughness_stem_adapter: true
+  use_pair_value_stem_conditioner: true
+  use_feature_value_boundary_corrector: true
+
+loss:
+  focus_ce_extra_weight: 0.20
+  family_mechanism_router_weight: 0.240
+  family_router_split_concrete_film_routes: true
+  family_router_entropy_weight: 0.045
+  family_router_entropy_active_only: true
+  family_router_target_margin_weight: 0.074
+  family_router_target_margin: 0.250
+  family_router_margin_active_only: true
+  family_router_protect_sample_weight: 0.45
+  family_router_dry_weight: 1.08
+  family_router_asphalt_weight: 1.38
+  family_router_concrete_weight: 1.62
+  family_router_concrete_slight_weight: 1.30
+  family_router_concrete_severe_weight: 1.16
+  family_router_protect_leak_weight: 0.052
+  anchor_consistency_weight: 0.50
+  anchor_consistency_protect_weight: 0.78
+  anchor_no_flip_weight: 0.64
+  anchor_nonregression_weight: 0.36
+  anchor_nonregression_focus_weight: 0.030
+
+train:
+  resume_from: E:/perception_outputs/rscd_surface_classification/c3_farnet_screen_s96_wc_pair_relative_boundary_20260712/best_checkpoint.pth
+  teacher_checkpoint: E:/perception_outputs/rscd_surface_classification/c3_farnet_screen_s96_wc_pair_relative_boundary_20260712/best_checkpoint.pth
+  teacher_backbone: convnext_tiny_gate_calibrated_tensor_coupling_concrete_film_rough_stem
+  teacher_head_type: hardpair_error_gated_calibrated
+  teacher_preserve_hardpair_focus: true
+  trainable_prefixes:
+    - backbone.family_route_routers
+    - backbone.family_safe_tensor_coupling_banks
+    - feature_value_boundary_corrector
+  evaluate_initial: true
+  lr: 0.000040
+  weight_decay: 0.0014
+  epochs: 1
+  batch_size: 4
+  grad_accum_steps: 4
+  num_workers: 2
+  prefetch_factor: 2
+  amp: true
+  augmentation: true
+  factor_graph_pair_sampling: true
+  factor_graph_pair_sampling_seed: 14517
+  factor_graph_pair_sampling_pair_slots: 2
+  factor_graph_pair_sampling_positive_slots: 0
+  factor_graph_pair_sampling_wet_concrete_focus_scale: 10.0
+  factor_graph_pair_sampling_roughness_focus_scale: 3.5
+  factor_graph_pair_sampling_wet_water_focus_scale: 2.0
+  max_train_samples_per_class: 1000
+  samples_per_epoch: 27000
+  grad_clip_norm: 1.6
+  log_every_steps: 500
+
+eval:
+  batch_size: 16
+  max_val_samples_per_class: 250
+  max_test_samples_per_class: 250
+
