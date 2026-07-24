@@ -1,0 +1,121 @@
+Dataset sizes: train=958941 val=19860 test=49500
+Loaded flexible checkpoint: D:\NMI_SPWFM_datasets\friction_affordance_outputs\rscd_surface_classification\c3_farnet_errorgate_paircal_screen_20260703\best_checkpoint.pth
+  loaded=672 skipped=1 missing=7 unexpected=0
+Trainable prefixes: {'backbone.gate_calibrated_tensor_coupling_banks': 366677, 'pairwise_hardpair_experts': 431152, 'pairwise_hardpair_error_gates': 295632}
+Loaded flexible checkpoint: D:\NMI_SPWFM_datasets\friction_affordance_outputs\rscd_surface_classification\screen_dry_concrete_vor_residual_scale012_lr1e3_s8k_from_anchor\best.pt
+  loaded=233 skipped=0 missing=129 unexpected=0
+Frozen anchor teacher enabled: D:/NMI_SPWFM_datasets/friction_affordance_outputs/rscd_surface_classification/screen_dry_concrete_vor_residual_scale012_lr1e3_s8k_from_anchor/best.pt
+Evaluating initial checkpoint before fine-tuning
+  initial val top1=0.9005 macro_f1=0.8878 wcs=0.6726
+  saved initial best: E:\perception_outputs\rscd_surface_classification\c3_farnet_formal_fullmanifest_source_reliable_router_s7_20260709\best_checkpoint.pth
+Epoch 1/1
+  train step 2000/119868 loss=0.2547 top1=0.9414
+  train step 4000/119868 loss=0.2573 top1=0.9411
+  train step 6000/119868 loss=0.2551 top1=0.9414
+  train step 8000/119868 loss=0.2563 top1=0.9408
+  train step 10000/119868 loss=0.2553 top1=0.9412
+  train step 12000/119868 loss=0.2549 top1=0.9415
+  train step 14000/119868 loss=0.2552 top1=0.9415
+  train step 16000/119868 loss=0.2550 top1=0.9413
+  train step 18000/119868 loss=0.2552 top1=0.9410
+  train step 20000/119868 loss=0.2544 top1=0.9410
+  train step 22000/119868 loss=0.2544 top1=0.9409
+  train step 24000/119868 loss=0.2542 top1=0.9407
+  train step 26000/119868 loss=0.2541 top1=0.9407
+  train step 28000/119868 loss=0.2534 top1=0.9409
+  train step 30000/119868 loss=0.2534 top1=0.9408
+  train step 32000/119868 loss=0.2534 top1=0.9409
+  train step 34000/119868 loss=0.2535 top1=0.9407
+  train step 36000/119868 loss=0.2535 top1=0.9407
+  train step 38000/119868 loss=0.2537 top1=0.9405
+  train step 40000/119868 loss=0.2536 top1=0.9405
+  train step 42000/119868 loss=0.2535 top1=0.9405
+  train step 44000/119868 loss=0.2533 top1=0.9405
+  train step 46000/119868 loss=0.2531 top1=0.9406
+  train step 48000/119868 loss=0.2531 top1=0.9405
+  train step 50000/119868 loss=0.2532 top1=0.9405
+  train step 52000/119868 loss=0.2528 top1=0.9406
+  train step 54000/119868 loss=0.2527 top1=0.9406
+  train step 56000/119868 loss=0.2528 top1=0.9406
+  train step 58000/119868 loss=0.2525 top1=0.9406
+  train step 60000/119868 loss=0.2520 top1=0.9407
+  train step 62000/119868 loss=0.2524 top1=0.9406
+  train step 64000/119868 loss=0.2529 top1=0.9404
+  train step 66000/119868 loss=0.2528 top1=0.9405
+  train step 68000/119868 loss=0.2528 top1=0.9404
+  train step 70000/119868 loss=0.2526 top1=0.9405
+  train step 72000/119868 loss=0.2526 top1=0.9405
+  train step 74000/119868 loss=0.2528 top1=0.9405
+  train step 76000/119868 loss=0.2527 top1=0.9405
+  train step 78000/119868 loss=0.2526 top1=0.9405
+  train step 80000/119868 loss=0.2526 top1=0.9405
+  train step 82000/119868 loss=0.2526 top1=0.9405
+  train step 84000/119868 loss=0.2525 top1=0.9405
+  train step 86000/119868 loss=0.2522 top1=0.9405
+  train step 88000/119868 loss=0.2523 top1=0.9405
+  train step 90000/119868 loss=0.2523 top1=0.9405
+  train step 92000/119868 loss=0.2522 top1=0.9405
+  train step 94000/119868 loss=0.2523 top1=0.9405
+  train step 96000/119868 loss=0.2524 top1=0.9405
+  train step 98000/119868 loss=0.2524 top1=0.9404
+  train step 100000/119868 loss=0.2524 top1=0.9404
+  train step 102000/119868 loss=0.2523 top1=0.9404
+  train step 104000/119868 loss=0.2521 top1=0.9404
+  train step 106000/119868 loss=0.2521 top1=0.9404
+  train step 108000/119868 loss=0.2520 top1=0.9404
+  train step 110000/119868 loss=0.2518 top1=0.9405
+  train step 112000/119868 loss=0.2518 top1=0.9404
+  train step 114000/119868 loss=0.2517 top1=0.9405
+  train step 116000/119868 loss=0.2515 top1=0.9404
+  train step 118000/119868 loss=0.2514 top1=0.9405
+  train step 119868/119868 loss=0.2511 top1=0.9405
+  train loss=0.2511 top1=0.9405
+  val top1=0.9007 macro_f1=0.8879 wcs=0.6774
+  saved best: E:\perception_outputs\rscd_surface_classification\c3_farnet_formal_fullmanifest_source_reliable_router_s7_20260709\best_checkpoint.pth
+{
+  "loss": 0.2826229557832374,
+  "top1": 0.9063232323232323,
+  "mean_precision": 0.8872932907227024,
+  "mean_recall": 0.8922606382978723,
+  "macro_f1": 0.8891966645824468,
+  "weighted_f1": 0.90653926148745,
+  "num_samples": 49500,
+  "num_classes": 27,
+  "hard_class_mean_f1": 0.8051573245673431,
+  "water_concrete_slight_precision": 0.7816245006657789,
+  "water_concrete_slight_recall": 0.73375,
+  "water_concrete_slight_f1": 0.7569310122501612,
+  "rho_R_mean": 0.43956742581875635,
+  "head_type": "hardpair_error_gated_calibrated",
+  "dryvor_enabled": true,
+  "logits_after_dryvor": true,
+  "boundary_use_physics_feature": false,
+  "pareto_safe_logit_patch_enabled": false,
+  "pareto_safe_logit_patch_count": 0,
+  "rho_R_mean_water": 0.4431410197650685,
+  "rho_R_mean_wet": 0.45347321842879373,
+  "rho_R_mean_dry": 0.4262631282512692,
+  "rho_R_mean_water_concrete_slight": 0.42523591201752425,
+  "rho_R_gap_dry_minus_water_concrete_slight": 0.0010272162337449653,
+  "rho_R_mean_water_concrete_severe": 0.43161508705466983,
+  "rho_R_gap_dry_minus_water_concrete_severe": -0.005351958803400614,
+  "rho_R_mean_wet_concrete_slight": 0.4298960496112704,
+  "rho_R_gap_dry_minus_wet_concrete_slight": -0.0036329213600012067,
+  "rho_R_mean_dry_concrete_slight": 0.4103729257431436,
+  "rho_R_gap_dry_minus_dry_concrete_slight": 0.015890202508125617,
+  "hard_pair_acc": 0.9788755319075093,
+  "hard_pair_count": 130.09049773755657,
+  "friction_pair_acc": 0.9834558823529411,
+  "friction_pair_count": 63.994828700711054,
+  "material_pair_acc": 0.851309589459194,
+  "material_pair_count": 27.440206851971556,
+  "roughness_pair_acc": 0.6333125710512745,
+  "roughness_pair_count": 38.65546218487395,
+  "friction_acc": 0.9659595959595959,
+  "material_acc": 0.9721010101010101,
+  "roughness_acc": 0.9517575757575758,
+  "friction_error_share": 0.36338149665732156,
+  "material_error_share": 0.2978218675868018,
+  "roughness_error_share": 0.5149881388828984,
+  "num_errors": 4637
+}

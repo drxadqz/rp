@@ -1,0 +1,26 @@
+[
+  {
+    "path": "checkpoints/c3_farnet_formal_fullmanifest_source_reliable_router_s7_20260709/best_checkpoint.pth",
+    "role": "final formal S7 checkpoint, preferred for reproducing the reported standalone S7 result",
+    "bytes": 130237017,
+    "sha256": "7672fa67b2680ef127ddd226ffac8f72a68336b6a2ea5d5bdbbde455e52be306"
+  },
+  {
+    "path": "checkpoints/c3_farnet_formal_fullmanifest_source_reliable_router_s7_20260709/best.pt",
+    "role": "same formal S7 model payload saved by the training script under the short best.pt name",
+    "bytes": 130202602,
+    "sha256": "d19c92e15a89848256f87f638779f5a421841b5bf6d48a7dd1cbefd0ef762936"
+  },
+  {
+    "path": "checkpoints/c3_farnet_errorgate_paircal_screen_20260703/best_checkpoint.pth",
+    "role": "direct parent checkpoint used as S7 resume_from and by the parent plus source-router result",
+    "bytes": 130229365,
+    "sha256": "162be55f1f973b939326ca4c9b1f63706aaec9fc28884780266e6f4c0da3a784"
+  },
+  {
+    "path": "checkpoints/screen_dry_concrete_vor_residual_scale012_lr1e3_s8k_from_anchor/best.pt",
+    "role": "dry-concrete VOR teacher checkpoint used for anchor-consistency protection",
+    "bytes": 114178976,
+    "sha256": "a82e5ee233b140155365f4c28e3626be3071a416debd0f0ae5f9a90884d3c069"
+  }
+]

@@ -2,6 +2,8 @@
 
 This document records the exact lineage of the current S7-family RSCD models, the meaning of the `90.045%` number, and the uploaded warm-start checkpoints.
 
+For the complete source/config/checkpoint/result file inventory, see [s7_release_inventory.md](s7_release_inventory.md).
+
 ## Key Conclusions
 
 1. The direct parent checkpoint does exist:

@@ -1,0 +1,16 @@
+﻿class,candidate_f1,baseline_f1,delta_f1,support,key,friction,material,roughness,friction_material,material_roughness
+dry_asphalt_severe,0.8659549228944247,0.8659549228944247,0.0,800.0,False,dry,asphalt,severe,dry_asphalt,asphalt_severe
+dry_asphalt_slight,0.9017837954008167,0.9017837954008167,0.0,2350.0,False,dry,asphalt,slight,dry_asphalt,asphalt_slight
+dry_asphalt_smooth,0.9232423134809719,0.9232423134809719,0.0,2350.0,False,dry,asphalt,smooth,dry_asphalt,asphalt_smooth
+dry_concrete_severe,0.86543759271032,0.86543759271032,0.0,2350.0,True,dry,concrete,severe,dry_concrete,concrete_severe
+dry_concrete_slight,0.8324742268041238,0.8324742268041238,0.0,2350.0,True,dry,concrete,slight,dry_concrete,concrete_slight
+dry_concrete_smooth,0.918451222150119,0.918451222150119,0.0,2350.0,False,dry,concrete,smooth,dry_concrete,concrete_smooth
+dry_gravel,0.9244235695986337,0.9244235695986337,0.0,2350.0,False,dry,gravel,nonparam,dry_gravel,gravel_nonparam
+dry_mud,0.9382296752281893,0.9382296752281893,0.0,2350.0,False,dry,mud,nonparam,dry_mud,mud_nonparam
+fresh_snow,0.9893526405451448,0.9893526405451448,0.0,2350.0,False,snow_ice,snow,fresh,snow_ice_snow,snow_fresh
+ice,0.9853472074750478,0.9853472074750478,0.0,2350.0,False,snow_ice,ice,ice,snow_ice_ice,ice_ice
+melted_snow,0.984992601986895,0.984992601986895,0.0,2350.0,False,snow_ice,snow,melted,snow_ice_snow,snow_melted
+water_asphalt_severe,0.8391608391608392,0.8391608391608392,0.0,800.0,False,water,asphalt,severe,water_asphalt,asphalt_severe
+water_asphalt_slight,0.7927107061503417,0.7927107061503417,0.0,800.0,True,water,asphalt,slight,water_asphalt,asphalt_slight
+water_asphalt_smooth,0.9375807145931985,0.9375807145931985,0.0,2350.0,False,water,asphalt,smooth,water_asphalt,asphalt_smooth
+water_concrete_severe,0.8098380323935213,0.8098380323935213,0.0,800.0,True,water,concrete,severe,water_concrete,concrete_severe

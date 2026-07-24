@@ -130,11 +130,14 @@ The result files in [results/current_best_s7](results/current_best_s7) record th
 
 The detailed warm-start chain, parent checkpoint metrics, source-router inference result, and the meaning of the `90.045%` validation number are documented in [docs/s7_training_lineage.md](docs/s7_training_lineage.md).
 
+The complete list of S7-related source files, configs, checkpoints, result evidence and intentionally excluded files is documented in [docs/s7_release_inventory.md](docs/s7_release_inventory.md).
+
 ## Algorithm Explanation
 
 - English explanation: [docs/algorithm.md](docs/algorithm.md)
 - Chinese explanation: [docs/algorithm_zh.md](docs/algorithm_zh.md)
 - Parent training recipe: [docs/parent_model_training.md](docs/parent_model_training.md)
+- Complete S7 release inventory: [docs/s7_release_inventory.md](docs/s7_release_inventory.md)
 
 ## Scientific Boundary
 

@@ -16,11 +16,14 @@ wandb/
 !checkpoints/
 !checkpoints/**/
 !checkpoints/c3_farnet_formal_fullmanifest_source_reliable_router_s7_20260709/best_checkpoint.pth
+!checkpoints/c3_farnet_formal_fullmanifest_source_reliable_router_s7_20260709/best.pt
 !checkpoints/c3_farnet_errorgate_paircal_screen_20260703/best_checkpoint.pth
 !checkpoints/screen_dry_concrete_vor_residual_scale012_lr1e3_s8k_from_anchor/best.pt
 *.ckpt
 *.onnx
 *.log
+!results/s7_lineage/formal_fullmanifest_s7/train_stdout_20260709_074914.log
+!results/s7_lineage/formal_fullmanifest_s7/train_stderr_20260709_074914.log
 *.tmp
 data/manifests_full/*.csv
 data/raw/
