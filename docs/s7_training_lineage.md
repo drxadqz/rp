@@ -60,6 +60,12 @@ The direct parent checkpoint is:
 checkpoints/c3_farnet_errorgate_paircal_screen_20260703/best_checkpoint.pth
 ```
 
+The full parent training recipe is documented in [parent_model_training.md](parent_model_training.md). The portable public training config is:
+
+```text
+configs/c3_farnet/parent_errorgate_paircal_screen_public.yaml
+```
+
 Its architecture is the C3-FaRNet parent before the source-reliable boundary router. The main parts are:
 
 - ConvNeXt-tiny visual backbone with a gate-calibrated tensor-coupling road stem.
@@ -242,4 +248,3 @@ Before running, make sure Git LFS files are present:
 ```bash
 git lfs pull
 ```
-

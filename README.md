@@ -102,6 +102,14 @@ python train.py --config configs/c3_farnet/current_best_s7_public.yaml
 
 The historical verified S7 run used warm-start teacher/checkpoint files from earlier local screening runs. Those selected binary files are included through Git LFS under [checkpoints](checkpoints). Run `git lfs pull` before reproducing checkpoint-based training or evaluation.
 
+To reproduce the direct parent model training recipe:
+
+```bash
+python train.py --config configs/c3_farnet/parent_errorgate_paircal_screen_public.yaml
+```
+
+The full parent training chain is documented in [docs/parent_model_training.md](docs/parent_model_training.md).
+
 ## Evaluate
 
 ```bash
@@ -126,6 +134,7 @@ The detailed warm-start chain, parent checkpoint metrics, source-router inferenc
 
 - English explanation: [docs/algorithm.md](docs/algorithm.md)
 - Chinese explanation: [docs/algorithm_zh.md](docs/algorithm_zh.md)
+- Parent training recipe: [docs/parent_model_training.md](docs/parent_model_training.md)
 
 ## Scientific Boundary
 

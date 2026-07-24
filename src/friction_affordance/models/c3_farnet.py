@@ -773,6 +773,274 @@ class BackboneFamilyOrdinalNoSpillAdapter(nn.Module):
         }
 
 
+class BackboneSpectralPairLocalSelector(nn.Module):
+    """Pair-local spectral roughness selector from backbone stage maps.
+
+    This is narrower than the family ordinal no-spill adapter. It does not
+    smooth a whole roughness triplet. Instead, it reads frequency-conditioned
+    stage maps and fixed non-wavelet spectral evidence, then changes only one
+    hard-pair margin at a time. The main target is the RSCD case where water
+    film on concrete hides the visual boundary between slight and severe
+    roughness.
+    """
+
+    def __init__(
+        self,
+        class_to_idx: dict[str, int],
+        pairs: list[str] | tuple[str, ...] | None,
+        *,
+        hidden_dim: int = 64,
+        scale: float = 0.12,
+        gate_margin: float = 1.00,
+        gate_temperature: float = 5.0,
+        gate_floor: float = 0.0,
+        spectral_margin_threshold: float = 0.030,
+        spectral_margin_temperature: float = 18.0,
+        alignment_temperature: float = 18.0,
+        dropout: float = 0.0,
+    ) -> None:
+        super().__init__()
+        self.scale = max(float(scale), 0.0)
+        self.gate_margin = float(gate_margin)
+        self.gate_temperature = float(gate_temperature)
+        self.gate_floor = min(max(float(gate_floor), 0.0), 1.0)
+        self.spectral_margin_threshold = float(spectral_margin_threshold)
+        self.spectral_margin_temperature = float(spectral_margin_temperature)
+        self.alignment_temperature = float(alignment_temperature)
+        self.idx_to_class = {int(idx): canonical_class_label(name) for name, idx in class_to_idx.items()}
+        self.pair_names: dict[frozenset[str], tuple[str, str]] = {}
+        for item in pairs or []:
+            parts = str(item).replace("<->", "|").replace(",", "|").split("|")
+            if len(parts) != 2:
+                raise ValueError(f"backbone_spectral_pair_selector_pairs entry must contain two class names: {item}")
+            left_name, right_name = canonical_class_label(parts[0]), canonical_class_label(parts[1])
+            if left_name not in class_to_idx or right_name not in class_to_idx:
+                raise ValueError(f"unknown backbone_spectral_pair_selector class: {item}")
+            self.pair_names[frozenset((left_name, right_name))] = (left_name, right_name)
+        # stage-1 family/slight/severe/artifact pools plus stage-3 equivalents,
+        # boundary stats, frequency stats, spectral summary, pair-state features,
+        # and the signed logit gap.
+        input_dim = (4 * 96 + 4 * 192) + 28 + 36 + 16 + 5 + 1
+        self.pair_nets = nn.ModuleDict()
+        for left_name, right_name in self.pair_names.values():
+            key = self._pair_key(class_to_idx[left_name], class_to_idx[right_name])
+            net = nn.Sequential(
+                nn.LayerNorm(input_dim),
+                nn.Linear(input_dim, int(hidden_dim)),
+                nn.GELU(),
+                nn.Dropout(float(dropout)),
+                nn.Linear(int(hidden_dim), int(hidden_dim)),
+                nn.GELU(),
+                nn.Linear(int(hidden_dim), 2),
+            )
+            last = net[-1]
+            if isinstance(last, nn.Linear):
+                nn.init.zeros_(last.weight)
+                nn.init.zeros_(last.bias)
+            self.pair_nets[key] = net
+
+    @staticmethod
+    def _pair_key(left: int, right: int) -> str:
+        return f"p{int(left)}_{int(right)}"
+
+    @staticmethod
+    def _top_fraction_mean(x: torch.Tensor, fraction: float) -> torch.Tensor:
+        flat = x.flatten(1)
+        k = max(1, int(flat.size(1) * float(fraction)))
+        return flat.topk(k, dim=1).values.mean(dim=1, keepdim=True)
+
+    @staticmethod
+    def _masked_pool(feat: torch.Tensor, mask: torch.Tensor) -> torch.Tensor:
+        mask = F.interpolate(mask, size=feat.shape[-2:], mode="bilinear", align_corners=False)
+        mask = mask.to(device=feat.device, dtype=feat.dtype).clamp(0.0, 1.0)
+        denom = mask.sum(dim=(2, 3)).clamp_min(1e-4)
+        return (feat * mask).sum(dim=(2, 3)) / denom
+
+    def _field_signature(self, fields: tuple[torch.Tensor, ...]) -> torch.Tensor:
+        parts = []
+        for field in fields:
+            f = field.clamp(0.0, 1.0)
+            parts.extend(
+                [
+                    f.mean(dim=(2, 3)),
+                    f.std(dim=(2, 3), unbiased=False),
+                    self._top_fraction_mean(f, 0.15),
+                    self._top_fraction_mean(f, 0.05),
+                ]
+            )
+        return torch.cat(parts, dim=1)
+
+    def _spectral_masks(
+        self,
+        boundary_evidence: torch.Tensor,
+        frequency_evidence: torch.Tensor,
+    ) -> tuple[dict[str, torch.Tensor], torch.Tensor, torch.Tensor]:
+        be = boundary_evidence
+        fe = frequency_evidence
+        concrete = be[:, 6:7].clamp(0.0, 1.0)
+        specular = be[:, 8:9].clamp(0.0, 1.0)
+        dark_water = torch.maximum(be[:, 9:10], fe[:, 9:10]).clamp(0.0, 1.0)
+        erasure = be[:, 10:11].clamp(0.0, 1.0)
+        visible_rough = be[:, 11:12].clamp(0.0, 1.0)
+        marking = torch.maximum(be[:, 13:14], torch.maximum(fe[:, 16:17], fe[:, 17:18])).clamp(0.0, 1.0)
+
+        film_concrete = fe[:, 2:3].clamp(0.0, 1.0)
+        film_protect = fe[:, 3:4].clamp(0.0, 1.0)
+        granular = torch.maximum(fe[:, 4:5], fe[:, 5:6]).clamp(0.0, 1.0)
+        rough_energy = torch.maximum(fe[:, 6:7], visible_rough).clamp(0.0, 1.0)
+        smooth_null = fe[:, 7:8].clamp(0.0, 1.0)
+        thin_film = fe[:, 8:9].clamp(0.0, 1.0)
+        lap = fe[:, 14:15].clamp(0.0, 1.0)
+        hf_iso = fe[:, 15:16].clamp(0.0, 1.0)
+
+        film = torch.maximum(torch.maximum(specular, thin_film), torch.maximum(erasure, film_protect)).clamp(0.0, 1.0)
+        water = torch.maximum(dark_water, 0.45 * thin_film).clamp(0.0, 1.0)
+        clean = (1.0 - 0.75 * marking).clamp(0.10, 1.0)
+        family = (concrete * water * clean).clamp(0.0, 1.0)
+        tail = (0.34 * hf_iso + 0.24 * rough_energy + 0.18 * granular + 0.14 * lap + 0.10 * visible_rough).clamp(
+            0.0,
+            1.0,
+        )
+        severe = (family * tail * (1.0 - 0.35 * smooth_null).clamp(0.0, 1.0)).clamp(0.0, 1.0)
+        slight = (
+            family
+            * torch.maximum(film, smooth_null)
+            * (1.0 - 0.62 * tail).clamp(0.0, 1.0)
+            * (1.0 - 0.40 * granular).clamp(0.0, 1.0)
+        ).clamp(0.0, 1.0)
+        artifact = (family * marking).clamp(0.0, 1.0)
+
+        summary = self._field_signature((family, slight, severe, artifact))
+        slight_score = (
+            0.34 * summary[:, 4:5]
+            + 0.24 * summary[:, 6:7]
+            + 0.18 * film.mean(dim=(2, 3))
+            + 0.14 * smooth_null.mean(dim=(2, 3))
+            + 0.10 * family.mean(dim=(2, 3))
+        ).clamp(0.0, 1.0)
+        severe_score = (
+            0.30 * summary[:, 8:9]
+            + 0.26 * summary[:, 10:11]
+            + 0.20 * summary[:, 11:12]
+            + 0.14 * hf_iso.mean(dim=(2, 3))
+            + 0.10 * granular.mean(dim=(2, 3))
+        ).clamp(0.0, 1.0)
+        desired_signed = (slight_score - severe_score).clamp(-1.0, 1.0)
+        return {
+            "family": family,
+            "slight": slight,
+            "severe": severe,
+            "artifact": artifact,
+        }, summary, desired_signed
+
+    def _stage_vector(self, stage_maps: dict[str, torch.Tensor], masks: dict[str, torch.Tensor]) -> torch.Tensor:
+        pools: list[torch.Tensor] = []
+        for key in ("1", "3"):
+            feat = stage_maps[key]
+            pools.extend(
+                [
+                    self._masked_pool(feat, masks["family"]),
+                    self._masked_pool(feat, masks["slight"]),
+                    self._masked_pool(feat, masks["severe"]),
+                    self._masked_pool(feat, masks["artifact"]),
+                ]
+            )
+        return torch.cat(pools, dim=1)
+
+    def forward(
+        self,
+        logits: torch.Tensor,
+        stage_maps: dict[str, torch.Tensor],
+        boundary_evidence: torch.Tensor,
+        boundary_stats: torch.Tensor,
+        frequency_evidence: torch.Tensor,
+        frequency_stats: torch.Tensor,
+        spec: RSCDFactorSpec,
+    ) -> tuple[torch.Tensor, dict[str, torch.Tensor]]:
+        if self.scale <= 0.0 or not self.pair_nets:
+            return logits, {"residual": torch.zeros_like(logits)}
+        if "1" not in stage_maps or "3" not in stage_maps:
+            return logits, {"residual": torch.zeros_like(logits)}
+
+        boundary_evidence = boundary_evidence.to(device=logits.device, dtype=logits.dtype)
+        boundary_stats = boundary_stats.to(device=logits.device, dtype=logits.dtype)
+        frequency_evidence = frequency_evidence.to(device=logits.device, dtype=logits.dtype)
+        frequency_stats = frequency_stats.to(device=logits.device, dtype=logits.dtype)
+        masks, spectral_summary, desired_signed = self._spectral_masks(boundary_evidence, frequency_evidence)
+        stage_vec = self._stage_vector(stage_maps, masks).to(device=logits.device, dtype=logits.dtype)
+        spectral_summary = spectral_summary.to(device=logits.device, dtype=logits.dtype)
+        probs = F.softmax(logits, dim=1)
+        residual = torch.zeros_like(logits)
+        raw_terms: dict[str, torch.Tensor] = {}
+        deltas: dict[str, torch.Tensor] = {}
+        gates: dict[str, torch.Tensor] = {}
+        desired_terms: dict[str, torch.Tensor] = {}
+
+        for pair in spec.hard_pairs:
+            left = int(pair.left)
+            right = int(pair.right)
+            left_name = self.idx_to_class[left]
+            right_name = self.idx_to_class[right]
+            wanted = self.pair_names.get(frozenset((left_name, right_name)))
+            if wanted is None:
+                continue
+            key = self._pair_key(left, right)
+            reversed_orientation = wanted != (left_name, right_name)
+            net_key = key if key in self.pair_nets else self._pair_key(right, left)
+            if net_key not in self.pair_nets:
+                continue
+            pair_features = C3FaRNetSurfaceClassifier._hardpair_pair_features(logits, probs, left, right).to(
+                dtype=logits.dtype
+            )
+            signed_gap = (logits[:, left : left + 1] - logits[:, right : right + 1]).to(dtype=logits.dtype)
+            pair_input = torch.cat(
+                [
+                    stage_vec,
+                    boundary_stats,
+                    frequency_stats,
+                    spectral_summary,
+                    pair_features,
+                    torch.tanh(0.25 * signed_gap),
+                ],
+                dim=1,
+            )
+            raw = self.pair_nets[net_key](pair_input)
+            signed_raw = raw[:, 0]
+            if reversed_orientation:
+                signed_raw = -signed_raw
+                desired = -desired_signed.squeeze(1)
+            else:
+                desired = desired_signed.squeeze(1)
+            signed = torch.tanh(signed_raw)
+            base_gap = signed_gap.abs().squeeze(1)
+            pair_mass = (probs[:, left] + probs[:, right]).clamp(0.0, 1.0)
+            boundary_gate = torch.sigmoid((self.gate_margin - base_gap) * self.gate_temperature) * pair_mass
+            learned_gate = torch.sigmoid(raw[:, 1])
+            if self.gate_floor > 0.0:
+                learned_gate = self.gate_floor + (1.0 - self.gate_floor) * learned_gate
+            spectral_gate = torch.sigmoid(
+                (desired.abs() - self.spectral_margin_threshold) * self.spectral_margin_temperature
+            )
+            alignment_gate = torch.sigmoid((signed * desired) * self.alignment_temperature)
+            artifact_guard = (1.0 - 0.85 * spectral_summary[:, 12]).clamp(0.05, 1.0)
+            gate = (boundary_gate * learned_gate * spectral_gate * alignment_gate * artifact_guard).clamp(0.0, 1.0)
+            delta = self.scale * gate * signed
+            residual[:, left] = residual[:, left] + delta
+            residual[:, right] = residual[:, right] - delta
+            raw_terms[key] = signed_raw
+            deltas[key] = delta
+            gates[key] = gate
+            desired_terms[key] = desired
+        aux = {
+            "residual": residual,
+            "raw": raw_terms,
+            "delta": deltas,
+            "gate": gates,
+            "desired": desired_terms,
+        }
+        return logits + residual, aux
+
+
 class DryConcretePairSignedSelector(nn.Module):
     """Pair-local signed selector for dry-concrete roughness boundaries.
 
@@ -5250,6 +5518,17 @@ class C3FaRNetSurfaceClassifier(nn.Module):
         backbone_family_ordinal_no_spill_gate_temperature: float = 10.0,
         backbone_family_ordinal_no_spill_dropout: float = 0.02,
         backbone_family_ordinal_no_spill_families: Any = None,
+        use_backbone_spectral_pair_selector: bool = False,
+        backbone_spectral_pair_selector_pairs: list[str] | tuple[str, ...] | None = None,
+        backbone_spectral_pair_selector_hidden_dim: int = 64,
+        backbone_spectral_pair_selector_scale: float = 0.12,
+        backbone_spectral_pair_selector_gate_margin: float = 1.00,
+        backbone_spectral_pair_selector_gate_temperature: float = 5.0,
+        backbone_spectral_pair_selector_gate_floor: float = 0.0,
+        backbone_spectral_pair_selector_spectral_margin_threshold: float = 0.030,
+        backbone_spectral_pair_selector_spectral_margin_temperature: float = 18.0,
+        backbone_spectral_pair_selector_alignment_temperature: float = 18.0,
+        backbone_spectral_pair_selector_dropout: float = 0.0,
         use_pair_value_mechanism_conditioner: bool = False,
         pair_value_mechanism_hidden_dim: int = 64,
         pair_value_mechanism_feature_scale: float = 0.010,
@@ -5950,6 +6229,23 @@ class C3FaRNetSurfaceClassifier(nn.Module):
                 families=backbone_family_ordinal_no_spill_families,
             )
             if bool(use_backbone_family_ordinal_no_spill_adapter)
+            else None
+        )
+        self.backbone_spectral_pair_selector = (
+            BackboneSpectralPairLocalSelector(
+                self.spec.class_to_idx,
+                backbone_spectral_pair_selector_pairs,
+                hidden_dim=int(backbone_spectral_pair_selector_hidden_dim),
+                scale=float(backbone_spectral_pair_selector_scale),
+                gate_margin=float(backbone_spectral_pair_selector_gate_margin),
+                gate_temperature=float(backbone_spectral_pair_selector_gate_temperature),
+                gate_floor=float(backbone_spectral_pair_selector_gate_floor),
+                spectral_margin_threshold=float(backbone_spectral_pair_selector_spectral_margin_threshold),
+                spectral_margin_temperature=float(backbone_spectral_pair_selector_spectral_margin_temperature),
+                alignment_temperature=float(backbone_spectral_pair_selector_alignment_temperature),
+                dropout=float(backbone_spectral_pair_selector_dropout),
+            )
+            if bool(use_backbone_spectral_pair_selector)
             else None
         )
         self.pareto_edge_expert = (
@@ -6870,6 +7166,7 @@ class C3FaRNetSurfaceClassifier(nn.Module):
         tristate_wet_concrete_boundary_aux: dict[str, Any] | None = None
         closed_set_factor_redistributor_aux: dict[str, Any] | None = None
         backbone_family_ordinal_no_spill_aux: dict[str, torch.Tensor] | None = None
+        backbone_spectral_pair_selector_aux: dict[str, Any] | None = None
         backbone_isolated_dry_concrete_aux: dict[str, torch.Tensor] | None = None
         pareto_edge_expert_aux: dict[str, Any] | None = None
         protected_factor_adapter_delta: torch.Tensor | None = None
@@ -6968,6 +7265,28 @@ class C3FaRNetSurfaceClassifier(nn.Module):
                     stage_maps,
                     boundary_evidence,
                     boundary_stats,
+                )
+        if self.backbone_spectral_pair_selector is not None:
+            stage_maps = getattr(self.backbone, "stage_feature_maps", None)
+            boundary_evidence = getattr(self.backbone, "last_boundary_evidence", None)
+            boundary_stats = getattr(self.backbone, "last_boundary_stats", None)
+            frequency_evidence = getattr(self.backbone, "last_frequency_evidence", None)
+            frequency_stats = getattr(self.backbone, "last_frequency_stats", None)
+            if (
+                isinstance(stage_maps, dict)
+                and isinstance(boundary_evidence, torch.Tensor)
+                and isinstance(boundary_stats, torch.Tensor)
+                and isinstance(frequency_evidence, torch.Tensor)
+                and isinstance(frequency_stats, torch.Tensor)
+            ):
+                logits, backbone_spectral_pair_selector_aux = self.backbone_spectral_pair_selector(
+                    logits,
+                    stage_maps,
+                    boundary_evidence,
+                    boundary_stats,
+                    frequency_evidence,
+                    frequency_stats,
+                    self.spec,
                 )
         if self.backbone_isolated_dry_concrete_adapter is not None:
             branch_feature = getattr(self.backbone, "last_dry_concrete_isolated_feature", None)
@@ -7075,6 +7394,12 @@ class C3FaRNetSurfaceClassifier(nn.Module):
             aux["backbone_family_ordinal_no_spill_delta"] = backbone_family_ordinal_no_spill_aux["residual"]
             aux["backbone_family_ordinal_no_spill_gates"] = backbone_family_ordinal_no_spill_aux["gates"]
             aux["backbone_family_ordinal_no_spill_raw"] = backbone_family_ordinal_no_spill_aux["raw"]
+        if backbone_spectral_pair_selector_aux is not None:
+            aux["backbone_spectral_pair_selector_delta"] = backbone_spectral_pair_selector_aux["residual"]
+            aux["backbone_spectral_pair_selector_raw"] = backbone_spectral_pair_selector_aux["raw"]
+            aux["backbone_spectral_pair_selector_pair_delta"] = backbone_spectral_pair_selector_aux["delta"]
+            aux["backbone_spectral_pair_selector_gate"] = backbone_spectral_pair_selector_aux["gate"]
+            aux["backbone_spectral_pair_selector_desired"] = backbone_spectral_pair_selector_aux["desired"]
         if backbone_isolated_dry_concrete_aux is not None:
             aux["backbone_isolated_dry_concrete_delta"] = backbone_isolated_dry_concrete_aux["residual"]
             aux["backbone_isolated_dry_concrete_raw"] = backbone_isolated_dry_concrete_aux["raw"]

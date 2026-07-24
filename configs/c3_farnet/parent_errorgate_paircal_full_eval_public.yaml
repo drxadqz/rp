@@ -1,0 +1,8 @@
+extends: parent_errorgate_paircal_screen_public.yaml
+
+output_dir: outputs/parent_errorgate_paircal_full_eval
+
+eval:
+  batch_size: 32
+  max_val_samples_per_class:
+  max_test_samples_per_class:

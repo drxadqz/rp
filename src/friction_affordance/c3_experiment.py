@@ -949,6 +949,35 @@ def build_model(cfg: dict[str, Any], class_to_idx: dict[str, int]) -> C3FaRNetSu
             m.get("backbone_family_ordinal_no_spill_dropout", 0.02)
         ),
         backbone_family_ordinal_no_spill_families=m.get("backbone_family_ordinal_no_spill_families"),
+        use_backbone_spectral_pair_selector=bool(m.get("use_backbone_spectral_pair_selector", False)),
+        backbone_spectral_pair_selector_pairs=m.get("backbone_spectral_pair_selector_pairs"),
+        backbone_spectral_pair_selector_hidden_dim=int(
+            m.get("backbone_spectral_pair_selector_hidden_dim", 64)
+        ),
+        backbone_spectral_pair_selector_scale=float(
+            m.get("backbone_spectral_pair_selector_scale", 0.12)
+        ),
+        backbone_spectral_pair_selector_gate_margin=float(
+            m.get("backbone_spectral_pair_selector_gate_margin", 1.00)
+        ),
+        backbone_spectral_pair_selector_gate_temperature=float(
+            m.get("backbone_spectral_pair_selector_gate_temperature", 5.0)
+        ),
+        backbone_spectral_pair_selector_gate_floor=float(
+            m.get("backbone_spectral_pair_selector_gate_floor", 0.0)
+        ),
+        backbone_spectral_pair_selector_spectral_margin_threshold=float(
+            m.get("backbone_spectral_pair_selector_spectral_margin_threshold", 0.030)
+        ),
+        backbone_spectral_pair_selector_spectral_margin_temperature=float(
+            m.get("backbone_spectral_pair_selector_spectral_margin_temperature", 18.0)
+        ),
+        backbone_spectral_pair_selector_alignment_temperature=float(
+            m.get("backbone_spectral_pair_selector_alignment_temperature", 18.0)
+        ),
+        backbone_spectral_pair_selector_dropout=float(
+            m.get("backbone_spectral_pair_selector_dropout", 0.0)
+        ),
         use_pair_value_mechanism_conditioner=bool(m.get("use_pair_value_mechanism_conditioner", False)),
         pair_value_mechanism_hidden_dim=int(m.get("pair_value_mechanism_hidden_dim", 64)),
         pair_value_mechanism_feature_scale=float(m.get("pair_value_mechanism_feature_scale", 0.010)),
@@ -3483,6 +3512,78 @@ def water_concrete_opponent_feature_pairwise_loss(
     return float(weight) * loss, logs
 
 
+def pseudo_roughness_state_supervision_loss(
+    model_out: dict[str, Any],
+    labels: torch.Tensor,
+    spec: RSCDFactorSpec,
+    loss_cfg: dict[str, Any],
+) -> tuple[torch.Tensor, dict[str, float]]:
+    """Weakly supervise the RSCD-specific roughness reliability states.
+
+    The pseudo-roughness module has three latent states:
+    true visible roughness, hidden roughness under film, and pseudo-roughness.
+    For the current hard RSCD slice, the useful supervision is intentionally
+    narrow: wet/water concrete slight samples should prefer the hidden-film
+    state, while wet/water concrete severe samples should prefer true visible
+    roughness. Smooth samples are not forced because a smooth-looking wet
+    concrete patch may be genuinely smooth or simply texture-erased.
+    """
+
+    weight = float(loss_cfg.get("pseudo_roughness_state_weight", 0.0))
+    probs = model_out.get("pseudo_roughness_reliability_state_probs")
+    if weight <= 0.0 or not isinstance(probs, torch.Tensor):
+        return model_out["logits"].new_zeros(()), {
+            "loss_pseudo_roughness_state": 0.0,
+            "pseudo_roughness_state_count": 0.0,
+            "pseudo_roughness_state_acc": 0.0,
+        }
+    factors = spec.class_to_factor.to(device=labels.device).index_select(0, labels)
+    friction = factors[:, 0]
+    material = factors[:, 1]
+    roughness = factors[:, 2]
+    friction_labels = list(FACTOR_LABELS["friction"])
+    material_labels = list(FACTOR_LABELS["material"])
+    roughness_labels = list(FACTOR_LABELS["roughness"])
+    wet = friction_labels.index("wet")
+    water = friction_labels.index("water")
+    concrete = material_labels.index("concrete")
+    slight = roughness_labels.index("slight")
+    severe = roughness_labels.index("severe")
+    active = ((friction == wet) | (friction == water)) & material.eq(concrete) & (
+        roughness.eq(slight) | roughness.eq(severe)
+    )
+    if not bool(active.any()):
+        return probs.new_zeros(()), {
+            "loss_pseudo_roughness_state": 0.0,
+            "pseudo_roughness_state_count": 0.0,
+            "pseudo_roughness_state_acc": 0.0,
+        }
+    # state indices follow PseudoRoughnessAwareReliability:
+    # 0=true visible roughness, 1=hidden by film, 2=pseudo roughness.
+    target = torch.where(
+        roughness[active].eq(severe),
+        torch.zeros_like(roughness[active]),
+        torch.ones_like(roughness[active]),
+    )
+    gate = model_out.get("pseudo_roughness_reliability_hand_gate")
+    if isinstance(gate, torch.Tensor):
+        sample_weight = gate.to(device=probs.device, dtype=probs.dtype).view(-1)[active].detach().clamp(0.25, 1.0)
+    else:
+        sample_weight = probs.new_ones((int(active.sum().detach().cpu()),))
+    log_probs = probs[active].clamp_min(1e-6).log()
+    per_sample = F.nll_loss(log_probs, target.to(device=probs.device), reduction="none")
+    loss = (per_sample * sample_weight).sum() / sample_weight.sum().clamp_min(1e-6)
+    pred = probs[active].argmax(dim=1)
+    acc = pred.eq(target.to(device=pred.device)).float().mean()
+    logs = {
+        "loss_pseudo_roughness_state": float(loss.detach().cpu()),
+        "pseudo_roughness_state_count": float(active.sum().detach().cpu()),
+        "pseudo_roughness_state_acc": float(acc.detach().cpu()),
+        "pseudo_roughness_state_weight_mean": float(sample_weight.detach().mean().cpu()),
+    }
+    return float(weight) * loss.to(dtype=model_out["logits"].dtype), logs
+
+
 def value_guided_roughness_order_loss(
     model_out: dict[str, Any],
     labels: torch.Tensor,
@@ -4666,6 +4767,12 @@ def train_one_epoch(
                 model.spec,
                 loss_cfg,
             )
+            pseudo_roughness_state_loss, pseudo_roughness_state_logs = pseudo_roughness_state_supervision_loss(
+                out,
+                label,
+                model.spec,
+                loss_cfg,
+            )
             rough_order_loss, rough_order_logs = value_guided_roughness_order_loss(
                 out,
                 label,
@@ -4873,6 +4980,7 @@ def train_one_epoch(
                 + value_pair_loss
                 + feature_value_pair_loss
                 + opponent_feature_pair_loss
+                + pseudo_roughness_state_loss
                 + rough_order_loss
                 + protected_tristate_loss
                 + value_margin_loss
@@ -4955,6 +5063,8 @@ def train_one_epoch(
         for key, value in feature_value_pair_logs.items():
             aux_log_sum[key] = aux_log_sum.get(key, 0.0) + float(value)
         for key, value in opponent_feature_pair_logs.items():
+            aux_log_sum[key] = aux_log_sum.get(key, 0.0) + float(value)
+        for key, value in pseudo_roughness_state_logs.items():
             aux_log_sum[key] = aux_log_sum.get(key, 0.0) + float(value)
         for key, value in rough_order_logs.items():
             aux_log_sum[key] = aux_log_sum.get(key, 0.0) + float(value)

@@ -23829,6 +23829,427 @@ class ConvNeXtGateCalibratedTensorCouplingBackbone(ConvNeXtBoundaryFactorizedBac
         return self.proj(feat)
 
 
+def _make_local_dct_bank(kernel_size: int = 5) -> torch.Tensor:
+    """Create zero-mean local DCT AC filters used as fixed spectral probes."""
+
+    k = int(kernel_size)
+    coords = torch.arange(k, dtype=torch.float32)
+    yy, xx = torch.meshgrid(coords, coords, indexing="ij")
+    pairs = ((0, 1), (1, 0), (1, 1), (0, 2), (2, 0), (2, 2), (1, 3), (3, 1))
+    filters = []
+    for u, v in pairs:
+        au = math.sqrt(1.0 / k) if u == 0 else math.sqrt(2.0 / k)
+        av = math.sqrt(1.0 / k) if v == 0 else math.sqrt(2.0 / k)
+        basis = (
+            au
+            * av
+            * torch.cos(math.pi * (2.0 * yy + 1.0) * float(u) / (2.0 * k))
+            * torch.cos(math.pi * (2.0 * xx + 1.0) * float(v) / (2.0 * k))
+        )
+        basis = basis - basis.mean()
+        basis = basis / basis.square().sum().sqrt().clamp_min(1e-6)
+        filters.append(basis)
+    return torch.stack(filters, dim=0).unsqueeze(1)
+
+
+class _FactorConditionedLocalDctRoadAdapter(nn.Module):
+    """Early RSCD-specific local-DCT feature conditioner.
+
+    Unlike RSPNet-style wavelet/WTConv blocks, this adapter uses fixed local
+    cosine probes only as a spectral coordinate system. Trainable updates remain
+    factor-conditioned: wet/water film, concrete/asphalt material texture, and
+    slight/severe roughness route different low/mid/high-frequency feature
+    branches before the backbone representation is pooled.
+    """
+
+    def __init__(
+        self,
+        channels: int,
+        *,
+        evidence_channels: int = 32,
+        stats_dim: int = 64,
+        rank: int | None = None,
+        kernel_size: int = 5,
+        scale: float = 0.020,
+        init_std: float = 5e-5,
+        max_update_ratio: float = 0.007,
+        artifact_suppression: float = 0.78,
+        route_temperature: float = 1.35,
+        prior_weight: float = 0.46,
+        write_gate_mode: str = "open",
+    ) -> None:
+        super().__init__()
+        channels = int(channels)
+        rank = int(rank or max(32, min(96, channels // 2)))
+        self.scale = float(scale)
+        self.max_update_ratio = max(float(max_update_ratio), 0.0)
+        self.artifact_suppression = max(float(artifact_suppression), 0.0)
+        self.route_temperature = max(float(route_temperature), 0.30)
+        self.prior_weight = min(max(float(prior_weight), 0.0), 1.0)
+        self.write_gate_mode = str(write_gate_mode)
+        self.kernel_size = int(kernel_size)
+        self.norm = nn.GroupNorm(math.gcd(8, channels), channels)
+        self.down = nn.Conv2d(channels, rank, kernel_size=1, bias=False)
+        dct_bank = _make_local_dct_bank(self.kernel_size)
+        dct_weight = dct_bank.view(1, dct_bank.shape[0], 1, self.kernel_size, self.kernel_size).repeat(
+            rank, 1, 1, 1, 1
+        )
+        self.register_buffer(
+            "dct_weight",
+            dct_weight.view(rank * dct_bank.shape[0], 1, self.kernel_size, self.kernel_size),
+        )
+        self.num_dct = int(dct_bank.shape[0])
+        self.evidence_proj = nn.Sequential(
+            nn.Conv2d(int(evidence_channels), rank, kernel_size=3, padding=1, bias=False),
+            nn.GroupNorm(math.gcd(8, rank), rank),
+            nn.GELU(),
+        )
+        self.smooth_dw = nn.Conv2d(rank, rank, kernel_size=7, padding=3, groups=rank, bias=False)
+        self.material_dw = nn.Conv2d(rank, rank, kernel_size=5, padding=2, groups=rank, bias=False)
+        self.rough_dw = nn.Conv2d(rank, rank, kernel_size=3, padding=1, groups=rank, bias=False)
+        self.film_dw = nn.Conv2d(rank, rank, kernel_size=7, padding=3, groups=rank, bias=False)
+        self.orientation_dw = nn.Conv2d(rank, rank, kernel_size=3, padding=1, groups=rank, bias=False)
+        self.feature_router = nn.Conv2d(rank, 5, kernel_size=1)
+        self.evidence_router = nn.Sequential(
+            nn.Conv2d(int(evidence_channels), rank, kernel_size=3, padding=1, bias=False),
+            nn.GroupNorm(math.gcd(8, rank), rank),
+            nn.GELU(),
+            nn.Conv2d(rank, 5, kernel_size=1),
+        )
+        self.stats_router = nn.Sequential(
+            nn.LayerNorm(int(stats_dim)),
+            nn.Linear(int(stats_dim), rank),
+            nn.GELU(),
+            nn.Linear(rank, 5),
+        )
+        self.reliability = nn.Sequential(
+            nn.Conv2d(int(evidence_channels), rank, kernel_size=3, padding=1, bias=False),
+            nn.GroupNorm(math.gcd(8, rank), rank),
+            nn.GELU(),
+            nn.Conv2d(rank, rank, kernel_size=1),
+        )
+        self.up = nn.Conv2d(rank, channels, kernel_size=1)
+        self.gamma = nn.Conv2d(rank, channels, kernel_size=1)
+        nn.init.normal_(self.up.weight, mean=0.0, std=float(init_std))
+        nn.init.zeros_(self.up.bias)
+        nn.init.normal_(self.gamma.weight, mean=0.0, std=float(init_std) * 0.50)
+        nn.init.zeros_(self.gamma.bias)
+
+    def forward(self, feat: torch.Tensor, evidence: torch.Tensor, stats: torch.Tensor) -> torch.Tensor:
+        evidence = F.interpolate(evidence, size=feat.shape[-2:], mode="bilinear", align_corners=False)
+        evidence = evidence.to(device=feat.device, dtype=feat.dtype)
+        stats = stats.to(device=feat.device, dtype=feat.dtype)
+
+        # Boundary evidence occupies [0:14], frequency evidence occupies [14:32].
+        b_concrete = evidence[:, 6:7]
+        b_asphalt = evidence[:, 7:8]
+        b_specular = evidence[:, 8:9]
+        b_dark = evidence[:, 9:10]
+        b_film = evidence[:, 10:11]
+        b_rough = evidence[:, 11:12]
+        b_marking = evidence[:, 13:14]
+        f_offset = 14
+        f_concrete_smooth = evidence[:, f_offset + 1 : f_offset + 2]
+        f_film_concrete = evidence[:, f_offset + 2 : f_offset + 3]
+        f_film_protect = evidence[:, f_offset + 3 : f_offset + 4]
+        f_granular = evidence[:, f_offset + 4 : f_offset + 5]
+        f_rough = evidence[:, f_offset + 6 : f_offset + 7]
+        f_smooth_null = evidence[:, f_offset + 7 : f_offset + 8]
+        f_thin = evidence[:, f_offset + 8 : f_offset + 9]
+        f_dark = evidence[:, f_offset + 9 : f_offset + 10]
+        f_specular = evidence[:, f_offset + 10 : f_offset + 11]
+        f_hf_iso = evidence[:, f_offset + 15 : f_offset + 16]
+        f_artifact = evidence[:, f_offset + 16 : f_offset + 17]
+        f_marking = evidence[:, f_offset + 17 : f_offset + 18]
+
+        z = self.down(self.norm(feat))
+        z = z + 0.25 * self.evidence_proj(evidence)
+        low3 = F.avg_pool2d(z, kernel_size=3, stride=1, padding=1)
+        low7 = F.avg_pool2d(z, kernel_size=7, stride=1, padding=3)
+        low13 = F.avg_pool2d(z, kernel_size=13, stride=1, padding=6)
+        dct = F.conv2d(
+            z,
+            self.dct_weight.to(device=feat.device, dtype=feat.dtype),
+            padding=self.kernel_size // 2,
+            groups=z.shape[1],
+        )
+        dct = dct.view(feat.shape[0], z.shape[1], self.num_dct, feat.shape[-2], feat.shape[-1]).abs()
+        low_ac = dct[:, :, 0:2].mean(dim=2)
+        mid_ac = dct[:, :, 2:5].mean(dim=2)
+        high_ac = dct[:, :, 5:8].mean(dim=2)
+        orientation_ac = dct[:, :, 0] - dct[:, :, 1]
+
+        smooth_signal = torch.maximum(f_smooth_null, torch.maximum(f_film_protect, b_film)).clamp(0.0, 1.0)
+        material_signal = torch.maximum(torch.maximum(b_concrete, b_asphalt), f_concrete_smooth).clamp(0.0, 1.0)
+        rough_signal = torch.maximum(torch.maximum(b_rough, f_rough), torch.maximum(f_granular, f_hf_iso)).clamp(
+            0.0, 1.0
+        )
+        film_signal = torch.maximum(
+            torch.maximum(b_specular, b_dark),
+            torch.maximum(torch.maximum(f_thin, f_dark), torch.maximum(f_specular, f_film_concrete)),
+        ).clamp(0.0, 1.0)
+        artifact_signal = torch.maximum(b_marking, torch.maximum(f_artifact, f_marking)).clamp(0.0, 1.0)
+        if self.write_gate_mode == "asphalt_dry_concrete_no_concrete_film":
+            asphalt_gate = b_asphalt * (1.0 - 0.35 * b_concrete).clamp(0.0, 1.0)
+            dry_concrete_texture_gate = (
+                b_concrete
+                * (1.0 - 0.78 * film_signal).clamp(0.0, 1.0)
+                * torch.maximum(rough_signal, f_smooth_null)
+            ).clamp(0.0, 1.0)
+            allowed_gate = torch.maximum(asphalt_gate, 0.72 * dry_concrete_texture_gate).clamp(0.0, 1.0)
+            concrete_film_protect = (b_concrete * film_signal).clamp(0.0, 1.0)
+            write_gate = (0.06 + 0.94 * allowed_gate) * (1.0 - 0.86 * concrete_film_protect).clamp(0.08, 1.0)
+        else:
+            write_gate = torch.ones_like(film_signal)
+
+        smooth_branch = self.smooth_dw(low7 + 0.25 * low_ac) * (0.55 + smooth_signal)
+        material_branch = self.material_dw((low3 - low13) + 0.45 * mid_ac) * (0.55 + material_signal)
+        rough_branch = self.rough_dw((z - low3) + 0.45 * high_ac) * (0.55 + rough_signal)
+        film_branch = self.film_dw(low13 - 0.20 * high_ac + 0.25 * low_ac) * (0.55 + film_signal)
+        orientation_branch = self.orientation_dw(orientation_ac) * (0.45 + artifact_signal)
+
+        route_logits = (
+            self.feature_router(z)
+            + self.evidence_router(evidence)
+            + self.stats_router(stats).view(feat.shape[0], 5, 1, 1)
+        )
+        route = torch.softmax(route_logits / self.route_temperature, dim=1)
+        prior = torch.cat([smooth_signal, material_signal, rough_signal, film_signal, artifact_signal], dim=1)
+        prior = prior / prior.sum(dim=1, keepdim=True).clamp_min(1e-4)
+        route = (1.0 - self.prior_weight) * route + self.prior_weight * prior
+
+        stack = torch.stack(
+            [smooth_branch, material_branch, rough_branch, film_branch, -0.35 * orientation_branch],
+            dim=1,
+        )
+        mixed = (stack * route.unsqueeze(2)).sum(dim=1)
+        artifact_guard = (1.0 - self.artifact_suppression * artifact_signal * (1.0 - 0.55 * film_signal)).clamp(
+            0.16, 1.0
+        )
+        target_guard = (0.62 + 0.38 * torch.maximum(torch.maximum(material_signal, rough_signal), film_signal)).clamp(
+            0.62, 1.0
+        )
+        reliable = torch.sigmoid(self.reliability(evidence)) * artifact_guard * target_guard
+        reliable = reliable * write_gate.clamp(0.0, 1.0)
+        adapted = F.gelu(mixed * reliable)
+        update = self.scale * self.up(adapted) + (0.45 * self.scale) * feat * torch.tanh(self.gamma(adapted))
+        if self.max_update_ratio > 0.0:
+            feat_norm = feat.detach().flatten(1).norm(dim=1).clamp_min(1e-6)
+            update_norm = update.flatten(1).norm(dim=1).clamp_min(1e-6)
+            ratio = (self.max_update_ratio * feat_norm / update_norm).clamp(max=1.0)
+            update = update * ratio.view(-1, 1, 1, 1)
+        return feat + update
+
+
+class ConvNeXtGateCalibratedFrequencyPhysicsBackbone(ConvNeXtGateCalibratedTensorCouplingBackbone):
+    """S96 tensor-coupling backbone with non-wavelet frequency physics gating.
+
+    This keeps the validated S96 wet/water-concrete tensor route, but adds an
+    early RSCD-specific frequency observer. It deliberately avoids RSPNet-style
+    wavelet/WTConv blocks: local frequency evidence is built from fixed blur
+    residual bands, directionality, high-frequency isotropy, and low-frequency
+    film suppression.
+    """
+
+    def __init__(
+        self,
+        out_dim: int,
+        pretrained: bool = False,
+        *,
+        frequency_layers: tuple[int, ...] = (0,),
+        frequency_scale: float = 0.010,
+        frequency_init_std: float = 1.6e-5,
+        frequency_max_update_ratio: float = 0.0030,
+        frequency_artifact_suppression: float = 0.80,
+        frequency_router_temperature: float = 1.55,
+    ) -> None:
+        super().__init__(
+            out_dim,
+            pretrained=pretrained,
+            condition_layers=(0,),
+            scale=0.0010,
+            max_update_ratio=0.00055,
+            artifact_suppression=0.78,
+            h_temperature=10.0,
+            h_margin=0.016,
+            gate_temperature=6.5,
+            analytic_prior_weight=0.78,
+            state_gate_scale=0.35,
+            stats_gate_scale=0.25,
+            mechanism_floor=0.040,
+            counterfactual_strength=0.12,
+            active_cells=(10, 11, 16, 17),
+            up_init_std=2.0e-5,
+        )
+        stage_channels = {0: 96, 1: 96, 3: 192}
+        self.frequency_physics_stem_adapters = nn.ModuleDict(
+            {
+                str(idx): _FrequencyPhysicsStemAdapter(
+                    stage_channels[idx],
+                    scale=float(frequency_scale),
+                    init_std=float(frequency_init_std),
+                    max_update_ratio=float(frequency_max_update_ratio),
+                    artifact_suppression=float(frequency_artifact_suppression),
+                    router_temperature=float(frequency_router_temperature),
+                )
+                for idx in frequency_layers
+                if idx in stage_channels
+            }
+        )
+        if not self.frequency_physics_stem_adapters:
+            raise ValueError("ConvNeXtGateCalibratedFrequencyPhysicsBackbone requires a valid frequency layer.")
+        self.register_buffer(
+            "diag_pos",
+            torch.tensor([[0.0, 0.0, 1.0], [0.0, 0.0, 0.0], [-1.0, 0.0, 0.0]]).view(1, 1, 3, 3) / 2.0,
+        )
+        self.register_buffer(
+            "diag_neg",
+            torch.tensor([[1.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, -1.0]]).view(1, 1, 3, 3) / 2.0,
+        )
+        self.stage_feature_maps: dict[str, torch.Tensor] = {}
+        self.last_boundary_evidence: torch.Tensor | None = None
+        self.last_boundary_stats: torch.Tensor | None = None
+        self.last_frequency_evidence: torch.Tensor | None = None
+        self.last_frequency_stats: torch.Tensor | None = None
+
+    def _frequency_physics_evidence(self, x: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
+        return ConvNeXtFrequencyPhysicsStemBackbone._frequency_physics_evidence(self, x)
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        boundary_evidence, boundary_stats = self._boundary_evidence(x)
+        frequency_evidence, frequency_stats = self._frequency_physics_evidence(x)
+        self.last_boundary_evidence = boundary_evidence
+        self.last_boundary_stats = boundary_stats
+        self.last_frequency_evidence = frequency_evidence
+        self.last_frequency_stats = frequency_stats
+        feat = x
+        stage_maps: dict[str, torch.Tensor] = {}
+        for idx, layer in enumerate(self.features):
+            feat = layer(feat)
+            key = str(idx)
+            if key in self.frequency_physics_stem_adapters:
+                feat = self.frequency_physics_stem_adapters[key](feat, frequency_evidence, frequency_stats)
+            if key in self.gate_calibrated_tensor_coupling_banks:
+                feat = self.gate_calibrated_tensor_coupling_banks[key](feat, boundary_evidence, boundary_stats)
+            if idx in {1, 3}:
+                stage_maps[key] = feat
+            elif idx == 5:
+                stage_maps["5"] = feat
+            elif idx == 7:
+                stage_maps["7"] = feat
+        self.stage_feature_maps = stage_maps
+        self.last_feature_map = feat
+        feat = self.avgpool(feat).flatten(1)
+        return self.proj(feat)
+
+
+class ConvNeXtGateCalibratedLocalDctFactorBackbone(ConvNeXtGateCalibratedTensorCouplingBackbone):
+    """S96 tensor-coupling backbone with early factor-conditioned local DCT mixing.
+
+    This is a non-RSPNet frequency route. It does not use wavelets, WTConv, or
+    star operations. Local DCT filters provide low/mid/high/oriented spectral
+    coordinates, and RSCD physical evidence decides how much each branch should
+    write into early ConvNeXt maps before the validated tensor-coupling route.
+    """
+
+    def __init__(
+        self,
+        out_dim: int,
+        pretrained: bool = False,
+        *,
+        dct_layers: tuple[int, ...] = (0, 1),
+        dct_scale: float = 0.020,
+        dct_init_std: float = 5e-5,
+        dct_max_update_ratio: float = 0.007,
+        dct_route_temperature: float = 1.35,
+        dct_prior_weight: float = 0.46,
+        dct_write_gate_mode: str = "open",
+    ) -> None:
+        super().__init__(
+            out_dim,
+            pretrained=pretrained,
+            condition_layers=(0,),
+            scale=0.0010,
+            max_update_ratio=0.00055,
+            artifact_suppression=0.78,
+            h_temperature=10.0,
+            h_margin=0.016,
+            gate_temperature=6.5,
+            analytic_prior_weight=0.78,
+            state_gate_scale=0.35,
+            stats_gate_scale=0.25,
+            mechanism_floor=0.040,
+            counterfactual_strength=0.12,
+            active_cells=(10, 11, 16, 17),
+            up_init_std=2.0e-5,
+        )
+        stage_channels = {0: 96, 1: 96, 3: 192}
+        self.local_dct_factor_adapters = nn.ModuleDict(
+            {
+                str(idx): _FactorConditionedLocalDctRoadAdapter(
+                    stage_channels[idx],
+                    evidence_channels=32,
+                    stats_dim=64,
+                    scale=float(dct_scale),
+                    init_std=float(dct_init_std),
+                    max_update_ratio=float(dct_max_update_ratio),
+                    route_temperature=float(dct_route_temperature),
+                    prior_weight=float(dct_prior_weight),
+                    write_gate_mode=str(dct_write_gate_mode),
+                )
+                for idx in dct_layers
+                if idx in stage_channels
+            }
+        )
+        if not self.local_dct_factor_adapters:
+            raise ValueError("ConvNeXtGateCalibratedLocalDctFactorBackbone requires a valid DCT layer.")
+        self.register_buffer(
+            "diag_pos",
+            torch.tensor([[0.0, 0.0, 1.0], [0.0, 0.0, 0.0], [-1.0, 0.0, 0.0]]).view(1, 1, 3, 3) / 2.0,
+        )
+        self.register_buffer(
+            "diag_neg",
+            torch.tensor([[1.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, -1.0]]).view(1, 1, 3, 3) / 2.0,
+        )
+        self.stage_feature_maps: dict[str, torch.Tensor] = {}
+        self.last_boundary_evidence: torch.Tensor | None = None
+        self.last_boundary_stats: torch.Tensor | None = None
+        self.last_frequency_evidence: torch.Tensor | None = None
+        self.last_frequency_stats: torch.Tensor | None = None
+
+    def _frequency_physics_evidence(self, x: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
+        return ConvNeXtFrequencyPhysicsStemBackbone._frequency_physics_evidence(self, x)
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        boundary_evidence, boundary_stats = self._boundary_evidence(x)
+        frequency_evidence, frequency_stats = self._frequency_physics_evidence(x)
+        combined_evidence = torch.cat([boundary_evidence, frequency_evidence], dim=1)
+        combined_stats = torch.cat([boundary_stats, frequency_stats], dim=1)
+        self.last_boundary_evidence = boundary_evidence
+        self.last_boundary_stats = boundary_stats
+        self.last_frequency_evidence = frequency_evidence
+        self.last_frequency_stats = frequency_stats
+        feat = x
+        stage_maps: dict[str, torch.Tensor] = {}
+        for idx, layer in enumerate(self.features):
+            feat = layer(feat)
+            key = str(idx)
+            if key in self.local_dct_factor_adapters:
+                feat = self.local_dct_factor_adapters[key](feat, combined_evidence, combined_stats)
+            if key in self.gate_calibrated_tensor_coupling_banks:
+                feat = self.gate_calibrated_tensor_coupling_banks[key](feat, boundary_evidence, boundary_stats)
+            if idx in {1, 3}:
+                stage_maps[key] = feat
+            elif idx == 5:
+                stage_maps["5"] = feat
+            elif idx == 7:
+                stage_maps["7"] = feat
+        self.stage_feature_maps = stage_maps
+        self.last_feature_map = feat
+        feat = self.avgpool(feat).flatten(1)
+        return self.proj(feat)
+
+
 class _DryConcreteIsolatedBranchReadout(nn.Module):
     """Read dry-concrete roughness evidence without writing into shared features."""
 
@@ -29000,6 +29421,53 @@ def build_backbone(name: str, out_dim: int, pretrained: bool = False) -> nn.Modu
             counterfactual_strength=0.12,
             active_cells=(10, 11, 16, 17),
             up_init_std=2.0e-5,
+        )
+    if name == "convnext_tiny_gate_calibrated_frequency_physics_concrete_film_rough_stem":
+        # S146: keep the S96 wet/water-concrete tensor route, but condition the
+        # first ConvNeXt stage with non-wavelet frequency physics evidence.
+        # This borrows frequency-domain CV ideas without duplicating RSPNet's
+        # WTConv/wavelet backbone: high-frequency isotropic aggregate,
+        # mid-frequency material texture, low-frequency film suppression, and
+        # anisotropic marking protection are fixed evidence maps.
+        return ConvNeXtGateCalibratedFrequencyPhysicsBackbone(
+            out_dim,
+            pretrained=pretrained,
+            frequency_layers=(0,),
+            frequency_scale=0.010,
+            frequency_init_std=1.6e-5,
+            frequency_max_update_ratio=0.0030,
+            frequency_artifact_suppression=0.80,
+            frequency_router_temperature=1.55,
+        )
+    if name == "convnext_tiny_gate_calibrated_local_dct_factor_concrete_film_rough_stem":
+        # S150: a stronger non-RSPNet frequency route. Instead of appending a
+        # late residual or copying wavelet/WTConv blocks, it uses fixed local
+        # DCT probes as low/mid/high/oriented spectral coordinates and lets
+        # RSCD friction-material-roughness evidence route early feature writes.
+        return ConvNeXtGateCalibratedLocalDctFactorBackbone(
+            out_dim,
+            pretrained=pretrained,
+            dct_layers=(0, 1),
+            dct_scale=0.020,
+            dct_init_std=5.0e-5,
+            dct_max_update_ratio=0.007,
+            dct_route_temperature=1.35,
+            dct_prior_weight=0.46,
+        )
+    if name == "convnext_tiny_gate_calibrated_local_dct_selective_asphalt_dry_concrete_stem":
+        # S151: S150 with a mechanism-family write gate. It preserves the
+        # asphalt/dry-concrete gains observed in S150 while suppressing writes
+        # on concrete + wet/water film regions that S150 damaged.
+        return ConvNeXtGateCalibratedLocalDctFactorBackbone(
+            out_dim,
+            pretrained=pretrained,
+            dct_layers=(0, 1),
+            dct_scale=0.020,
+            dct_init_std=5.0e-5,
+            dct_max_update_ratio=0.007,
+            dct_route_temperature=1.35,
+            dct_prior_weight=0.46,
+            dct_write_gate_mode="asphalt_dry_concrete_no_concrete_film",
         )
     if name == "convnext_tiny_dry_concrete_isolated_branch_stem":
         return ConvNeXtDryConcreteIsolatedBranchBackbone(
