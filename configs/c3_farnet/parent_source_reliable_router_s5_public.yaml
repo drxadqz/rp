@@ -1,0 +1,19 @@
+extends: current_best_s7_public.yaml
+
+output_dir: outputs/parent_source_reliable_router_s5_from_parent
+
+model:
+  # This is the public, portable version of the source-reliable-router
+  # evaluation that produced the best recorded full-test Top-1 from the
+  # parent checkpoint.
+  source_reliable_boundary_scale: 5.0
+
+train:
+  resume_from: checkpoints/c3_farnet_errorgate_paircal_screen_20260703/best_checkpoint.pth
+  teacher_checkpoint:
+  evaluate_initial: false
+
+eval:
+  batch_size: 32
+  max_val_samples_per_class:
+  max_test_samples_per_class:

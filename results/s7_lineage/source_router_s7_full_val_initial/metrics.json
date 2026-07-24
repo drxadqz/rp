@@ -1,0 +1,192 @@
+{
+  "summary": {
+    "loss": 0.30203668434934433,
+    "top1": 0.9004028197381672,
+    "mean_precision": 0.8848351425634469,
+    "mean_recall": 0.8923288166214997,
+    "macro_f1": 0.8877529678739312,
+    "weighted_f1": 0.9009660371843875,
+    "num_samples": 19860,
+    "num_classes": 27,
+    "num_errors": 1978,
+    "pareto_safe_logit_patch_enabled": false,
+    "pareto_safe_logit_patch_hits": 0
+  },
+  "classification_report": {
+    "dry_asphalt_severe": {
+      "precision": 0.9256926952141058,
+      "recall": 0.8963414634146342,
+      "f1-score": 0.9107806691449815,
+      "support": 820.0
+    },
+    "dry_asphalt_slight": {
+      "precision": 0.8721893491124261,
+      "recall": 0.8987804878048781,
+      "f1-score": 0.8852852852852853,
+      "support": 820.0
+    },
+    "dry_asphalt_smooth": {
+      "precision": 0.9196538936959209,
+      "recall": 0.9073170731707317,
+      "f1-score": 0.9134438305709024,
+      "support": 820.0
+    },
+    "dry_concrete_severe": {
+      "precision": 0.8389830508474576,
+      "recall": 0.8451219512195122,
+      "f1-score": 0.8420413122721749,
+      "support": 820.0
+    },
+    "dry_concrete_slight": {
+      "precision": 0.8071253071253072,
+      "recall": 0.801219512195122,
+      "f1-score": 0.8041615667074663,
+      "support": 820.0
+    },
+    "dry_concrete_smooth": {
+      "precision": 0.9345314505776636,
+      "recall": 0.8878048780487805,
+      "f1-score": 0.9105691056910569,
+      "support": 820.0
+    },
+    "dry_gravel": {
+      "precision": 0.9466501240694789,
+      "recall": 0.9304878048780488,
+      "f1-score": 0.9384993849938499,
+      "support": 820.0
+    },
+    "dry_mud": {
+      "precision": 0.9430992736077481,
+      "recall": 0.95,
+      "f1-score": 0.9465370595382746,
+      "support": 820.0
+    },
+    "fresh_snow": {
+      "precision": 0.9914320685434517,
+      "recall": 0.9878048780487805,
+      "f1-score": 0.9896151496640195,
+      "support": 820.0
+    },
+    "ice": {
+      "precision": 0.9746376811594203,
+      "recall": 0.9841463414634146,
+      "f1-score": 0.9793689320388349,
+      "support": 820.0
+    },
+    "melted_snow": {
+      "precision": 0.9806295399515739,
+      "recall": 0.9878048780487805,
+      "f1-score": 0.9842041312272175,
+      "support": 820.0
+    },
+    "water_asphalt_severe": {
+      "precision": 0.7285714285714285,
+      "recall": 0.816,
+      "f1-score": 0.769811320754717,
+      "support": 250.0
+    },
+    "water_asphalt_slight": {
+      "precision": 0.8911392405063291,
+      "recall": 0.8585365853658536,
+      "f1-score": 0.8745341614906832,
+      "support": 820.0
+    },
+    "water_asphalt_smooth": {
+      "precision": 0.9254278728606357,
+      "recall": 0.9231707317073171,
+      "f1-score": 0.9242979242979243,
+      "support": 820.0
+    },
+    "water_concrete_severe": {
+      "precision": 0.9145860709592641,
+      "recall": 0.848780487804878,
+      "f1-score": 0.8804554079696395,
+      "support": 820.0
+    },
+    "water_concrete_slight": {
+      "precision": 0.6031746031746031,
+      "recall": 0.76,
+      "f1-score": 0.672566371681416,
+      "support": 250.0
+    },
+    "water_concrete_smooth": {
+      "precision": 0.8657799274486094,
+      "recall": 0.8731707317073171,
+      "f1-score": 0.8694596235579842,
+      "support": 820.0
+    },
+    "water_gravel": {
+      "precision": 0.9331683168316832,
+      "recall": 0.9195121951219513,
+      "f1-score": 0.9262899262899262,
+      "support": 820.0
+    },
+    "water_mud": {
+      "precision": 0.937424789410349,
+      "recall": 0.95,
+      "f1-score": 0.9436705027256208,
+      "support": 820.0
+    },
+    "wet_asphalt_severe": {
+      "precision": 0.8861788617886179,
+      "recall": 0.872,
+      "f1-score": 0.8790322580645161,
+      "support": 250.0
+    },
+    "wet_asphalt_slight": {
+      "precision": 0.8681710213776722,
+      "recall": 0.8914634146341464,
+      "f1-score": 0.8796630565583634,
+      "support": 820.0
+    },
+    "wet_asphalt_smooth": {
+      "precision": 0.9004854368932039,
+      "recall": 0.9048780487804878,
+      "f1-score": 0.902676399026764,
+      "support": 820.0
+    },
+    "wet_concrete_severe": {
+      "precision": 0.7094594594594594,
+      "recall": 0.84,
+      "f1-score": 0.7692307692307693,
+      "support": 250.0
+    },
+    "wet_concrete_slight": {
+      "precision": 0.9155495978552279,
+      "recall": 0.8329268292682926,
+      "f1-score": 0.8722860791826309,
+      "support": 820.0
+    },
+    "wet_concrete_smooth": {
+      "precision": 0.8453364817001181,
+      "recall": 0.8731707317073171,
+      "f1-score": 0.8590281943611278,
+      "support": 820.0
+    },
+    "wet_gravel": {
+      "precision": 0.9255189255189256,
+      "recall": 0.9243902439024391,
+      "f1-score": 0.924954240390482,
+      "support": 820.0
+    },
+    "wet_mud": {
+      "precision": 0.905952380952381,
+      "recall": 0.9280487804878049,
+      "f1-score": 0.9168674698795181,
+      "support": 820.0
+    },
+    "accuracy": 0.9004028197381672,
+    "macro avg": {
+      "precision": 0.8848351425634469,
+      "recall": 0.8923288166214997,
+      "f1-score": 0.8877529678739312,
+      "support": 19860.0
+    },
+    "weighted avg": {
+      "precision": 0.9023988406418969,
+      "recall": 0.9004028197381672,
+      "f1-score": 0.9009660371843875,
+      "support": 19860.0
+    }
+  }
+}

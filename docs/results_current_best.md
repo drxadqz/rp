@@ -1,12 +1,14 @@
 # Current Verified Full-Test Result
 
-The current best completed run is:
+The current best self-contained completed S7 checkpoint is:
 
 ```text
 c3_farnet_formal_fullmanifest_source_reliable_router_s7_20260709
 ```
 
 It completed the full RSCD test split with 49,500 images.
+
+There is also a parent-checkpoint plus source-reliable-router inference record with `90.640%` Top-1 on the same 49,500-image test split. That record is documented separately because it loads the parent checkpoint and applies the router at evaluation time, rather than using the standalone formal S7 checkpoint.
 
 ## Summary
 
@@ -66,3 +68,5 @@ results/current_best_s7/per_class_metrics.csv
 results/current_best_s7/confusion_matrix.csv
 results/current_best_s7/hard_pair_metrics.csv
 ```
+
+For the parent checkpoint, the `90.045%` initial-validation number, and the source-router `90.640%` record, see [s7_training_lineage.md](s7_training_lineage.md).

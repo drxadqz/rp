@@ -1,0 +1,56 @@
+{
+  "class": "water_concrete_slight",
+  "present": true,
+  "precision": 0.7816245006657789,
+  "recall": 0.73375,
+  "f1": 0.7569310122501612,
+  "support": 800,
+  "top_confused_classes": [
+    {
+      "pred": "water_concrete_severe",
+      "count": 98
+    },
+    {
+      "pred": "wet_concrete_slight",
+      "count": 55
+    },
+    {
+      "pred": "water_concrete_smooth",
+      "count": 19
+    },
+    {
+      "pred": "water_asphalt_slight",
+      "count": 13
+    },
+    {
+      "pred": "water_gravel",
+      "count": 10
+    },
+    {
+      "pred": "water_mud",
+      "count": 8
+    },
+    {
+      "pred": "wet_concrete_severe",
+      "count": 5
+    }
+  ],
+  "roughness_error_count": 144,
+  "friction_error_count": 62,
+  "material_error_count": 35,
+  "roughness_error_share": 0.5149881388828984,
+  "friction_error_share": 0.36338149665732156,
+  "material_error_share": 0.2978218675868018,
+  "rho_R_mean": 0.43956742581875635,
+  "rho_R_mean_water": 0.4431410197650685,
+  "rho_R_mean_wet": 0.45347321842879373,
+  "rho_R_mean_dry": 0.4262631282512692,
+  "rho_R_mean_water_concrete_slight": 0.42523591201752425,
+  "rho_R_mean_water_concrete_severe": 0.43161508705466983,
+  "rho_R_mean_wet_concrete_slight": 0.4298960496112704,
+  "rho_R_mean_dry_concrete_slight": 0.4103729257431436,
+  "rho_R_gap_dry_minus_water_concrete_slight": 0.0010272162337449653,
+  "rho_R_gap_dry_minus_water_concrete_severe": -0.005351958803400614,
+  "rho_R_gap_dry_minus_wet_concrete_slight": -0.0036329213600012067,
+  "tournament_pair_accuracy_involving_water_concrete_slight": 0.8047738095238095
+}

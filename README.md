@@ -10,8 +10,9 @@ The released method is the best run that has already completed the full train/va
 - test split: 49,500 images
 - input size: 192 x 192, letterbox resize
 - model parameters: 32.49M total, about 1.09M trainable under the S7 prefix-tuning setup
-- current verified Top-1: 90.632%
-- current verified Macro-F1: 88.920%
+- current verified self-contained S7 checkpoint Top-1: 90.632%
+- current verified self-contained S7 checkpoint Macro-F1: 88.920%
+- best recorded parent-checkpoint plus source-router inference Top-1: 90.640%
 - weakest class: `water_concrete_slight`, F1 = 75.693%
 
 The active later experiments are not reported here until they finish full training and full 49,500-image test evaluation.
@@ -49,7 +50,7 @@ validate.py
 test.py
 ```
 
-Large datasets, full local manifests, checkpoints, predictions, and logs are intentionally not committed.
+Large datasets, full local manifests, predictions, and logs are intentionally not committed. The selected S7 final checkpoint, direct parent checkpoint, and dry-concrete teacher checkpoint are committed through Git LFS.
 
 ## Install
 
@@ -99,7 +100,7 @@ python scripts/build_manifests.py --config configs/data/local_paths.yaml --out-d
 python train.py --config configs/c3_farnet/current_best_s7_public.yaml
 ```
 
-The historical verified S7 run used warm-start teacher/checkpoint files from earlier local screening runs. Those binary files are not included in GitHub. The complete model implementation is released; exact historical checkpoint reproduction requires the same warm-start checkpoints.
+The historical verified S7 run used warm-start teacher/checkpoint files from earlier local screening runs. Those selected binary files are included through Git LFS under [checkpoints](checkpoints). Run `git lfs pull` before reproducing checkpoint-based training or evaluation.
 
 ## Evaluate
 
@@ -118,6 +119,8 @@ The result files in [results/current_best_s7](results/current_best_s7) record th
 - `confusion_matrix.csv`: 27-class confusion matrix
 - `hard_pair_metrics.csv`: hard-pair boundary statistics
 - `history.json`: training history for the verified run
+
+The detailed warm-start chain, parent checkpoint metrics, source-router inference result, and the meaning of the `90.045%` validation number are documented in [docs/s7_training_lineage.md](docs/s7_training_lineage.md).
 
 ## Algorithm Explanation
 

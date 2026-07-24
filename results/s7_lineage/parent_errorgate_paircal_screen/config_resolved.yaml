@@ -1,14 +1,12 @@
 seed: 97
-output_dir: outputs/current_best_s7
-
+output_dir: D:/NMI_SPWFM_datasets/friction_affordance_outputs/rscd_surface_classification/c3_farnet_errorgate_paircal_screen_20260703
 data:
-  train_manifest: data/manifests_full/rscd_prepared_train.csv
-  val_manifest: data/manifests_full/rscd_prepared_val.csv
-  test_manifest: data/manifests_full/rscd_prepared_test.csv
+  train_manifest: E:/perception/friction_affordance_field/data/manifests_full/rscd_prepared_train.csv
+  val_manifest: E:/perception/friction_affordance_field/data/manifests_full/rscd_prepared_val.csv
+  test_manifest: E:/perception/friction_affordance_field/data/manifests_full/rscd_prepared_test.csv
   image_size: 192
   train_resize_mode: letterbox
   eval_resize_mode: letterbox
-
 model:
   backbone: convnext_tiny_gate_calibrated_tensor_coupling_concrete_film_rough_stem
   embedding_dim: 768
@@ -18,16 +16,16 @@ model:
   pair_rank: 8
   triple_rank: 8
   head_type: hardpair_error_gated_calibrated
-  hardpair_correction_scale: 0.10
+  hardpair_correction_scale: 0.1
   hardpair_gate_margin: 1.05
   hardpair_gate_temperature: 4.5
   hardpair_error_gate_bias_init: -4.0
   hardpair_error_gate_floor: 0.0
   hardpair_focus_classes:
-    - water_concrete_slight
-    - wet_concrete_slight
-    - water_concrete_severe
-    - wet_concrete_severe
+  - water_concrete_slight
+  - wet_concrete_slight
+  - water_concrete_severe
+  - wet_concrete_severe
   use_physics_branch: true
   physics_dim: 96
   physics_quality_cues: true
@@ -42,24 +40,6 @@ model:
   dry_concrete_roughness_scale: 0.12
   dry_concrete_roughness_gate_threshold: 0.12
   dry_concrete_roughness_gate_temperature: 14.0
-  use_source_reliable_boundary_router: true
-  source_reliable_boundary_hidden_dim: 32
-  source_reliable_boundary_scale: 7.0
-  source_reliable_boundary_base_strength: 1.0
-  source_reliable_boundary_physics_gate_floor: 0.5
-  source_reliable_boundary_gate_temperature: 6.0
-  source_reliable_boundary_source_temperature: 28.0
-  source_reliable_boundary_learned_gate_bias: -1.6
-  source_reliable_boundary_dropout: 0.0
-  source_reliable_boundary_routes:
-    - source: dry_concrete_smooth
-      target: dry_concrete_slight
-      topk: 3
-      margin: 1.00
-      source_f1: 0.907292954264524
-      min_source_f1: 0.90
-      kind: dry_concrete_roughness
-
 loss:
   factor_weight: 0.0
   factor_axis_weights:
@@ -73,10 +53,10 @@ loss:
   supervise_none: false
   focus_ce_extra_weight: 0.3
   focus_ce_classes:
-    - water_concrete_slight
-    - wet_concrete_slight
-    - water_concrete_severe
-    - wet_concrete_severe
+  - water_concrete_slight
+  - wet_concrete_slight
+  - water_concrete_severe
+  - wet_concrete_severe
   anchor_consistency_weight: 0.55
   anchor_consistency_focus_weight: 0.015
   anchor_consistency_focus_low_margin_threshold: 0.18
@@ -90,38 +70,33 @@ loss:
   anchor_error_gate_pos_weight: 10.0
   anchor_error_gate_pair_error_only: true
   anchor_consistency_exempt_classes:
-    - water_concrete_slight
-    - wet_concrete_slight
-    - water_concrete_severe
-    - wet_concrete_severe
-
+  - water_concrete_slight
+  - wet_concrete_slight
+  - water_concrete_severe
+  - wet_concrete_severe
 train:
-  # Historical warm-start files used by the verified S7 run.
-  # They are stored with Git LFS under checkpoints/.
-  resume_from: checkpoints/c3_farnet_errorgate_paircal_screen_20260703/best_checkpoint.pth
-  teacher_checkpoint: checkpoints/screen_dry_concrete_vor_residual_scale012_lr1e3_s8k_from_anchor/best.pt
+  resume_from: D:/NMI_SPWFM_datasets/friction_affordance_outputs/rscd_surface_classification/screen_dry_concrete_vor_residual_scale012_lr1e3_s8k_from_anchor/best.pt
+  teacher_checkpoint: D:/NMI_SPWFM_datasets/friction_affordance_outputs/rscd_surface_classification/screen_dry_concrete_vor_residual_scale012_lr1e3_s8k_from_anchor/best.pt
   teacher_backbone: convnext_tiny
   teacher_head_type: linear
   trainable_prefixes:
-    - backbone.gate_calibrated_tensor_coupling_banks
-    - pairwise_hardpair_experts
-    - pairwise_hardpair_error_gates
-  evaluate_initial: true
+  - backbone.gate_calibrated_tensor_coupling_banks
+  - pairwise_hardpair_experts
+  - pairwise_hardpair_error_gates
   batch_size: 8
   grad_accum_steps: 2
   num_workers: 2
   prefetch_factor: 2
-  lr: 0.00003
+  lr: 9.0e-05
   weight_decay: 0.002
-  epochs: 1
+  epochs: 2
   amp: true
   augmentation: true
   balanced_sampling: true
-  samples_per_epoch: 0
+  samples_per_epoch: 12000
   grad_clip_norm: 5.0
-  log_every_steps: 2000
-
+  log_every_steps: 150
 eval:
-  batch_size: 32
-  max_val_samples_per_class:
-  max_test_samples_per_class:
+  batch_size: 16
+  max_val_samples_per_class: 120
+  max_test_samples_per_class: 120

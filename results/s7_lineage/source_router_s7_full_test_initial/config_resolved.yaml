@@ -1,0 +1,4 @@
+{
+  "config": "configs\\c3_farnet\\c3_farnet_official_anchor_source_reliable_router_s5_fulltest_20260708.yaml",
+  "checkpoint": "D:\\NMI_SPWFM_datasets\\friction_affordance_outputs\\rscd_surface_classification\\c3_farnet_errorgate_paircal_screen_20260703\\best_checkpoint.pth"
+}
