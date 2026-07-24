@@ -1,0 +1,104 @@
+# Relevant Launch Commands
+
+This file is a curated command record for the recovered S7 line and nearby recovery targets.
+
+It is not a full raw PowerShell history export. Unrelated commands, credentials, tokens, proxy settings, and personal shell history are intentionally excluded.
+
+## Formal S7 Full-Manifest Training
+
+Source: `recovery/launch_history/run_scripts/run_c3_formal_fullmanifest_s7_20260709.ps1`
+
+```powershell
+Set-Location "E:\perception\friction_affordance_field"
+$env:PYTHONPATH = "E:\perception\friction_affordance_field\src"
+$env:PYTHONUNBUFFERED = "1"
+$env:TEMP = "E:\perception_tmp"
+$env:TMP = "E:\perception_tmp"
+$env:TORCH_HOME = "E:\perception_cache\torch"
+& "D:\NMI_SPWFM_datasets\conda_envs\faf_paper\python.exe" -u train.py --config "configs\c3_farnet\c3_farnet_formal_fullmanifest_source_reliable_router_s7_20260709.yaml"
+```
+
+Formal output directory:
+
+```text
+E:\perception_outputs\rscd_surface_classification\c3_farnet_formal_fullmanifest_source_reliable_router_s7_20260709
+```
+
+## Formal S7 Exact-Pass Training
+
+Source: `recovery/launch_history/run_scripts/run_c3_formal_exactpass_s7_20260709.ps1`
+
+```powershell
+Set-Location "E:\perception\friction_affordance_field"
+$env:PYTHONPATH = "E:\perception\friction_affordance_field\src"
+$env:PYTHONUNBUFFERED = "1"
+$env:TEMP = "E:\perception_tmp"
+$env:TMP = "E:\perception_tmp"
+$env:TORCH_HOME = "E:\perception_cache\torch"
+& "D:\NMI_SPWFM_datasets\conda_envs\faf_paper\python.exe" -u train.py --config "configs\c3_farnet\c3_farnet_formal_exactpass_source_reliable_router_s7_20260709.yaml"
+```
+
+Exact-pass output directory:
+
+```text
+E:\perception_outputs\rscd_surface_classification\c3_farnet_formal_exactpass_source_reliable_router_s7_20260709
+```
+
+## Formal S7 Watcher
+
+Source: `recovery/launch_history/run_scripts/watch_c3_formal_s7_20260709.ps1`
+
+```powershell
+$PidToCheck = 13808
+$OutDir = "E:\perception_outputs\rscd_surface_classification\c3_farnet_formal_fullmanifest_source_reliable_router_s7_20260709"
+Get-Process -Id $PidToCheck -ErrorAction SilentlyContinue
+nvidia-smi --query-gpu=name,memory.used,memory.total,utilization.gpu,temperature.gpu --format=csv,noheader
+Get-ChildItem $OutDir -Force
+Get-Content (Join-Path $OutDir "history.json") -Tail 80
+```
+
+## Historical `screen_local_physics_field_s8k_from_best`
+
+No original raw PowerShell launch command was found for this run.
+
+The following is a protocol-equivalent reconstruction from:
+
+```text
+recovery/checkpoint_lineage/screen_local_physics_field_s8k_from_best/protocol.json
+```
+
+It is not claimed to be the exact shell command originally typed.
+
+```powershell
+Set-Location "E:\perception\friction_affordance_field"
+& "D:\NMI_SPWFM_datasets\conda_envs\faf_paper\python.exe" scripts\run_rscd_surface_classification.py `
+  --train-manifest "data\manifests_full\rscd_prepared_train.csv" `
+  --val-manifest "data\manifests_full\rscd_prepared_val.csv" `
+  --test-manifest "data\manifests_full\rscd_prepared_test.csv" `
+  --output-dir "D:\NMI_SPWFM_datasets\friction_affordance_outputs\rscd_surface_classification\screen_local_physics_field_s8k_from_best" `
+  --backbone "convnext_tiny" `
+  --embedding-dim 768 `
+  --image-size 192 `
+  --batch-size 8 `
+  --grad-accum-steps 2 `
+  --epochs 1 `
+  --lr 0.000002 `
+  --weight-decay 0.01 `
+  --dropout 0.2 `
+  --use-physics-branch `
+  --physics-dim 96 `
+  --physics-quality-cues `
+  --use-semantic-physics-attention-branch `
+  --semantic-physics-attention-dim 64 `
+  --use-local-physics-field-branch `
+  --local-physics-field-dim 64 `
+  --local-physics-field-scale 0.08 `
+  --hflip-consistency-weight 0.0 `
+  --max-val-samples-per-class 300 `
+  --max-test-samples-per-class 300 `
+  --seed 109 `
+  --num-workers 2 `
+  --resume-from "D:\NMI_SPWFM_datasets\friction_affordance_outputs\rscd_surface_classification\screen_semantic_attention_line_fourier_directed_conf001_s8k_from_best\best.pt"
+```
+
+The recorded `resume_from` path is an untraced earlier ancestor in this recovery pass.
